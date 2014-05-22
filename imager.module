@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Module for the Ticket Entity - a starting point to create your own Entity
+ * and associated administration interface
+ */  
+
+/**
+ * Implement hook_init
+ */
+function imager_init( ) {
+  $name = "dude";
+  return;
+}
+
+/**
+ * Implement hook_menu
+ */
+function imager_menu( ) {
+  $items['imager-save'] = array(
+    'page callback' => 'imager_save_response',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return;
+}
+
+function imager_save_response($type = 'ajax', $nid = 0) {
+  // this should have the image to be decoded
+  // how can I get the file ID?
+
+  return $output;  // What is the output - a save response to update a status field?, yes.
+}
+
+function imager_load_js_css($css_selector) {
+  drupal_add_js ('misc/jquery.form.js',                                                    array('weight' => 1001));
+  drupal_add_library ('system', 'drupal.ajax');
+
+  $modulePath = drupal_get_path('module', 'imager');
+  drupal_add_js(
+    array(
+      'imager' => array(
+        'rootURL' => $GLOBALS['base_root'] . $GLOBALS['base_path'],
+        'modulePath' => $modulePath,
+        'cssSelector' => $css_selector,
+        'viewMode' => 'media_imager',
+      ),
+    ),
+    'setting'
+  );
+  drupal_add_js ($modulePath . '/js/hoverintent.js',                                       array('weight' => 1003));
+  drupal_add_js ($modulePath . '/js/jquery.imgareaselect/scripts/jquery.imgareaselect.js', array('weight' => 1005));
+  drupal_add_js ($modulePath . '/js/screenfull.js',                                        array('weight' => 1007));
+  drupal_add_js ($modulePath . '/js/imager.js',                                            array('weight' => 1009));
+
+  drupal_add_css($modulePath . '/js/jquery.imgareaselect/css/imgareaselect-animated.css');
+  drupal_add_css($modulePath . '/css/imager.css');
+}
+
+function imager_views_pre_view(&$view, &$display_id, &$args) {
+  if (preg_match('/media_gallery/',$view->name)) {
+    imager_load_js_css('.imager > a > img');
+  }
+  return;
+}
+
+function imager_views_pre_render(&$view) {
+  return;
+}
+

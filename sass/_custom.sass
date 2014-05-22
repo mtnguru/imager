@@ -1,0 +1,89 @@
+//
+// Custom sass variables and mixins
+//
+// Variables
+// -----------------------------------------------------------------------------
+// The variables set here serve only as example of how you can use SASS variables
+// to centralize and control frequently used styles more easily. Here you will
+// find variables for colors, fonts and the global gutter width.
+//
+// Mixins
+// -----------------------------------------------------------------------------
+// To use a mixin in this file, add this line to the top of your .scss file:
+//   @import "base"; (_base.scss imports _custom.scss).
+//
+// Then to use a mixin for a particular rule, add this inside the ruleset's
+// curly brackets:
+//   @include mix-in-name;
+//
+
+//
+// Color Variables
+// Colors used in the sample global.styles. You can use these to recolor many
+// elements such as forms, tables, tabs etc.
+//
+
+// Site theme colors
+//  greys
+$white:        #ffffff
+$lightgrey:    #dddddd
+$grey:         #aaaaaa
+$darkgrey:     #444444
+
+$medium_light: #ebebeb    // table row even active
+$medium_dark:  #e5e5e5    // table thead
+//  browns
+$brown:        #6f3d10
+$lighterbrown: #e1d0c5
+$lightbrown:   #ede0d2
+$faintbrown:   #f9f0e7
+$darkbrown:    #341005
+//  tans
+$tan:          #f3e49f
+$yellowtan:    #ffffbb
+$fainttan:     #fff5cc
+$lighttan:     #fae9ba  
+//  greens
+$faintgreen:   #dcffdc
+$lightgreen:   #c0f0c0
+$green:        #22ff22
+$darkgreen:    #006000
+//  blues
+$faintblue:    #e6e6f6
+$darkblue:     #0000aa
+$blue:         #aaaaff
+$lightblue:    #ccccff
+$cyan:         #33ffff
+//  purples
+$faintpurple:  #f0e0ff     
+$lightpurple:  #f0c0ff     
+$purple:       #d0a0ef     
+//  reds
+$red:          #ff0000
+$lightred:     #ffaaaa
+$faintred:     #ffcccc
+//  oranges
+$orange:       #da4119
+$lightorange:  #ffcda0
+$faintorange:  #ffddbb
+//  yellows
+$faintyellow:  #f9e9d9
+$lightyellow:  #ffffbb
+$yellow:       #ffff55
+
+// table rows?
+$medium_light: #ebebeb    // table row even active
+$medium_dark:  #e5e5e5    // table thead
+
+
+$page:        $lightyellow  // to match the page background, default is white
+$body:        $faintgreen
+$columns:     $tan
+$block-inner: $lighttan
+$views-row:   $lighttan
+$shadow:      $darkbrown
+
+//$page:         #ff00ff  // to match the page background, default is white
+$border:       $brown       // all borders set in global.styles - tables, fieldset, primary links
+$highlight:    #c00       // required mark, form error highlight, "new" label on comments
+
