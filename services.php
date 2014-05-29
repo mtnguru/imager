@@ -14,10 +14,11 @@ if ($_POST && $_POST['action']) {
   $cli = false;
 } else {
   $cli = true;
-  $_POST['action']    = 'display-entity';
-  $_POST['uri']       = "http://d/c16/sites/c16/files/image/2014:01:04/2014:01:04_09:08:30_0_12_1_1_1.jpg";
-  $_POST['viewMode']  = 'DS Medium';
-  $_POST['imgBase64'] = 'bogus image file';
+  $_POST['action']     = 'display-entity';
+  $_POST['uri']        = "http://d/c16/sites/c16/files/image/2014:01:04/2014:01:04_09:08:30_0_12_1_1_1.jpg";
+  $_POST['viewMode']   = 'DS Medium';
+  $_POST['imgBase64']  = 'bogus image file';
+  $_POST['drupalRoot'] = '/home/eco/d7';
 }
 if ($cli == true) print "starting services.php\n";
 $action    = $_POST['action'];
@@ -37,8 +38,11 @@ $tzoffset = -21600;
 try {
   bootstrapDrupal();
   switch ($action) {
-    case 'display-entity': displayEntity(); break;
-    case 'save-file':     saveFile();     break;
+    case 'display-entity':       displayEntity(); break;
+    case 'save-file':            saveFile();      break;
+    case 'edit-form-load':       editFormLoad();  break;
+    case 'edit-form-field-load': editFormFieldLoad();  break;
+    case 'delete-file':          deleteFile();  break;
   }
   print json_encode($out);
 } 
@@ -61,6 +65,7 @@ function displayEntity() {
   global $out;
   global $cli;
   if ($cli) print "starting displayEntity\n";
+  $iconPath = drupal_get_path('module', 'imager') . '/icons';
   $uri       = urldecode($_POST['uri']);
   $cmp = extractPathComponents($uri);
   $puri = "public://$cmp[dir]/$cmp[filename].$cmp[suffix]";
@@ -70,8 +75,32 @@ function displayEntity() {
   $fid = getFid($puri);
   $out['debug'] .= "fid: " . $fid . "<br>\n";
   $file = file_load($fid);
+//$user = user_load($file->field_who[und][0]['target_id']);
+//$file->field_who[und][0]['entity'] = $user;
   $viewMode = $_POST['viewMode'];
-  $out['data'] = drupal_render(file_view($file,$viewMode));
+  $modulePath = $_POST['modulePath'];
+  $view = file_view($file,$viewMode);
+
+  $common = "class='imager-info-edit' src='$modulePath/icons/edit.png'";
+  $view['field_file_image_title_text']['#prefix'] = "<img id='imager-field-file-image-title-text' $common />";
+  $view['field_who']['#prefix']                   = "<img id='imager-field-who' $common />";
+  $view['field_how']['#prefix']                   = "<img id='imager-field-who' $common />";
+  $view['field_what']['#prefix']                  = "<img id='imager-field-what' $common />";
+  $view['field_create_date']['#prefix']           = "<img id='imager-field-create-date' $common />";
+  $view['field_status']['#prefix']                = "<img id='imager-field-status' $common />";
+  $view['field_detail']['#prefix']                = "<img id='imager-field-detail' $common />";
+
+  // Geometry and filesize added by ecoMedia module - cannot be edited
+  $view['field_geometry']['#prefix'] = "<img id='imager-field-geometry' " .
+            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+  $view['field_filename']['#prefix'] = "<img id='imager-field-filename' " .
+            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+  $view['field_owner']['#prefix']    = "<img id='imager-field-owner' " .
+            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+  $view['field_filesize']['#prefix'] = "<img id='imager-field-filesize' " .
+            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+
+  $out['data'] = drupal_render($view);
 }
 
 /**
@@ -79,10 +108,59 @@ function displayEntity() {
  * @global type $out
  * @param type $uri
  */
-function saveFile($uri) {
+function editFormLoad() {
   global $out;
-  global $drupalRoot;
-  global $sitename;
+  global $cli;
+  if ($cli) print "starting editFormLoad\n";
+  $uri       = urldecode($_POST['uri']);
+  $cmp = extractPathComponents($uri);
+  $puri = "public://$cmp[dir]/$cmp[filename].$cmp[suffix]";
+  $out['debug'] .= "uri: " . $uri . "<br>\n";
+  $out['debug'] .= "public uri: " . $puri . "<br>\n";
+
+  $fid = getFid($puri);
+  $out['debug'] .= "fid: " . $fid . "<br>\n";
+  $file = file_load($fid);
+//$viewMode = $_POST['viewMode'];
+//$out['data'] = drupal_render(drupal_get_form('imager_file_entity_edit',$file));
+  $form_id = 'imager_file_entity_edit';
+  $out['data'] = drupal_render(drupal_get_form($form_id,$file));
+}
+/**
+ * 
+ * @global type $out
+ * @param type $uri
+ */
+function editFormFieldLoad() {
+  global $out;
+  global $cli;
+  if ($cli) print "starting editFormFieldLoad\n";
+  $fieldname = preg_replace('/\-/','_',$_POST['field']);
+  $uri       = urldecode($_POST['uri']);
+  $cmp = extractPathComponents($uri);
+  $puri = "public://$cmp[dir]/$cmp[filename].$cmp[suffix]";
+  $out['debug'] .= "field: " . $fieldname . "<br>\n";
+  $out['debug'] .= "uri: " . $uri . "<br>\n";
+  $out['debug'] .= "public uri: " . $puri . "<br>\n";
+
+  $fid = getFid($puri);
+  $out['debug'] .= "fid: " . $fid . "<br>\n";
+  $file = file_load($fid);
+  $form_id = 'imager_file_entity_edit';
+  $form = drupal_get_form($form_id,$file);
+//$viewMode = $_POST['viewMode'];
+//$out['data'] = drupal_render(drupal_get_form('imager_file_entity_edit',$file));
+  $field = $form[$fieldname];
+  $out['data'] = drupal_render($field);
+}
+
+/**
+ * 
+ * @global type $out
+ * @param type $uri
+ */
+function saveFile() {
+  global $out;
   $overwrite = $_POST['overwrite'];
   $uri       = urldecode($_POST['uri']);
 
@@ -99,7 +177,7 @@ function saveFile($uri) {
 
   $file = file_load($fid);
   if ($overwrite == "true") {      
-    $path = "$drupalRoot/sites/$sitename/files/$cmp[dir]/$cmp[file].$cmp[suffix]";
+    $path = "$_POST[drupalRoot]/sites/$_POST[sitename]/files/$cmp[dir]/$cmp[file].$cmp[suffix]";
     $out['info'] = "File $path overwritten<br>\n";
     system("rm $path");
   } else {
@@ -110,7 +188,7 @@ function saveFile($uri) {
     $out['debug'] .= "new uri: " . $nuri . "<br>\n";
     $file->uri = $nuri;
     $file->filename = $nfilename . '.' . $cmp['suffix'];
-    $path = "$drupalRoot/sites/$sitename/files/$cmp[dir]/$nfilename.$cmp[suffix]";
+    $path = "$_POST[drupalRoot]/sites/$_POST[sitename]/files/$cmp[dir]/$nfilename.$cmp[suffix]";
     $out['info'] = "Saved new file $path<br>\n";
   }
   $filteredData = explode(',', $_POST['imgBase64']);
@@ -126,6 +204,25 @@ function saveFile($uri) {
 
   file_save($file);  // Save/Resave the file in Drupal
 }
+
+
+function deleteFile() {
+  global $out;
+  $uri       = urldecode($_POST['uri']);
+  $out['debug'] .= "deleteFile() start uri: " . $uri . "<br>\n";
+  $cmp = extractPathComponents($uri);
+  
+  $puri = "public://$cmp[dir]/$cmp[filename].$cmp[suffix]";
+  $out['debug'] .= "deleteFile() public uri: " . $puri . "<br>\n";
+
+  $fid = getFid($puri);
+  $out['debug'] .= "deleteFile() fid: " . $fid . "<br>\n";
+
+  $file = file_load($fid);
+  $force = TRUE;
+  file_delete($file,$force);
+}
+
 
 function extractPathComponents($uri) {
   global $out;
@@ -168,24 +265,19 @@ function getFid($puri) {
 function bootstrapDrupal () {
   global $out;
   global $cli;
-  global $drupalRoot;
-  global $sitename;
-  $user = "eco";
-  $host = "ecosleuth.com";   // Not needed, anything should work here
-  $sitename = "e2";
+  global $user;
 
-  $drupalRoot = "/home/eco/d7";
-  $bootstrap  = "includes/bootstrap.inc";
-  $siteRoot   = "$drupalRoot/sites/$sitename";
+
   $_SERVER['SCRIPT_NAME'] = "/bin/services.php";  // Path must start with a /
-  $_SERVER['REMOTE_ADDR'] = $host;
-  $_SERVER['HTTP_HOST']   = $sitename;
+  $_SERVER['REMOTE_ADDR'] = 'anything.com';
+  $_SERVER['HTTP_HOST']   = $_POST['siteName'];
 
-  chdir($drupalRoot);
-  define('DRUPAL_ROOT', $drupalRoot);
+  chdir($_POST['drupalRoot']);
+  define('DRUPAL_ROOT', $_POST['drupalRoot']);
 
-  require_once $bootstrap;
+  require_once "includes/bootstrap.inc";
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  $user->uid = $_POST['uid'];
   $out['debug'] .= "bootstrapDrupal() - done<br>\n";
   if ($cli) print "\n"; // Start a new line, drupal_bootstrap outputs a space somewhere
 }
@@ -201,12 +293,10 @@ function bootstrapDrupal () {
  */
 function makeUniqFilepath ($cmp) {
   global $out;
-  global $drupalRoot;
-  global $sitename;
   $n = 0;
   do {
     $n++;
-    $path = "$drupalRoot/sites/$sitename/files/$cmp[dir]/$cmp[filename]_$n.$cmp[suffix]";
+    $path = "$_POST[drupalRoot]/sites/$_POST[sitename]/files/$cmp[dir]/$cmp[filename]_$n.$cmp[suffix]";
     $out['debug'] .= "makeUniqFilepath()  " . $path . "<br>\n";
   } while (file_exists($path));
   return $cmp[filename] . "_" . $n;

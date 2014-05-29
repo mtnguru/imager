@@ -10,7 +10,6 @@
  * Implement hook_init
  */
 function imager_init( ) {
-  $name = "dude";
   return;
 }
 
@@ -18,12 +17,12 @@ function imager_init( ) {
  * Implement hook_menu
  */
 function imager_menu( ) {
-  $items['imager-save'] = array(
-    'page callback' => 'imager_save_response',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
+//$items['imager-save'] = array(
+//  'page callback' => 'imager_save_response',
+//  'access callback' => 'user_access',
+//  'access arguments' => array('access content'),
+//  'type' => MENU_CALLBACK,
+//);
   return;
 }
 
@@ -34,34 +33,39 @@ function imager_save_response($type = 'ajax', $nid = 0) {
   return $output;  // What is the output - a save response to update a status field?, yes.
 }
 
-function imager_load_js_css($css_selector) {
+function imager_load_js_css($cssSelector,$viewMode) {
+  global $user;
   drupal_add_js ('misc/jquery.form.js',                                                    array('weight' => 1001));
   drupal_add_library ('system', 'drupal.ajax');
 
-  $modulePath = drupal_get_path('module', 'imager');
+$modulePath = drupal_get_path('module', 'imager');
   drupal_add_js(
     array(
       'imager' => array(
-        'rootURL' => $GLOBALS['base_root'] . $GLOBALS['base_path'],
-        'modulePath' => $modulePath,
-        'cssSelector' => $css_selector,
-        'viewMode' => 'media_imager',
+        'modulePath'  => $modulePath,
+        'cssSelector' => $cssSelector,
+        'viewMode'    => $viewMode,
+        'drupalRoot'  => $_SERVER['DOCUMENT_ROOT'],
+        'baseUrl'     => $GLOBALS['base_url'],
+        'basePath'    => $GLOBALS['base_path'],
+        'siteName'    => preg_replace('/\//','',$GLOBALS['base_path']),
+        'uid'         => $user->uid,
       ),
     ),
     'setting'
   );
-  drupal_add_js ($modulePath . '/js/hoverintent.js',                                       array('weight' => 1003));
-  drupal_add_js ($modulePath . '/js/jquery.imgareaselect/scripts/jquery.imgareaselect.js', array('weight' => 1005));
-  drupal_add_js ($modulePath . '/js/screenfull.js',                                        array('weight' => 1007));
-  drupal_add_js ($modulePath . '/js/imager.js',                                            array('weight' => 1009));
+  drupal_add_js ($modulePath . '/js/hoverintent.js',          array('weight' => 1003));
+  drupal_add_js ($modulePath . '/js/jquery.imgareaselect.js', array('weight' => 1005));
+  drupal_add_js ($modulePath . '/js/screenfull.js',           array('weight' => 1007));
+  drupal_add_js ($modulePath . '/js/imager.js',               array('weight' => 1009));
 
-  drupal_add_css($modulePath . '/js/jquery.imgareaselect/css/imgareaselect-animated.css');
+  drupal_add_css($modulePath . '/css/imgareaselect-animated.css');
   drupal_add_css($modulePath . '/css/imager.css');
 }
 
 function imager_views_pre_view(&$view, &$display_id, &$args) {
   if (preg_match('/media_gallery/',$view->name)) {
-    imager_load_js_css('.imager > a > img');
+    imager_load_js_css('.imager > a > img','media_imager');
   }
   return;
 }
@@ -70,3 +74,266 @@ function imager_views_pre_render(&$view) {
   return;
 }
 
+
+
+/**
+ * Implement hook_theme
+ */
+function imager_theme( ) {
+  return array(
+    'imager_file_entity_edit' => array(
+      'render element' => 'form',
+      'template' => 'imager-file-entity-edit',
+      'path' => drupal_get_path('module','imager'),
+    ),
+  );
+}
+
+/**
+ * Page callback: Form constructor for the file edit form.
+ *
+ * Path: file/%file/edit
+ *
+ * @param object $file
+ *   A file object from file_load().
+ *
+ * @see file_entity_menu()
+ *
+ * @todo Rename this form to file_edit_form to ease into core.
+ */
+function imager_file_entity_edit($form, &$form_state, $file) {
+  drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $file->type, '@title' => $file->filename)), PASS_THROUGH);
+
+  $form_state['file'] = $file;
+
+  $form['#attributes']['class'][] = 'file-form';
+  if (!empty($file->type)) {
+    $form['#attributes']['class'][] = 'file-' . $file->type . '-form';
+  }
+
+  // Basic file information.
+  // These elements are just values so they are not even sent to the client.
+  foreach (array('fid', 'type', 'uid', 'timestamp') as $key) {
+    $form[$key] = array(
+      '#type' => 'value',
+      '#value' => isset($file->$key) ? $file->$key : NULL,
+    );
+  }
+
+  $form['filename'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#default_value' => $file->filename,
+    '#required' => TRUE,
+    '#maxlength' => 255,
+    '#weight' => -10,
+  );
+
+  /*
+  // Add a 'replace this file' upload field if the file is writeable.
+  if (file_entity_file_is_writeable($file)) {
+    // Set up replacement file validation.
+    $replacement_options = array();
+    // The replacement file must have the same extension as the original file.
+    $replacement_options['file_extensions'] = pathinfo($file->uri, PATHINFO_EXTENSION);
+
+    $form['replace_upload'] = array(
+      '#type' => 'file',
+      '#title' => t('Replace file'),
+      '#description' => t('This file will replace the existing file. This action cannot be undone.'),
+      '#upload_validators' => file_entity_get_upload_validators($replacement_options),
+      '#pre_render' => array('file_entity_upload_validators_pre_render'),
+    );
+  }
+
+  $form['preview'] = file_view_file($file, 'preview'); */
+
+  $form['additional_settings'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 99,
+  );
+
+  // File destination information for administrators
+  $form['destination'] = array(
+    '#type' => 'fieldset',
+    '#access' => user_access('administer files') && file_entity_file_is_writeable($file),
+    '#title' => t('Destination'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    '#attributes' => array(
+      'class' => array('file-form-destination'),
+    ),
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'file_entity') . '/file_entity.js',
+      ),
+    ),
+  );
+
+  $options = array();
+  foreach (file_get_stream_wrappers(STREAM_WRAPPERS_WRITE_VISIBLE) as $scheme => $info) {
+    $options[$scheme] = check_plain($info['name']);
+  }
+
+  $form['destination']['scheme'] = array(
+    '#type' => 'radios',
+    '#title' => t('Destination'),
+    '#options' => $options,
+    '#default_value' => file_uri_scheme($file->uri),
+  );
+
+  // File user information for administrators
+  $form['user'] = array(
+    '#type' => 'fieldset',
+    '#access' => user_access('administer files'),
+    '#title' => t('User information'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    '#attributes' => array(
+      'class' => array('file-form-user'),
+    ),
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'file_entity') . '/file_entity.js',
+        array(
+          'type' => 'setting',
+          'data' => array('anonymous' => variable_get('anonymous', t('Anonymous'))),
+        ),
+      ),
+    ),
+    '#weight' => 90,
+  );
+  $form['user']['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Associated with'),
+    '#maxlength' => 60,
+    '#autocomplete_path' => 'user/autocomplete',
+    '#default_value' => !empty($file->uid) ? user_load($file->uid)->name : '',
+    '#weight' => -1,
+    '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+  );
+
+  // Add the buttons.
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#weight' => 5,
+    '#submit' => array('imager_file_entity_edit_submit'),
+  );
+  $form['actions']['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
+    '#weight' => 10,
+    '#submit' => array('imager_file_entity_edit_delete_submit'),
+    '#access' => file_entity_access('delete', $file),
+  );
+
+  // Build the URL for the cancel button taking into account that there might be
+  // a "destination" that includes query string variables.
+  $parameters = drupal_get_query_parameters();
+  $destination = isset($parameters['destination']) ? $parameters['destination'] : 'file/' . $file->fid;
+  $url = drupal_parse_url($destination);
+
+  $form['actions']['cancel'] = array(
+    '#type' => 'link',
+    '#title' => t('Cancel'),
+    '#href' => $url['path'],
+    '#options' => array('query' => $url['query']),
+    '#weight' => 15,
+  );
+
+  $langcode = function_exists('entity_language') ? entity_language('file', $file) : NULL;
+  field_attach_form('file', $file, $form, $form_state, $langcode);
+
+  return $form;
+}
+
+/**
+ * Form validation handler for imager_file_entity_edit().
+ */
+function imager_file_entity_edit_validate($form, &$form_state) {
+  $file = (object) $form_state['values'];
+
+  // Validate the "associated user" field.
+  if (!empty($file->name) && !($account = user_load_by_name($file->name))) {
+    // The use of empty() is mandatory in the context of usernames
+    // as the empty string denotes the anonymous user. In case we
+    // are dealing with an anonymous user we set the user ID to 0.
+    form_set_error('name', t('The username %name does not exist.', array('%name' => $file->name)));
+  }
+
+  // Handle the replacement file if uploaded.
+  if (isset($form_state['values']['replace_upload'])) {
+    // Save the file as a temporary file.
+    $file = file_save_upload('replace_upload', $form['replace_upload']['#upload_validators']);
+    if (!empty($file)) {
+      // Put the temporary file in form_values so we can save it on submit.
+      $form_state['values']['replace_upload'] = $file;
+    }
+    elseif ($file === FALSE) {
+      // File uploaded failed.
+      form_set_error('replace_upload', t('The replacement file could not be uploaded.'));
+    }
+  }
+
+  // Run entity form validation.
+  entity_form_field_validate('file', $form, $form_state);
+}
+
+/**
+ * Form submission handler for the 'Save' button for file_entity_edit().
+ */
+function imager_file_entity_edit_submit($form, &$form_state) {
+  $file = $form_state['file'];
+
+  // Check if a replacement file has been uploaded.
+  if (!empty($form_state['values']['replace_upload'])) {
+    $replacement = $form_state['values']['replace_upload'];
+    // Move file from temp to permanent home.
+    file_unmanaged_copy($replacement->uri, $file->uri, FILE_EXISTS_REPLACE);
+  }
+
+  // Run entity form submit handling and save the file.
+  entity_form_submit_build_entity('file', $file, $form, $form_state);
+
+  // A user might assign the associated user by entering a user name in the file
+  // edit form, which we then need to translate to a user ID.
+  if (isset($file->name)) {
+    // The use of isset() is mandatory in the context of user IDs, because
+    // user ID 0 denotes the anonymous user.
+    if ($user = user_load_by_name($file->name)) {
+      $file->uid = $user->uid;
+    }
+    else {
+      $file->uid = 0; // anonymous user
+    }
+  }
+  elseif ($file->uid) {
+    $user = user_load($file->uid);
+    $file->name = $user->name;
+  }
+
+  if (file_uri_scheme($file->uri) != $form_state['values']['scheme']) {
+    if ($moved_file = file_move($file, $form_state['values']['scheme'] . '://' . file_uri_target($file->uri), FILE_EXISTS_RENAME)) {
+      // Only re-assign the file object if file_move() did not fail.
+      $file = $moved_file;
+    }
+  }
+
+  file_save($file);
+
+  $args = array(
+    '@type' => file_entity_type_get_name($file),
+    '%title' => entity_label('file', $file),
+  );
+  watchdog('file', '@type: updated %title.', $args);
+  drupal_set_message(t('@type %title has been updated.', $args));
+
+  $form_state['redirect'] = 'file/' . $file->fid;
+
+  // Clear the page and block caches.
+  cache_clear_all();
+}

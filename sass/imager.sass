@@ -69,8 +69,10 @@
       @include pa-border(12px,3px,$lightblue)
       padding: 2px 2px
       img
-        margin: 0 2px
-        padding: 1px 4px
+        display: block
+        margin: 2px 2px
+        padding: 2px 4px
+        clear: both
         float: none
         border-radius: 6px
       .checked
@@ -112,7 +114,7 @@
   z-index: 1005
   right: 5px
   top: 5px
-  padding: 10px
+  padding: 5px 10px
   max-width: 800px
   .title
     color: $brown 
@@ -129,6 +131,41 @@
   .error
     background-color: $red
     color: white
+  #imager-info-buttons
+    float: right
+    @include pa-border(12px,3px,$lightblue)
+    z-index: 1100
+    padding: 0 5px
+    img
+      float: left
+      padding: 5px
+  #imager-info-geometry
+    clear: both
+  #imager-info-content
+    img.imager-info-edit
+      float: left
+      clear: both
+      margin: 0 5px 3px 0
+    section
+      float: left
+
+#imager-edit.hide
+  right: 100000px
+#imager-edit
+  @include pi-border(15px,3px,$darkgreen)
+  position: fixed
+  right: 5px
+  top: 6px
+  padding: 5px 5px
+  z-index: 1010
+  #imager-edit-buttons
+    float: right
+    @include pa-border(12px,3px,$lightblue)
+    z-index: 1100
+    padding: 0 5px
+    img
+      float: left
+      padding: 5px
 
 #imager-messages.hide
   left: 100000px
@@ -205,3 +242,13 @@
   font-style: italic
   color: $lightgrey
   float: right
+
+#imager-busy
+  position: fixed
+  top: 400px
+  left: 600px
+  z-index: 1100    
+
+
+.field-name-field-detail 
+  float: left

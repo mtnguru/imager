@@ -12,18 +12,18 @@
       if ($thumbnails.length == 0) return; // No thumbnails found, exit 
 
       var modulePath  = Drupal.settings.imager.modulePath;   // Path to the imager module
-      var drupalViewMode    = Drupal.settings.imager.viewMode;  // Drupal display mode to render file entity popup
 
-      var $imgWrapper;    // Wrapper around all imager html divs
-      var $imgOverlay;    // Div containing the popup image and buttons
-      var $imgCanvas;     // canvas with current displayed image
-      var $imgCanvas2;    // canvas with original full image - never shown
-      var $imgInfo;       // popup for displaying text information
-      var $imgBrightness; // brightness slider popup
-      var $imgColor;      // hsl color slider popup
-      var $imgStatus;     // Status or debug popup
-      var $imgMessages;   // Debug response debug popup
-      var $imgFilesave;   // Debug response debug popup
+      var $imagerWrapper;    // Wrapper around all imager html divs
+      var $imagerOverlay;    // Div containing the popup image and buttons
+      var $imagerCanvas;     // canvas with current displayed image
+      var $imagerCanvas2;    // canvas with original full image - never shown
+      var $imagerInfo;       // popup for displaying text information
+      var $imagerEdit;       // popup for displaying text information
+      var $imagerBrightness; // brightness slider popup
+      var $imagerColor;      // hsl color slider popup
+      var $imagerStatus;     // Status or debug popup
+      var $imagerMessages;   // Debug response debug popup
+      var $imagerFilesave;   // Debug response debug popup
       var ias;            // imgAreaSelect instance
       var ctx;            // canvas context
       var ctx2;           // canvas context of original unshown image
@@ -31,8 +31,8 @@
       var cimg = document.createElement('IMG');
       var imgs = [];      // file paths and titles of all matched images on page
       var nimgs = 0;      // number of images
-      var imgSrc = '';    // src path for current image
-      var imgTitle = '';  // Image title from attr data-title
+      var imagerSrc = '';    // src path for current image
+      var imagerTitle = '';  // Image title from attr data-title
       var viewMode = 0;     // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
       var editMode = 0;     // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
       var elapsed = 0;      // # elapsed msec since last mouse up
@@ -86,43 +86,43 @@
                <div id="button-wrapper"> \
                  <div id="image-buttons" class="buttons"> \
                    <div>Image</div> \
-                   <img title="View image to the left" alt="" id="image-left"  src="' + modulePath + '/icons/left_arrow.png"><br> \
-                   <img title="View image to the right" alt="" id="image-right" src="' + modulePath + '/icons/right_arrow.png"><br> \
+                   <img title="View image to the left" alt="" id="image-left"  src="' + modulePath + '/icons/left_arrow.png"> \
+                   <img title="View image to the right" alt="" id="image-right" src="' + modulePath + '/icons/right_arrow.png"> \
                    <img title="Exit image popup" alt="" id="image-exit" src="' + modulePath + '/icons/exit.png"> \
                  </div> \
                  <div id="mode-buttons" class="buttons"> \
                    <div>Mode</div> \
-                   <img title="View Image" alt="" id="mode-view"   class="checked" src="' + modulePath + '/icons/eye.png"><br> \
+                   <img title="View Image" alt="" id="mode-view"   class="checked" src="' + modulePath + '/icons/eye.png"> \
                    <img title="Edit Image - locked" alt="" id="mode-lock"   src="' + modulePath + '/icons/lock.png"> \
                  </div> \
                  <div id="view-buttons" class="buttons"> \
                    <div>View</div> \
-                   <img title="Zoom In"  alt="" id="view-zoom-in"    src="' + modulePath + '/icons/zoomin.png"><br> \
-                   <img title="Zoom Out" alt="" id="view-zoom-out"  src="' + modulePath + '/icons/zoomout.png"><br> \
-                   <img title="View full screen" alt="" id="view-fullscreen"   src="' + modulePath + '/icons/fullscreen.png"><br> \
-                   <img title="View description of this image" alt="" id="view-info" src="' + modulePath + '/icons/question.png"> \
+                   <img title="View description of this image" alt="" id="view-info" src="' + modulePath + '/icons/information.png"> \
+                   <img title="View full screen" alt="" id="view-fullscreen"   src="' + modulePath + '/icons/fullscreen.png"> \
+                   <img title="Zoom In"  alt="" id="view-zoom-in"    src="' + modulePath + '/icons/zoomin.png"> \
+                   <img title="Zoom Out" alt="" id="view-zoom-out"  src="' + modulePath + '/icons/zoomout.png"> \
                  </div> \
                  <div id="edit-buttons" class="buttons"> \
                    <div>Edit</div> \
-                   <img title="Start crop - select area" alt="" id="mode-crop" src="' + modulePath + '/icons/frame.png"><br> \
-                   <img title="Crop selected area" alt="" id="edit-crop" src="' + modulePath + '/icons/scissors.png"><br> \
-                   <img title="Brightness/Contrast" alt="" id="edit-brightness" src="' + modulePath + '/icons/contrast.png"><br> \
-                   <img title="Adjust Color" alt="" id="edit-color" src="' + modulePath + '/icons/color_wheel.png"><br> \
-                   <img title="Rotate image 90 degrees counter-clockwise" alt="" id="edit-left"   src="' + modulePath + '/icons/rotate-left.png"><br> \
+                   <img title="Start crop - select area" alt="" id="mode-crop" src="' + modulePath + '/icons/frame.png"> \
+                   <img title="Crop selected area" alt="" id="edit-crop" src="' + modulePath + '/icons/scissors.png"> \
+                   <img title="Brightness/Contrast" alt="" id="edit-brightness" src="' + modulePath + '/icons/contrast.png"> \
+                   <img title="Adjust Color" alt="" id="edit-color" src="' + modulePath + '/icons/color_wheel.png"> \
+                   <img title="Rotate image 90 degrees counter-clockwise" alt="" id="edit-left"   src="' + modulePath + '/icons/rotate-left.png"> \
                    <img title="Rotate image 90 degrees clockwise" alt="" id="edit-right"  src="' + modulePath + '/icons/rotate-right.png"> \
+                   <img title="Reset Image"  alt="" id="view-reset" src="' + modulePath + '/icons/reset.png"> \
                  </div> \
                  <div id="file-buttons" class="buttons"> \
                    <div>File</div> \
-                   <img title="Edit image data" alt="" id="file-edit" class="disabled" src="' + modulePath + '/icons/edit.png"><br> \
-                   <img title="Delete image" alt="" id="file-delete" class="disabled" src="' + modulePath + '/icons/delete.png"><br> \
-                   <img title="Email image" alt="" id="file-email" class="disabled" src="' + modulePath + '/icons/mail.png"><br> \
-                   <img title="Send image to clipboard" alt="" id="file-clipboard" class="disabled" src="' + modulePath + '/icons/clipboard.png"><br> \
-                   <img title="Download original image to your computer" alt="" id="file-download" class="disabled" src="' + modulePath + '/icons/download.png"><br> \
+                   <img title="Email image" alt="" id="file-email" class="disabled" src="' + modulePath + '/icons/mail.png"> \
+                   <img title="Send image to clipboard" alt="" id="file-clipboard" class="disabled" src="' + modulePath + '/icons/clipboard.png"> \
+                   <img title="Download original image to your computer" alt="" id="file-download" src="' + modulePath + '/icons/download.png"> \
                    <img title="Save edited image" alt="" id="file-save" src="' + modulePath + '/icons/floppy.png"> \
+                   <img title="Delete image" alt="" id="file-delete" src="' + modulePath + '/icons/delete.png"> \
                  </div> \
                  <div id="debug-buttons" class="buttons"> \
                    <div>Debug</div> \
-                   <img title="Toggle status output" alt="" id="debug-status" src="' + modulePath + '/icons/bug.png"><br>\
+                   <img title="Toggle status output" alt="" id="debug-status" src="' + modulePath + '/icons/bug.png">\
                    <img title="Toggle debug messages" alt="" id="debug-messages" src="' + modulePath + '/icons/bug2.png"> \
                  </div> \
                </div> \
@@ -171,10 +171,10 @@
                      <td>Screen</td> \
                      <td id="canvas-resolution"></td> \
                      <td id="scale" rowspan="2"></td></tr> \
-                 <tr><td><input type="radio" name="resolution" value="image-cropped" checked="checked"> \
+                 <tr><td><input type="radio" name="resolution" value="image-cropped" disabled> \
                      </td><td>Displayed Image</td> \
                      <td id="image-display-resolution"></td></tr> \
-                 <tr><td><input type="radio" name="resolution" value="image-full"></td> \
+                 <tr><td><input type="radio" name="resolution" value="image-full" checked="checked"></td> \
                      <td>Full Image</td> \
                      <td id="image-full-resolution"> \
                      </td><td></td></tr> \
@@ -184,30 +184,42 @@
                <button id="file-save-cancel">Cancel</button> \
              </div> \
              <div id="imager-status" class="hide"></div> \
-             <div id="imager-info" class="hide"></div> \
+             <div id="imager-info" class="hide"> \
+               <div id="imager-info-content"></div> \
+               <div id="imager-info-buttons">  \
+                 <img title="Exit popup" alt="" id="imager-info-exit" src="' + modulePath + '/icons/exit.png"> \
+               </div> \
+             </div> \
+             <div id="imager-edit" class="hide"> \
+               <div id="imager-edit-content"></div> \
+               <div id="imager-edit-buttons">  \
+                 <img title="Apply and exit" alt="" id="imager-edit-apply" src="' + modulePath + '/icons/checkmark.png"> \
+                 <img title="Exit popup" alt="" id="imager-edit-exit" src="' + modulePath + '/icons/exit.png"> \
+               </div> \
+             </div> \
              <div id="imager-messages" class="hide"></div> \
              <canvas id="imager-canvas-org"></canvas> \
+             <img alt="" id="imager-busy" src="' + modulePath + '/icons/busy.gif"> \
            </div>');
         
     // Additional buttons for above, saved here
-    //               <img alt="" id="file-view"     src="icons/view.png"><br> \
-    //               <img title="Coming soon! - Zoom to fit" alt="" id="zoom-fit" class="disabled" src="icons/zoom.png"><br> \
-    //               <img title="Coming soon! - Zoom 1:1" alt="" id="zoom-1"      src="icons/zoom1.png"><br> \
-    //               <img title="Coming Soon! - Scale" alt="" id="edit-scale"  src="icons/scale.png"><br> \
-    //               <img title="Overwrite existing image" alt="" id="file-save"     src="icons/floppy_overwrite.png"> \
+    //   <img title="Zoom to fit" alt="" id="zoom-fit" class="disabled" src="icons/zoom.png"><br> \
+    //   <img title="Zoom 1:1" alt="" id="zoom-1"      src="icons/zoom1.png"><br> \
+    //   <img title="Scale" alt="" id="edit-scale"  src="icons/scale.png"><br> \
 
-        $imgWrapper    = $('#imager-wrapper');
-        $imgOverlay    = $('#imager-overlay');
-        $imgCanvas     = $('#imager-canvas');
-        $imgCanvas2    = $('#imager-canvas-org');
-        $imgInfo       = $('#imager-info');
-        $imgBrightness = $('#imager-brightness');
-        $imgColor      = $('#imager-color');
-        $imgStatus     = $('#imager-status');
-        $imgMessages   = $('#imager-messages');
-        $imgFilesave   = $('#imager-filesave');
-        ctx  = $imgCanvas[0].getContext('2d');
-        ctx2 = $imgCanvas2[0].getContext('2d');           
+        $imagerWrapper    = $('#imager-wrapper');
+        $imagerOverlay    = $('#imager-overlay');
+        $imagerCanvas     = $('#imager-canvas');
+        $imagerCanvas2    = $('#imager-canvas-org');
+        $imagerInfo       = $('#imager-info');
+        $imagerEdit       = $('#imager-edit');
+        $imagerBrightness = $('#imager-brightness');
+        $imagerColor      = $('#imager-color');
+        $imagerStatus     = $('#imager-status');
+        $imagerMessages   = $('#imager-messages');
+        $imagerFilesave   = $('#imager-filesave');
+        ctx  = $imagerCanvas[0].getContext('2d');
+        ctx2 = $imagerCanvas2[0].getContext('2d');           
         ias = $('#imager-canvas').imgAreaSelect({
           instance: true,
           disable: true,
@@ -215,28 +227,28 @@
           autoHide: false,
           hide: true,
           show: true,
-    //    onSelectEnd: function (img, selection) { }
         });
         if (localStorage.imgShowInfo     === "TRUE") {
           $('#view-info').addClass('checked');
-          $imgInfo.removeClass('hide');
+          $imagerInfo.removeClass('hide');
         }
         if (localStorage.imgShowStatus   === "TRUE") {
           $('#debug-status').addClass('checked');
-          $imgStatus.removeClass('hide');
+          $imagerStatus.removeClass('hide');
         }
         if (localStorage.imgShowDebug === "TRUE") {
           $('#debug-messages').addClass('checked');
-          $imgMessages.removeClass('hide');
+          $imagerMessages.removeClass('hide');
         }
+        $('#imager-busy').hide();
       };
 
       var updateStatus = function() {
         ptCUlT = ctx.transformedPoint(0,0);
         ptCLrT = ctx.transformedPoint(cw,ch);
         if (localStorage.imgShowStatus === "FALSE") return;
-        $imgStatus.html(
-          '<div>Image file: ' + decodeURIComponent(imgSrc.split('/').reverse()[0]) + '</div>' +
+        $imagerStatus.html(
+          '<div>Image file: ' + decodeURIComponent(imagerSrc.split('/').reverse()[0]) + '</div>' +
           '<span>' +
             '<table>' +
               '<tr><th>Name</th><th>Value</th></tr>' +
@@ -259,15 +271,15 @@
               '<tr><th>Name</th><th>Width</th><th>Height</th></tr>' +
               '<tr><td>Maximum Canvas</td><td>'   + parseInt(mw) + '</td><td>' + parseInt(mh) + '</td></tr>' +
               '<tr><td>Actual Canvas</td><td>'    + parseInt(cw) + '</td><td>' + parseInt(ch) + '</td></tr>' +
-              '<tr><td>Displayed Image</td><td>' + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
+              '<tr><td>Displayed Image</td><td>'  + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
               '<tr><td>Full Image</td><td>'+ iw + '</td><td>' + ih + '</td></tr>' +
             '</table>' +
           '</span>' +
           '<span>' +
             '<table>' +
               '<tr><th>Name</th><th>X</th><th>Y</th></tr>' +
-              '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>' + parseInt(ptNowC.y) + '</td></tr>' +
-              '<tr><td>Mouse Now Tx</td><td>' + parseInt(ptNowT.x) + '</td><td>' + parseInt(ptNowT.y) + '</td></tr>' +
+              '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>'  + parseInt(ptNowC.y) + '</td></tr>' +
+              '<tr><td>Mouse Now Tx</td><td>'  + parseInt(ptNowT.x) + '</td><td>'  + parseInt(ptNowT.y) + '</td></tr>' +
               '<tr><td>Mouse Down</td><td>'    + parseInt(ptDownC.x) + '</td><td>' + parseInt(ptDownC.y) + '</td></tr>' +
               '<tr><td>Mouse Down Tx</td><td>' + parseInt(ptDownT.x) + '</td><td>' + parseInt(ptDownT.y) + '</td></tr>' +
               '<tr><td>Upper Left Canvas Tx</td><td>'    + parseInt(ptCUlT.x)   + '</td><td>' + parseInt(ptCUlT.y)   + '</td></tr>' +
@@ -285,8 +297,9 @@
        * @returns {undefined}
        */
       var changeImage = function(src,evt) {
-        imgSrc = src;
+        imagerSrc = src;
         cimg.src = src;   // This begins loading the image - upon completion load event is fired
+        $('#imager-busy').show();
       }
 
       var initializeImage = function() {
@@ -308,7 +321,7 @@
         }
         ptDownC.x = cw/2;    // Just in case 
         ptDownC.y = ch/2;
-        $imgCanvas.attr({width:  cw,
+        $imagerCanvas.attr({width:  cw,
                          height: ch});
     //  setViewMode(0);
         setEditMode(0);
@@ -322,16 +335,17 @@
 
       // When image is loaded - load event is fired
       cimg.addEventListener('load', function () {
+        $('#imager-busy').hide();
         initializeImage();
     //  var nimg = Pixastic.process(cimg,"desaturate");
         redraw();                                        // Draw the image
-        $imgOverlay.removeClass('hide');               // Hide the image overlay 
+        $imagerOverlay.removeClass('hide');               // Hide the image overlay 
         if (localStorage.imgShowInfo === "TRUE") getInfo();                                       //
       }, false);
      
       var redraw = function(){
         ptCUlT = ctx.transformedPoint(0,0);
-        ptCLrT = ctx.transformedPoint($imgCanvas[0].width,$imgCanvas[0].height);
+        ptCLrT = ctx.transformedPoint($imagerCanvas[0].width,$imagerCanvas[0].height);
         cscale = cw / (ptCLrT.x - ptCUlT.x);
         ctx.clearRect(ptCUlT.x,
                       ptCUlT.y,
@@ -341,7 +355,7 @@
         // Alternatively:
     //       ctx.save();
     //       ctx.setTransform(1,0,0,1,0,0);
-    //       ctx.clearRect(0,0,$imgCanvas[0].width,$imgCanvas[0].height);
+    //       ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
     //       ctx.restore();
 
         ctx.drawImage(cimg,0,0);
@@ -372,13 +386,13 @@
         }
         if (rotation == 0 || rotation == 180) {
           calcCanvasDims(iw,ih);
-          $imgCanvas.attr({width:  cw,
+          $imagerCanvas.attr({width:  cw,
                              height: ch});
           cscale=cw/iw;
           ptNowC.x=cw/2; 
           ptNowC.y=ch/2;
           ctx.setTransform(1,0,0,1,0,0);
-          ctx.clearRect(0,0,$imgCanvas[0].width,$imgCanvas[0].height);
+          ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
           if (rotation == 180) {
             ctx.translate(cw,ch);
             ctx.rotate(angleInRadians(rotation));
@@ -388,13 +402,13 @@
           }
         } else {
           calcCanvasDims(ih,iw);
-          $imgCanvas.attr({width:  cw,
+          $imagerCanvas.attr({width:  cw,
                              height: ch});
           cscale=cw/ih;
           ptNowC.x=cw/2; 
           ptNowC.y=ch/2;
           ctx.setTransform(1,0,0,1,0,0);
-          ctx.clearRect(0,0,$imgCanvas[0].width,$imgCanvas[0].height);
+          ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
           if (rotation == 90) {
             ctx.translate(cw,0);
             ctx.rotate(angleInRadians(rotation));
@@ -405,7 +419,7 @@
         }
         ctx.scale(cscale,cscale);
         redraw();
-        $imgOverlay.removeClass('hide');
+        $imagerOverlay.removeClass('hide');
       };
 
       var angleInRadians = function(deg) {
@@ -486,20 +500,22 @@
         contrast = 0;
         $('#slider-brightness').val(brightness);
         $('#slider-contrast').val(contrast);
-        adjustBrightness($imgCanvas2,$imgCanvas);
+        adjustBrightness($imagerCanvas2,$imagerCanvas);
         updateStatus();
       }
 
       var applyBrightness = function() {
-        $imgCanvas2.attr({width:  iw,       // Set canvas to same size as image
+        $('#imager-busy').show();
+        $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
                          height: ih});
         ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
         ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
 
-        adjustBrightness($imgCanvas2,$imgCanvas2);
-        cimg.src = $imgCanvas2[0].toDataURL(); 
+        adjustBrightness($imagerCanvas2,$imagerCanvas2);
+        cimg.src = $imagerCanvas2[0].toDataURL(); 
         redraw();
         setEditMode(0);
+        $('#imager-busy').hide();
       }
 
       var adjustColor = function($cvssrc,$cvsdst) {
@@ -640,19 +656,21 @@
         $('#slider-hue').val(0);
         $('#slider-saturation').val(0);
         $('#slider-lightness').val(0);
-        adjustColor($imgCanvas2,$imgCanvas);
+        adjustColor($imagerCanvas2,$imagerCanvas);
       }
 
       function applyColor() {
-        $imgCanvas2.attr({width:  iw,     // Set image to be full size
+        $('#imager-busy').show();
+        $imagerCanvas2.attr({width:  iw,     // Set image to be full size
                             height: ih});
         ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
         ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
 
-        adjustColor($imgCanvas2,$imgCanvas2);
-        cimg.src = $imgCanvas2[0].toDataURL(); 
+        adjustColor($imagerCanvas2,$imagerCanvas2);
+        cimg.src = $imagerCanvas2[0].toDataURL(); 
         redraw();
         setEditMode(0);
+        $('#imager-busy').hide();
       }
 
     /*
@@ -673,15 +691,15 @@
         var niw = ptSLrT.x - ptSUlT.x;
         var nih = ptSLrT.y - ptSUlT.y;
 
-        $imgCanvas.attr({width:  niw,           // Make canvas same size as the image
+        $imagerCanvas.attr({width:  niw,           // Make canvas same size as the image
                            height: nih});
         ctx.clearRect(0,0,cw,ch);
         ctx.setTransform(1,0,0,1,0,0);
         ctx.drawImage(cimg,ptSUlT.x,ptSUlT.y,niw,nih,0,0,niw,nih);  // Copy cropped area from img into canvas
 
-        cimg.src = $imgCanvas[0].toDataURL();  // Copy canvas image back into img
+        cimg.src = $imagerCanvas[0].toDataURL();  // Copy canvas image back into img
         calcCanvasDims(niw,nih);                  // Calculate maximum size of canvas
-        $imgCanvas.attr({width:  cw,            // Make canvas proper size
+        $imagerCanvas.attr({width:  cw,            // Make canvas proper size
                            height: ch});
         ctx.scale(cw/niw,ch/nih);                 // Scale image to fit canvas
     //  ctx.drawImage(cimg,0,0);                 // Draw image, not necessary, it's already drawn
@@ -709,22 +727,36 @@
  */
       function getInfo() {
 //      var out = [];
-//      out.push({name: 'filename', value: imgSrc});
+//      out.push({name: 'filename', value: imagerSrc});
         
         processAjax({ action: 'display-entity',
-                      uri: imgSrc,
-                      viewMode: drupalViewMode,
+                      uri: imagerSrc,
+                      viewMode: Drupal.settings.imager.viewMode,
                     },function(response) {
           var status = response['status'];
           var txt = "";
-//        txt  = "<div class='title'>" + imgTitle + "</div>";
-//        txt += "<div class='filename'>" + imgSrc + "</div>";
-          $imgInfo.removeClass('error').removeClass('hide').empty();
+//        txt  = "<div class='title'>" + imagerTitle + "</div>";
+//        txt += "<div class='filename'>" + imagerSrc + "</div>";
+          $imagerInfo.removeClass('error').removeClass('hide');
           if (response['data']) {
-            txt += "<div class='info'>" + response['data'] + '</div>';
-            $imgInfo.removeClass('error').removeClass('hide').append(txt);
+            $('#imager-info-content').html(response['data']);
+            $('.imager-info-edit').click(function (evt) {
+              var $field = this.id.replace('imager-','');
+              processAjax({ action: 'edit-form-field-load',
+                            uri: imagerSrc,
+                            field: $field,
+                          },function(response) {
+                var status = response['status'];
+                var txt = "";
+      //        txt  = "<div class='title'>" + imagerTitle + "</div>";
+      //        txt += "<div class='filename'>" + imagerSrc + "</div>";
+                $imagerEdit.removeClass('hide');
+                if (response['data']) {
+                  $('#imager-edit-content').html(response['data']);
+                }
+              });
+            });
           }
-          $imgInfo.append('<div class="clicktoexit">Click anywhere to exit</div>');
         });
       }
 
@@ -735,12 +767,12 @@
        */
       function mouseDown (evt){
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-        ptDownC.x = evt.offsetX || (evt.pageX - $imgCanvas[0].offsetLeft);
+        ptDownC.x = evt.offsetX || (evt.pageX - $imagerCanvas[0].offsetLeft);
         if (evt.offsetY) {              // This is kludgy, pageY work intermittently, I think it's
                                                // because the div has position: fixed and is out of sequence
-          ptDownC.y = evt.offsetY || (evt.pageY - $imgCanvas[0].offsetTop);
+          ptDownC.y = evt.offsetY || (evt.pageY - $imagerCanvas[0].offsetTop);
         } else {
-          ptDownC.y = evt.layerY + $imgCanvas[0].offsetTop;  // This works for me, I'm not sure the calc is correct
+          ptDownC.y = evt.layerY + $imagerCanvas[0].offsetTop;  // This works for me, I'm not sure the calc is correct
         }
         ptDownT = ctx.transformedPoint(ptDownC.x,ptDownC.y);
         dragging = true;
@@ -754,11 +786,11 @@
  * @returns {undefined}
  */
       function mouseMove(evt){
-        ptNowC.x = evt.offsetX || (evt.pageX - $imgCanvas[0].offsetLeft);
+        ptNowC.x = evt.offsetX || (evt.pageX - $imagerCanvas[0].offsetLeft);
         if (evt.offsetY) {
-          ptNowC.y = evt.offsetY || (evt.pageY - $imgCanvas[0].offsetTop);
+          ptNowC.y = evt.offsetY || (evt.pageY - $imagerCanvas[0].offsetTop);
         } else {
-          ptNowC.y = evt.layerY + $imgCanvas[0].offsetTop;
+          ptNowC.y = evt.layerY + $imagerCanvas[0].offsetTop;
         }
         ptNowT = ctx.transformedPoint(ptNowC.x,ptNowC.y);
         if (dragging){
@@ -789,13 +821,14 @@
           if (evt.ctrlKey) {
             zoom(evt.shiftKey ? -1 : 1 );  // click could zoom here to zoom, 
           } else {
-            if (elapsed < 250) {  // if double click than hide #imgOverlay
+            if (elapsed < 250) {  // if double click than hide #imagerOverlay
               if (fullScreen) {
                 screenfull.exit();
                 setFullScreen(false);
               } else {
-                $imgOverlay.addClass('hide');
-                $imgInfo.addClass('hide');
+                $imagerOverlay.addClass('hide');
+                $imagerInfo.addClass('hide');
+                $imagerEdit.addClass('hide');
                 setViewMode(0);
                 setEditMode(0);
               }
@@ -818,7 +851,7 @@
         return evt.preventDefault() && false;
       };
 
-      $imgCanvas[0].addEventListener('click',function(evt){
+      $imagerCanvas[0].addEventListener('click',function(evt){
     //  evt.stopPropagation();
     //  return false;
       });
@@ -830,11 +863,11 @@
  */
       function enablePanZoom() {
         // canvas#image-canvas event handlers
-        $imgCanvas[0].addEventListener('mousedown',mouseDown,false);
-        $imgCanvas[0].addEventListener('mousemove',mouseMove,false);
-        $imgCanvas[0].addEventListener('mouseup',mouseUp,false);
-        $imgCanvas[0].addEventListener('DOMMouseScroll',mouseWheel,false);
-        $imgCanvas[0].addEventListener('mousewheel',mouseWheel,false);
+        $imagerCanvas[0].addEventListener('mousedown',mouseDown,false);
+        $imagerCanvas[0].addEventListener('mousemove',mouseMove,false);
+        $imagerCanvas[0].addEventListener('mouseup',mouseUp,false);
+        $imagerCanvas[0].addEventListener('DOMMouseScroll',mouseWheel,false);
+        $imagerCanvas[0].addEventListener('mousewheel',mouseWheel,false);
         ias.setOptions({disable: true, hide: true});
       }
 
@@ -843,11 +876,11 @@
  * @returns {undefined}
  */
       function enableCrop() {
-        $imgCanvas[0].removeEventListener('mousedown',mouseDown);
-        $imgCanvas[0].removeEventListener('mousemove',mouseMove);
-        $imgCanvas[0].removeEventListener('mouseup',mouseUp);
-        $imgCanvas[0].removeEventListener('DOMMouseScroll',mouseWheel);
-        $imgCanvas[0].removeEventListener('mousewheel',mouseWheel);
+        $imagerCanvas[0].removeEventListener('mousedown',mouseDown);
+        $imagerCanvas[0].removeEventListener('mousemove',mouseMove);
+        $imagerCanvas[0].removeEventListener('mouseup',mouseUp);
+        $imagerCanvas[0].removeEventListener('DOMMouseScroll',mouseWheel);
+        $imagerCanvas[0].removeEventListener('mousewheel',mouseWheel);
         ias.setOptions({enable: true, 
                         hide: false, 
                         show: true,
@@ -892,10 +925,10 @@
  * @returns {undefined}
  */
       function setInitialImage() {
-        $imgCanvas2.attr({width:  cw,     // Set image to be full size
+        $imagerCanvas2.attr({width:  cw,     // Set image to be full size
                             height: ch});
         ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
-        ctx2.drawImage($imgCanvas[0],0,0);
+        ctx2.drawImage($imagerCanvas[0],0,0);
       }
 
 /**
@@ -908,9 +941,9 @@
         switch (editMode) {
           case 0:   // no editing
             $('#edit-brightness').removeClass('checked');
-            $imgBrightness.addClass('hide');
+            $imagerBrightness.addClass('hide');
             $('#edit-color').removeClass('checked');
-            $imgColor.addClass('hide');
+            $imagerColor.addClass('hide');
             break;
           case 1:   // #edit-brightness
             setInitialImage();
@@ -918,9 +951,9 @@
             $('#slider-brightness').val(0);
             $('#slider-contrast').val(0);
             $('#edit-brightness').addClass('checked');
-            $imgBrightness.removeClass('hide');
+            $imagerBrightness.removeClass('hide');
             $('#edit-color').removeClass('checked');
-            $imgColor.addClass('hide');
+            $imagerColor.addClass('hide');
             break;
           case 2:   // #edit-color
             $('#slider-hue').val(0);
@@ -929,9 +962,9 @@
             setInitialImage();
             setViewMode(1);
             $('#edit-brightness').removeClass('checked');
-            $imgBrightness.addClass('hide');
+            $imagerBrightness.addClass('hide');
             $('#edit-color').addClass('checked');
-            $imgColor.removeClass('hide');
+            $imagerColor.removeClass('hide');
             break;
         }
       }
@@ -944,10 +977,10 @@
       function setFullScreen(newMode) {
         if (newMode) {
           fullScreen = true;
-          $imgWrapper.addClass('fullscreen');
+          $imagerWrapper.addClass('fullscreen');
           $('#view-fullscreen').addClass('checked');
         } else {
-          $imgWrapper.removeClass('fullscreen');
+          $imagerWrapper.removeClass('fullscreen');
           fullScreen = false;
           $('#view-fullscreen').removeClass('checked');
         }
@@ -962,7 +995,7 @@
  * 
  * @param {type} src
  * @param {type} offset
- * @returns {Drupal.behaviors.imager.attach.imgSrc|String|src}
+ * @returns {Drupal.behaviors.imager.attach.imagerSrc|String|src}
  */
       function findImage(src,offset) {
         for(i=0; i < nimgs; i++) {
@@ -972,9 +1005,9 @@
             } else {
               if (--i == -1) i = nimgs-1;
             }
-            imgSrc   = imgs[i]['src'];
-            imgTitle = imgs[i]['title'];
-            return imgSrc;
+            imagerSrc   = imgs[i]['src'];
+            imagerTitle = imgs[i]['title'];
+            return imagerSrc;
           }
         }
         return undefined;
@@ -982,31 +1015,33 @@
 
     // div#imager-overlay event handlers
       // click on #imager-overlay - hide it, set mode back to view=0
-      $imgOverlay.click(function () {
+      $imagerOverlay.click(function () {
         if (viewMode > 0) return;
         $(this).addClass('hide');
-        $imgInfo.addClass('hide');
+        $imagerInfo.addClass('hide');
+        $imagerEdit.addClass('hide');
         setViewMode(0);
         setEditMode(0);
         updateStatus();
       });
 
       // mouse enters the #imager-overlay div - do nothing
-    //$imgOverlay.mouseenter(function() {
+    //$imagerOverlay.mouseenter(function() {
     //  console.debug('#imager-overlay mouseenter');
     //})
 
       // mouse leaves the #imager-overlay div - hide it
-      $imgOverlay.mouseleave(function(evt) {
+      $imagerOverlay.mouseleave(function(evt) {
         if (viewMode > 0) return false; 
         var el = evt.relatedTarget ? evt.relatedTarget : evt.toElement;
         var el1 = $(el).closest('#imager-info');        // if they went to the info overlay don't leave
-        if (el === $imgInfo[0] || el1.length) return;
+        if (el === $imagerInfo[0] || el1.length) return;
 
         setViewMode(0);
         setEditMode(0);
-        $imgOverlay.addClass('hide');
-        $imgInfo.addClass('hide');
+        $imagerOverlay.addClass('hide');
+        $imagerInfo.addClass('hide');
+        $imagerEdit.addClass('hide');
         updateStatus();
       });
 
@@ -1021,13 +1056,13 @@
       $('#image-left').click(function() {
         setViewMode(1);
         setEditMode(0);
-        changeImage(findImage(imgSrc,-1));   
+        changeImage(findImage(imagerSrc,-1));   
       });
       // click on #image-right - bring up next image to the right
       $('#image-right').click(function() {
         setViewMode(1);
         setEditMode(0);
-        changeImage(findImage(imgSrc,1));
+        changeImage(findImage(imagerSrc,1));
       });
       // click on #image-exit - Exit the large popup
       $('#image-exit').click(function() {
@@ -1035,28 +1070,42 @@
           screenfull.exit();
           setFullScreen(false);
         } else {
-          $imgOverlay.addClass('hide');
-          $imgInfo.addClass('hide');
+          $imagerOverlay.addClass('hide');
+          $imagerInfo.addClass('hide');
+          $imagerEdit.addClass('hide');
           setViewMode(0);
           setEditMode(0);
         }
       });
       // click on #image-ques - ajax call to bring in image description
-      $imgStatus.click(function(evt) {
-        $imgStatus.addClass('hide');
+      $imagerStatus.click(function(evt) {
+        $imagerStatus.addClass('hide');
         $('#debug-status').removeClass('checked');
         localStorage['imgShowStatus'] = "FALSE";
       });
-      $imgMessages.click(function(evt) {
-        $imgMessages.addClass('hide');
+      $imagerMessages.click(function(evt) {
+        $imagerMessages.addClass('hide');
         $('#debug-messages').removeClass('checked');
         localStorage['imgShowDebug'] = "FALSE";
       });
-      $imgInfo.click(function(evt) {
-        $imgInfo.addClass('hide');
+      $('#imager-info-exit').click(function(evt) {
+        $imagerInfo.addClass('hide');
+        $imagerEdit.addClass('hide');
         $('#view-info').removeClass('checked');
         localStorage['imgShowInfo'] = "FALSE";
       });
+      $('#imager-edit-exit').click(function(evt) {
+        $imagerEdit.addClass('hide');
+      });
+//    $('#imager-info-edit').click(function(evt) {
+        // not sure what to do yet, I think I want separate edit button or possibly fieldsets, that sounds like the ticket
+        // in which this function is not necessary, each field will have their own input fields
+//    });
+//    $imagerInfo.click(function(evt) {
+//      $imagerInfo.addClass('hide');
+//      $('#view-info').removeClass('checked');
+//      localStorage['imgShowInfo'] = "FALSE";
+//    });
       $('#imager-message a').click(function(evt) {
         evt.stopPropagation();
       });
@@ -1109,7 +1158,7 @@
       $('#view-fullscreen').click(function() {
         if (screenfull.enabled) {
           // We can use `this` since we want the clicked element
-          screenfull.toggle($imgWrapper[0]);
+          screenfull.toggle($imagerWrapper[0]);
           if (fullScreen) {
             setFullScreen(false);
           } else {
@@ -1133,7 +1182,8 @@
         } else {
           localStorage.imgShowInfo = "FALSE";
           $(this).removeClass('checked');
-          $imgInfo.addClass('hide');
+          $imagerInfo.addClass('hide');
+          $imagerEdit.addClass('hide');
         }
       });
 
@@ -1153,35 +1203,44 @@
       $('#edit-right').click(function()        { rotate(90); });
       // Crop
       $('#edit-crop').click(crop);
+      $('#view-reset').click(function(evt)     { changeImage(imagerSrc,evt); });
 
       // brightness/contrast and HSL slider change events 
-      $('#slider-contrast').change(function()   { adjustBrightness($imgCanvas2,$imgCanvas); updateStatus();});
-      $('#slider-brightness').change(function() { adjustBrightness($imgCanvas2,$imgCanvas); updateStatus();});
-      $('#slider-hue').change(function()        { adjustColor($imgCanvas2,$imgCanvas);      updateStatus();});
-      $('#slider-saturation').change(function() { adjustColor($imgCanvas2,$imgCanvas);      updateStatus();});
-      $('#slider-lightness').change(function()  { adjustColor($imgCanvas2,$imgCanvas);      updateStatus();});
+      $('#slider-contrast').change(function()   { adjustBrightness($imagerCanvas2,$imagerCanvas); updateStatus();});
+      $('#slider-brightness').change(function() { adjustBrightness($imagerCanvas2,$imagerCanvas); updateStatus();});
+      $('#slider-hue').change(function()        { adjustColor($imagerCanvas2,$imagerCanvas);      updateStatus();});
+      $('#slider-saturation').change(function() { adjustColor($imagerCanvas2,$imagerCanvas);      updateStatus();});
+      $('#slider-lightness').change(function()  { adjustColor($imagerCanvas2,$imagerCanvas);      updateStatus();});
 
     // div#file-buttons click event handlers
       $('#file-save').click(function () {
         setViewMode(1);
-        $('#save-file-name').text(decodeURIComponent(imgSrc.split('/').reverse()[0]));
+        $('#save-file-name').text(decodeURIComponent(imagerSrc.split('/').reverse()[0]));
         $('#canvas-resolution').html(cw + 'x' + ch);
         $('#image-display-resolution').html(parseInt(ptCLrT.x - ptCUlT.x) + 'x' + parseInt(ptCLrT.y - ptCUlT.y));
         $('#image-full-resolution').html(iw + 'x' + ih);
         $('#scale').html(parseInt(cscale * 100) / 100);
-        $imgFilesave.removeClass('hide');
+        $imagerFilesave.removeClass('hide');
       });
       $('#file-save-new').click(function () {
         saveFile(false);
-        $imgFilesave.addClass('hide');
+        $imagerFilesave.addClass('hide');
       });
       $('#file-save-overwrite').click(function () {
         saveFile(true);
-        $imgFilesave.addClass('hide');
+        $imagerFilesave.addClass('hide');
       });
       $('#file-save-cancel').click(function () {
-        $imgFilesave.addClass('hide');
+        $imagerFilesave.addClass('hide');
         redraw();
+      });
+      $('#file-delete').click(function () {
+        deleteFile();
+        $imagerFilesave.addClass('hide');
+        $imagerInfo.addClass('hide');
+        $imagerEdit.addClass('hide');
+        $imagerOverlay.addClass('hide');
+        $imagerStatus.addClass('hide');
       });
 
 /**
@@ -1191,22 +1250,23 @@
  */
       function saveFile(overwrite) {
         var img;
-        var sameMode;
+        var saveMode;
+        $('#imager-busy').show();
         ctx2.setTransform(1,0,0,1,0,0);
         switch (saveMode = $('input[name="resolution"]:checked').val()) {
           case 'canvas':
-            img = $imgCanvas[0].toDataURL();
+            img = $imagerCanvas[0].toDataURL();
             break;
           case 'image-cropped':
           case 'image-full':
             if (rotation == 0 || rotation == 180) {
-              $imgCanvas2.attr({width:  iw,      // Set canvas to same size as image
+              $imagerCanvas2.attr({width:  iw,      // Set canvas to same size as image
                                 height: ih});
               if (rotation == 180)  {
                 ctx2.translate(ih,iw);
               }
             } else {
-              $imgCanvas2.attr({width:  ih,      // Set canvas to same size as image
+              $imagerCanvas2.attr({width:  ih,      // Set canvas to same size as image
                                 height: iw});
               if (rotation == 90) {
                 ctx2.translate(ih,0);
@@ -1217,22 +1277,30 @@
             ctx2.rotate(angleInRadians(rotation));
             ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
     
-            img = $imgCanvas2[0].toDataURL();
+            img = $imagerCanvas2[0].toDataURL();
             break;
         }
-        $imgMessages.removeClass('hide').removeClass('error').html('Saving Image...');
+        $imagerMessages.removeClass('hide').removeClass('error').html('Saving Image...');
         processAjax({ overwrite: overwrite,
                       action: 'save-file',
                       saveMode: saveMode,
-                      uri: imgSrc,
+                      uri: imagerSrc,
                       imgBase64: img 
                     });
       };
-      $imgMessages.click(function (evt) {
+      function deleteFile() {
+        $imagerMessages.removeClass('hide').removeClass('error').html('Deleting Image...');
+        processAjax({ action: 'delete-file',
+                      uri: imagerSrc,
+                    });
+      }
+
+
+      $imagerMessages.click(function (evt) {
         $(this).addClass('hide');
       });
       $('#file-download').click(function() {
-        window.open(imgSrc);
+        window.open(imagerSrc);
       });
 
     //div#debug-buttons event handlers
@@ -1241,24 +1309,24 @@
         if (localStorage.imgShowStatus === "FALSE") {
           localStorage.imgShowStatus = "TRUE";
           $(this).addClass('checked');
-          $imgStatus.removeClass('hide');
+          $imagerStatus.removeClass('hide');
         } else {
           localStorage.imgShowStatus = "FALSE";
           $(this).removeClass('checked');
-          $imgStatus.addClass('hide');
+          $imagerStatus.addClass('hide');
         }
-        $imgMessages.append('<p>imgShowStatus: ' + localStorage.imgShowStatus + '</p>');
+        $imagerMessages.append('<p>imgShowStatus: ' + localStorage.imgShowStatus + '</p>');
         updateStatus();
       });
       $('#debug-messages').click(function(evt) {
         localStorage.imgShowDebug = (localStorage.imgShowDebug === "TRUE") ? "FALSE" : "TRUE";
         if (localStorage.imgShowDebug === "TRUE") {
           $(this).addClass('checked');
-          $imgMessages.removeClass('hide');
-          $imgMessages.empty();
+          $imagerMessages.removeClass('hide');
+          $imagerMessages.empty();
         } else {
           $(this).removeClass('checked');
-          $imgMessages.addClass('hide');
+          $imagerMessages.addClass('hide');
         }
       });
       
@@ -1279,9 +1347,9 @@
         // User clicks in thumbnail image
         $(this).click(function(evt) {
           if (viewMode == 1) {   // if the overlay is locked, select this image
-            imgSrc = $(this).parent().attr('href');
-            imgTitle = $(this).attr('data-title');
-            changeImage(imgSrc,evt);
+            imagerSrc = $(this).parent().attr('href');
+            imagerTitle = $(this).attr('data-title');
+            changeImage(imagerSrc,evt);
           } else {               // if the overlay is not locked, then lock it?
             setViewMode(1);
             updateStatus();
@@ -1303,14 +1371,14 @@
 //          $.each( classList, function(index, item){
 //            var ind = item.indexOf('fid-');
 //            if (item.indexOf('fid-') > -1) {
-//              $imgCanvas.attr('data-fid',(item.split(/\-/))[1]); // the parent element MUST be a link to the image to load
+//              $imagerCanvas.attr('data-fid',(item.split(/\-/))[1]); // the parent element MUST be a link to the image to load
 //            }
 //          });
 
-            imgSrc = $(this).parent().attr('href'); // the parent element MUST be a link to the image to load
-            imgTitle = $(this).attr('data-title');
+            imagerSrc = $(this).parent().attr('href'); // the parent element MUST be a link to the image to load
+            imagerTitle = $(this).attr('data-title');
             setViewMode(0);
-            changeImage(imgSrc,evt);
+            changeImage(imagerSrc,evt);
           },
           out: function(evt) {
             if (viewMode > 0) return false;
@@ -1318,11 +1386,12 @@
             var el = evt.relatedTarget ? evt.relatedTarget : evt.toElement;
             var el1 = $(el).closest('#imager-overlay');
             var el2 = $(el).closest('#imager-info');
-            if (el === $imgOverlay[0] || el1.length || el2.length) {
+            if (el === $imagerOverlay[0] || el1.length || el2.length) {
     //        console.debug("image mouseleave image has focus");
             } else {
-              $imgOverlay.addClass('hide');
-              $imgInfo.addClass('hide');
+              $imagerOverlay.addClass('hide');
+              $imagerInfo.addClass('hide');
+              $imagerEdit.addClass('hide');
               setViewMode(0);
               setEditMode(0);
               updateStatus();
@@ -1404,13 +1473,18 @@
  * 
  * @param {type} postData
  * @param {type} processFunc
- * @param {type} errorFunc
  * @returns {undefined}
  */
-      function processAjax(postData,processFunc,errorFunc) {
-        $imgMessages.removeClass('hide').empty();
+      function processAjax(postData,processFunc) {
+        postData['modulePath'] = Drupal.settings.imager.modulePath;
+        postData['baseUrl']    = Drupal.settings.imager.baseUrl;
+        postData['basePath']   = Drupal.settings.imager.basePath;
+        postData['siteName']   = Drupal.settings.imager.siteName;
+        postData['drupalRoot'] = Drupal.settings.imager.drupalRoot;
+        postData['uid']        = Drupal.settings.imager.uid;
+        $imagerMessages.removeClass('hide').empty();
 //      if (localStorage['imgShowDebug'] === "TRUE") {
-//        $imgMessages.append("<h2>Process action: " + postData.action + "</h2>" +
+//        $imagerMessages.append("<h2>Process action: " + postData.action + "</h2>" +
 //          "<div>" + JSON.stringify(postData).substr(1,256) + "</div>\n");
 //      }
         $.ajax({
@@ -1419,6 +1493,7 @@
                                               // I added the Drupal.settings to make path absolute
           data: postData, 
           success: function (response_json) {
+            $('#imager-busy').hide();
             var response = JSON.parse(response_json);
             var display = false;
             var out = [];
@@ -1434,24 +1509,25 @@
             }
 
             if (display) {
-              $imgMessages.removeClass('hide').removeClass('error').html(out);
+              $imagerMessages.removeClass('hide').removeClass('error').html(out);
             }
             if (processFunc) processFunc(response);   // Execute users function
             if (localStorage['imgShowDebug'] === "FALSE") {
               setTimeout(function() {
-                $imgMessages.addClass('hide');
+                $imagerMessages.addClass('hide');
               },5000);
             }
           },
           error: function(evt) {
-            $imgMessages.removeClass('hide')
+            $('#imager-busy').hide();
+            $imagerMessages.removeClass('hide')
                         .addClass('error')
                         .html('<p>Error: ' + evt.status + ': ' + evt.statusText + 
                               '<br>Action: ' + postData.action + '</p>');
-            if (errorFunc) errorFunc(response,evt);   // Execute users error function
+            if (processFunc) processFunc(response,evt);   // Execute users error function
             if (localStorage['imgShowDebug'] === "FALSE") {
               setTimeout(function() {
-                $imgMessages.removeClass('error').addClass('hide');
+                $imagerMessages.removeClass('error').addClass('hide');
               },10000);
             }
           }

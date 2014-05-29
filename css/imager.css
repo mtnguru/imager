@@ -105,24 +105,26 @@
 }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000371}}
 #imager-overlay #button-wrapper .buttons img {
-  margin: 0 2px;
-  padding: 1px 4px;
+  display: block;
+  margin: 2px 2px;
+  padding: 2px 4px;
+  clear: both;
   float: none;
   border-radius: 6px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000376}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000378}}
 #imager-overlay #button-wrapper .buttons .checked {
   background-color: #ffffbb;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000378}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000380}}
 #imager-overlay #button-wrapper .buttons .disabled {
   background-color: #555555;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000380}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000382}}
 #imager-overlay #button-wrapper .buttons .specific {
   background-color: #ccccff;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000382}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000384}}
 #imager-overlay #button-wrapper #debug-buttons {
   z-index: 999;
   font-size: 70%;
@@ -130,12 +132,12 @@
   bottom: 5px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000390}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000392}}
 #imager-status.hide {
   right: 100000px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000392}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000394}}
 #imager-status {
   border: solid 1px #ff9560;
   background-color: #602000;
@@ -146,25 +148,25 @@
   right: 5px;
   bottom: 5px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\0000398}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003100}}
 #imager-status div {
   padding: 5px;
   text-align: center;
   font-weight: bold;
   font-style: 120%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003103}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003105}}
 #imager-status span {
   float: left;
   padding: 5px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003107}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003109}}
 #imager-info.hide {
   right: 100000px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003109}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003111}}
 #imager-info {
   border: solid 1px #a573f0;
   background-color: #2a0a5a;
@@ -174,10 +176,10 @@
   z-index: 1005;
   right: 5px;
   top: 5px;
-  padding: 10px;
+  padding: 5px 10px;
   max-width: 800px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003117}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003119}}
 #imager-info .title {
   color: #6f3d10;
   text-align: center;
@@ -185,7 +187,7 @@
   font-weight: bold;
   word-wrap: break-word;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003123}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003125}}
 #imager-info .filename {
   color: #005500;
   font-style: italic;
@@ -193,18 +195,80 @@
   text-align: center;
   margin-bottom: 5px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003129}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003131}}
 #imager-info .error {
   background-color: #551919;
   color: white;
 }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003134}}
+#imager-info #imager-info-buttons {
+  float: right;
+  border: solid 1px #000099;
+  background-color: #ccccff;
+  box-shadow: 0px 0px 4px 3px #4400cc, 0px 0px 3px 2px #3377ff inset;
+  border-radius: 12px;
+  z-index: 1100;
+  padding: 0 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003139}}
+#imager-info #imager-info-buttons img {
+  float: left;
+  padding: 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003142}}
+#imager-info #imager-info-geometry {
+  clear: both;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003145}}
+#imager-info #imager-info-content img.imager-info-edit {
+  float: left;
+  clear: both;
+  margin: 0 5px 3px 0;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003149}}
+#imager-info #imager-info-content section {
+  float: left;
+}
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003133}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003152}}
+#imager-edit.hide {
+  right: 100000px;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003154}}
+#imager-edit {
+  border: solid 1px #20ff20;
+  background-color: #002000;
+  box-shadow: 0px 0px 4px 3px #00b93e, 0px 0px 3px 2px #3eb900 inset;
+  border-radius: 15px;
+  position: fixed;
+  right: 5px;
+  top: 6px;
+  padding: 5px 5px;
+  z-index: 1010;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003161}}
+#imager-edit #imager-edit-buttons {
+  float: right;
+  border: solid 1px #000099;
+  background-color: #ccccff;
+  box-shadow: 0px 0px 4px 3px #4400cc, 0px 0px 3px 2px #3377ff inset;
+  border-radius: 12px;
+  z-index: 1100;
+  padding: 0 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003166}}
+#imager-edit #imager-edit-buttons img {
+  float: left;
+  padding: 5px;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003170}}
 #imager-messages.hide {
   left: 100000px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003135}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003172}}
 #imager-messages.error {
   color: black;
   font-size: 140%;
@@ -212,7 +276,7 @@
   background-image: none;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003140}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003177}}
 #imager-messages {
   border: solid 1px #de8f8f;
   background-color: #551919;
@@ -224,28 +288,28 @@
   top: 5px;
   padding: 10px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003146}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003183}}
 #imager-messages .info {
   font-size: 110%;
   font-weight: bold;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003149}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003186}}
 #imager-messages h2 {
   margin: 5px 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003152}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003189}}
 #imager-messages .error {
   background-color: #551919;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003156}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003193}}
 #imager-filesave.hide,
 #imager-brightness.hide,
 #imager-color.hide {
   left: 100000px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003160}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003197}}
 #imager-filesave {
   left: 200px;
   top: 200px;
@@ -257,23 +321,23 @@
   z-index: 1040;
   padding: 10px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003167}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003204}}
 #imager-filesave #resolution {
   margin: 0 auto 10px;
   width: auto;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003170}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003207}}
 #imager-filesave .title {
   font-weight: bold;
   margin: 10px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003173}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003210}}
 #imager-brightness,
 #imager-color {
-  border: solid 1px #40ff40;
-  background-color: #004000;
-  box-shadow: 0px 0px 4px 3px #00d948, 0px 0px 3px 2px #48d900 inset;
+  border: solid 1px #20ff20;
+  background-color: #002000;
+  box-shadow: 0px 0px 4px 3px #00b93e, 0px 0px 3px 2px #3eb900 inset;
   border-radius: 15px;
   position: fixed;
   z-index: 1040;
@@ -281,36 +345,36 @@
   bottom: 5px;
   padding: 5px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003182}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003219}}
 #imager-brightness .error,
 #imager-color .error {
   background-color: #330000;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003184}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003221}}
 #imager-brightness .slider,
 #imager-color .slider {
   -webkit-appearance: none;
   z-index: 1050;
   border-radius: 8px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003188}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003225}}
 #imager-brightness #slider-hue,
 #imager-color #slider-hue {
   background: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #00ffff, #0000ff, #800080);
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003191}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003228}}
 #imager-brightness #slider-saturation,
 #imager-color #slider-saturation {
   background-image: linear-gradient(to right, #c8c8c8, rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(#ff0000, #ffff00, #008888);
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003193}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003230}}
 #imager-brightness #slider-lightness,
 #imager-brightness #slider-brightness,
 #imager-color #slider-lightness,
 #imager-color #slider-brightness {
   background: linear-gradient(to right, #000000, #ffffff);
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003196}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003233}}
 #imager-brightness #slider-contrast,
 #imager-color #slider-contrast {
   background-image: linear-gradient(to right, #888888, #666666, #222222, #000000), linear-gradient(to right, #888888, #aaaaaa, #dddddd, #ffffff);
@@ -319,11 +383,24 @@
   background-repeat: no-repeat;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003202}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003239}}
 .clicktoexit {
   margin-top: 10px;
   font-size: 70%;
   font-style: italic;
   color: #bbbbbb;
   float: right;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003246}}
+#imager-busy {
+  position: fixed;
+  top: 400px;
+  left: 600px;
+  z-index: 1100;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eco\/sites\/e2\/themes\/ptheme\/sass\/imager\.sass}line{font-family:\00003253}}
+.field-name-field-detail {
+  float: left;
 }
