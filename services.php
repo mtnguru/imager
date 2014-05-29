@@ -84,7 +84,7 @@ function displayEntity() {
   $common = "class='imager-info-edit' src='$modulePath/icons/edit.png'";
   $view['field_file_image_title_text']['#prefix'] = "<img id='imager-field-file-image-title-text' $common />";
   $view['field_who']['#prefix']                   = "<img id='imager-field-who' $common />";
-  $view['field_how']['#prefix']                   = "<img id='imager-field-who' $common />";
+  $view['field_how']['#prefix']                   = "<img id='imager-field-how' $common />";
   $view['field_what']['#prefix']                  = "<img id='imager-field-what' $common />";
   $view['field_create_date']['#prefix']           = "<img id='imager-field-create-date' $common />";
   $view['field_status']['#prefix']                = "<img id='imager-field-status' $common />";
