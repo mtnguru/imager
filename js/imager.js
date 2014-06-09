@@ -88,7 +88,7 @@
                    <div>Image</div> \
                    <img title="View image to the left" alt="" id="image-left"  src="' + modulePath + '/icons/left_arrow.png"> \
                    <img title="View image to the right" alt="" id="image-right" src="' + modulePath + '/icons/right_arrow.png"> \
-                   <img title="Exit image popup" alt="" id="image-exit" src="' + modulePath + '/icons/exit.png"> \
+                   <img title="Exit image popup" alt="" id="image-exit" src="' + modulePath + '/icons/redx.png"> \
                  </div> \
                  <div id="mode-buttons" class="buttons"> \
                    <div>Mode</div> \
@@ -187,14 +187,14 @@
              <div id="imager-info"> \
                <div id="imager-info-content"></div> \
                <div id="imager-info-buttons">  \
-                 <img title="Exit popup" alt="" id="imager-info-exit" src="' + modulePath + '/icons/exit.png"> \
+                 <img title="Exit popup" alt="" id="imager-info-exit" src="' + modulePath + '/icons/redx.png"> \
                </div> \
              </div> \
              <div id="imager-edit"> \
                <div id="imager-edit-content"></div> \
                <div id="imager-edit-buttons">  \
                  <img title="Apply and exit" alt="" id="imager-edit-apply" src="' + modulePath + '/icons/checkmark.png"> \
-                 <img title="Exit popup" alt="" id="imager-edit-exit" src="' + modulePath + '/icons/exit.png"> \
+                 <img title="Exit popup" alt="" id="imager-edit-exit" src="' + modulePath + '/icons/redx.png"> \
                </div> \
              </div> \
              <div id="imager-messages"></div> \
