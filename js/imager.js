@@ -750,7 +750,8 @@
 //      var out = [];
 //      out.push({name: 'filename', value: imagerSrc});
         
-        processAjax({ action: 'display-entity',
+        processAjax('imager/ajax/display_entity',
+                    { action: 'display-entity',
                       uri: imagerSrc,
                       viewMode: Drupal.settings.imager.viewMode,
                     },function(response) {
@@ -764,7 +765,8 @@
             $('.imager-info-edit').click(function (evt) {
               var $field = this.id.replace('imager-','');
               $imagerEdit.css('right',$(window).width() - evt.pageX + 10).css('top',evt.pageY);
-              processAjax({ action: 'edit-form-field-load',
+              processAjax('imager/ajax/edit_form_field_load',
+                          { action: 'edit-form-field-load',
                             uri: imagerSrc,
                             field: $field,
                           },function(response) {
@@ -1299,7 +1301,8 @@
             break;
         }
         $imagerMessages.show().removeClass('error').html('Saving Image...');
-        processAjax({ overwrite: overwrite,
+        processAjax('imager/ajax/save_file',
+                    { overwrite: overwrite,
                       action: 'save-file',
                       saveMode: saveMode,
                       uri: imagerSrc,
@@ -1308,7 +1311,8 @@
       };
       function deleteFile() {
         $imagerMessages.show().removeClass('error').html('Deleting Image...');
-        processAjax({ action: 'delete-file',
+        processAjax('imager/ajax/delete_file',
+                    { action: 'delete-file',
                       uri: imagerSrc,
                     });
       }
@@ -1494,7 +1498,7 @@
  * @param {type} processFunc
  * @returns {undefined}
  */
-      function processAjax(postData,processFunc) {
+      function processAjax(path,postData,processFunc) {
         postData['modulePath'] = Drupal.settings.imager.modulePath;
         postData['baseUrl']    = Drupal.settings.imager.baseUrl;
         postData['basePath']   = Drupal.settings.imager.basePath;
@@ -1508,8 +1512,7 @@
 //      }
         $.ajax({
           type: "POST",
-          url: modulePath + "/services.php",  // Relative paths were intermittent in Firefox
-                                              // I added the Drupal.settings to make path absolute
+          url:   Drupal.settings.basePath + '?q=' + path, 
           data: postData, 
           success: function (response_json) {
             $('#imager-busy').hide();
