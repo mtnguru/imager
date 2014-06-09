@@ -5,151 +5,108 @@
  */
 // @import "normalize"
 
-@import "custom"
+$green:       #0f0
+$red:         #f00
+$lightergrey: #eee
+$lightgrey:   #ccc
+$grey:        #aaa
+$greyer:      #888
+$darkgrey:    #666
+$darkergrey:  #444
 
 #imager-wrapper
   table
-    background-color: $greyblue
-    margin-top: 0
-    border: 0px
-    border-radius: 12px
+    background-color: $grey
     border-collapse: separate
     border-spacing: 3px
-    th:first-child 
-      border-radius: 10px 0 0 0
-    th:last-child 
-      border-radius: 0 10px 0 0
-    th:only-child 
-      border-radius: 10px 10px 0 0
     th
-      text-align: center
-      color: $lightyellow
-      background-color: $darkgreyblue
+      color: $lightgrey
+      background-color: $darkgrey
 #imager-overlay.fullscreen
-  margin: 0
-  box-shadow: none
   width: 100%
-  padding: 100px
 #imager-overlay
-  background: #555
+  background: $greyer
   z-index: 1000
   position: fixed
   top: 5px
   left: 5px
   overflow: auto
-  @include pi-border(15px,3px,$darkpurple)
-  margin: 0px 
-  padding: 0px
   button
-    border-radius: 8px
-    background-color: $faintpurple
+    background-color: $lightgrey
   #imager-canvas-wrapper
     float: left
-    margin: 3px 3px 0px 1px
-    padding: 0
     #imager-canvas-org
       display: hidden
     #imager-canvas
-      padding: 0
-      margin: 0
-      @include pi-border(12px,3px,#000)
   #button-wrapper
     float: left
-    margin-right: 0
     div
-      font-size: 80%
       text-align: center
-      margin: 2px 0
-      padding: 0
     .buttons
-      margin: 3px 3px 0
       color: #000
-      @include pa-border(12px,3px,$lightblue)
-      padding: 2px 2px
+      background-color: $lightgrey
       img
         display: block
-        margin: 2px 2px
-        padding: 2px 4px
-        clear: both
-        float: none
-        border-radius: 6px
       .checked
-        background-color: $lightyellow
+        background-color: $lightergrey
       .disabled
         background-color: $grey
       .specific
-        background-color: $lightblue
+        background-color: $darkgrey
     #debug-buttons
       z-index: 999
-      font-size: 70%
       position: absolute
       bottom: 5px
 .imgareaselect-outer
-//border-radius: 12px
 
 #imager-status
-  @include pi-border(15px,3px,$darkorange)
   position: fixed
-  z-index: 1010
-  right: 5px
   bottom: 5px
+  right: 5px
+  z-index: 1010
+  background-color: $darkgrey
   div
-    padding: 5px
     text-align: center
-    font-weight: bold
-    font-style: 120%
   span
     float: left
-    padding: 5px
 
 #imager-info
-  @include pi-border(15px,3px,$darkpurple)
   position: fixed
-  z-index: 1005
-  right: 5px
   top: 5px
-  padding: 5px 10px
+  right: 5px
+  z-index: 1005
   max-width: 600px
+  background-color: $grey
   .title
-    color: $brown 
+    color: $darkergrey
     text-align: center
-    font-size: 120%
-    font-weight: bold
     word-wrap: break-word
   .filename
-    color: #050
-    font-style: italic
-    font-size: 70%
     text-align: center
-    margin-bottom: 5px
   .error
     background-color: $red
     color: white
   #imager-info-buttons
     float: right
-    @include pa-border(12px,3px,$lightblue)
     z-index: 1100
-    padding: 0 5px
+    background-color: $lightgrey
     img
       float: left
-      padding: 5px
   #imager-info-geometry
     clear: both
   #imager-info-content
     img.imager-info-edit
       float: left
       clear: both
-      margin: 0 5px 3px 0
     section
       float: left
 
 #imager-edit
-  @include pi-border(15px,3px,$darkgreen)
   max-width: 400px
   position: fixed
   right: 5px
   top: 6px
-  padding: 5px 5px
+  background-color: $greyer
   z-index: 1010
   .description
     max-width: 300px
@@ -158,30 +115,22 @@
     max-width: 300px
   #imager-edit-buttons
     float: right
-    @include pa-border(12px,3px,$lightblue)
     z-index: 1100
-    padding: 0 5px
+    background-color: $lightgrey
     img
       float: left
-      padding: 5px
 
 #imager-messages.error
   color: black
-  font-size: 140%
   background-color: $red
   background-image: none
 #imager-messages
-  @include pi-border(15px,3px,$red)
   position: fixed
   z-index: 1010
   left: 250px
   top: 5px
   .info
-    font-size: 110%
-    font-weight: bold
   h2
-    margin: 5px 0
-  padding: 10px
   .error
     background-color: $red
 
@@ -189,10 +138,10 @@
 #imager-filesave
   left: 200px
   top: 200px
-  @include pi-border(15px,3px,$orange)
   position: fixed
   z-index: 1040
   padding: 10px
+  background-color: $grey
   #resolution
     margin: 0 auto 10px
     width: auto
@@ -201,19 +150,16 @@
     margin: 10px
 #imager-brightness,
 #imager-color
-  @include pi-border(15px,3px,$darkgreen)
   position: fixed
   z-index: 1040
   left: 65px
   bottom: 5px
-  padding: 5px
-
+  background-color: $grey
   .error
-    background-color: $darkred
+    background-color: $red
   .slider
     -webkit-appearance: none
     z-index: 1050
-    border-radius: 8px
   #slider-hue
     background: linear-gradient(to right,red,orange,yellow,green,cyan,blue,purple)
 
@@ -230,8 +176,6 @@
  
 .clicktoexit
   margin-top: 10px
-  font-size: 70%
-  font-style: italic
   color: $lightgrey
   float: right
 
