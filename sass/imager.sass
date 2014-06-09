@@ -25,8 +25,6 @@
       text-align: center
       color: $lightyellow
       background-color: $darkgreyblue
-#imager-overlay.hide
-  left: 10000px
 #imager-overlay.fullscreen
   margin: 0
   box-shadow: none
@@ -89,8 +87,6 @@
 .imgareaselect-outer
 //border-radius: 12px
 
-#imager-status.hide
-  right: 100000px
 #imager-status
   @include pi-border(15px,3px,$darkorange)
   position: fixed
@@ -106,8 +102,6 @@
     float: left
     padding: 5px
 
-#imager-info.hide
-  right: 100000px
 #imager-info
   @include pi-border(15px,3px,$darkpurple)
   position: fixed
@@ -115,7 +109,7 @@
   right: 5px
   top: 5px
   padding: 5px 10px
-  max-width: 800px
+  max-width: 600px
   .title
     color: $brown 
     text-align: center
@@ -149,15 +143,19 @@
     section
       float: left
 
-#imager-edit.hide
-  right: 100000px
 #imager-edit
   @include pi-border(15px,3px,$darkgreen)
+  max-width: 400px
   position: fixed
   right: 5px
   top: 6px
   padding: 5px 5px
   z-index: 1010
+  .description
+    max-width: 300px
+   
+  .form-text 
+    max-width: 300px
   #imager-edit-buttons
     float: right
     @include pa-border(12px,3px,$lightblue)
@@ -167,8 +165,6 @@
       float: left
       padding: 5px
 
-#imager-messages.hide
-  left: 100000px
 #imager-messages.error
   color: black
   font-size: 140%
@@ -190,10 +186,6 @@
     background-color: $red
 
 
-#imager-filesave.hide,
-#imager-brightness.hide,
-#imager-color.hide
-  left: 100000px
 #imager-filesave
   left: 200px
   top: 200px
