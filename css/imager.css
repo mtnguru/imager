@@ -272,3 +272,8 @@
 .field-name-field-detail {
   float: left;
 }
+
+/* line 193, ../sass/imager.sass */
+div.krumo-preview {
+  color: black;
+}

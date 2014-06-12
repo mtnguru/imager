@@ -24,19 +24,19 @@
       var $imagerStatus;     // Status or debug popup
       var $imagerMessages;   // Debug response debug popup
       var $imagerFilesave;   // Debug response debug popup
-      var ias;            // imgAreaSelect instance
-      var ctx;            // canvas context
-      var ctx2;           // canvas context of original unshown image
+      var ias;               // imgAreaSelect instance
+      var ctx;               // canvas context
+      var ctx2;              // canvas context of original unshown image
 
       var cimg = document.createElement('IMG');
-      var imgs = [];      // file paths and titles of all matched images on page
-      var nimgs = 0;      // number of images
+      var imgs = [];         // file paths and titles of all matched images on page
+      var nimgs = 0;         // number of images
       var imagerSrc = '';    // src path for current image
       var imagerTitle = '';  // Image title from attr data-title
-      var viewMode = 0;     // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
-      var editMode = 0;     // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
-      var elapsed = 0;      // # elapsed msec since last mouse up
-      var fullScreen = 0;
+      var viewMode = 0;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
+      var editMode = 0;      // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
+      var elapsed = 0;       // # elapsed msec since last mouse up
+      var fullScreen = 0;    // Are we currently in full screen mode
 
       var mw;  // Maximum canvas width
       var mh;  // Maximum canvas height
@@ -79,128 +79,11 @@
 
       function init() {
         // append #page the #imager-overlay and #imager-messages-response div's
-        $('#page').append(' \
-           <div id="imager-wrapper"> \
-             <div id="imager-results"></div> \
-             <div id="imager-overlay"> \
-               <div id="button-wrapper"> \
-                 <div id="image-buttons" class="buttons"> \
-                   <div>Image</div> \
-                   <img title="View image to the left" alt="" id="image-left"  src="' + modulePath + '/icons/left_arrow.png"> \
-                   <img title="View image to the right" alt="" id="image-right" src="' + modulePath + '/icons/right_arrow.png"> \
-                   <img title="Exit image popup" alt="" id="image-exit" src="' + modulePath + '/icons/redx.png"> \
-                 </div> \
-                 <div id="mode-buttons" class="buttons"> \
-                   <div>Mode</div> \
-                   <img title="View Image" alt="" id="mode-view"   class="checked" src="' + modulePath + '/icons/eye.png"> \
-                   <img title="Edit Image - locked" alt="" id="mode-lock"   src="' + modulePath + '/icons/lock.png"> \
-                 </div> \
-                 <div id="view-buttons" class="buttons"> \
-                   <div>View</div> \
-                   <img title="View description of this image" alt="" id="view-info" src="' + modulePath + '/icons/information.png"> \
-                   <img title="View full screen" alt="" id="view-fullscreen"   src="' + modulePath + '/icons/fullscreen.png"> \
-                   <img title="Zoom In"  alt="" id="view-zoom-in"    src="' + modulePath + '/icons/zoomin.png"> \
-                   <img title="Zoom Out" alt="" id="view-zoom-out"  src="' + modulePath + '/icons/zoomout.png"> \
-                 </div> \
-                 <div id="edit-buttons" class="buttons"> \
-                   <div>Edit</div> \
-                   <img title="Start crop - select area" alt="" id="mode-crop" src="' + modulePath + '/icons/frame.png"> \
-                   <img title="Crop selected area" alt="" id="edit-crop" src="' + modulePath + '/icons/scissors.png"> \
-                   <img title="Brightness/Contrast" alt="" id="edit-brightness" src="' + modulePath + '/icons/contrast.png"> \
-                   <img title="Adjust Color" alt="" id="edit-color" src="' + modulePath + '/icons/color_wheel.png"> \
-                   <img title="Rotate image 90 degrees counter-clockwise" alt="" id="edit-left"   src="' + modulePath + '/icons/rotate-left.png"> \
-                   <img title="Rotate image 90 degrees clockwise" alt="" id="edit-right"  src="' + modulePath + '/icons/rotate-right.png"> \
-                   <img title="Reset Image"  alt="" id="view-reset" src="' + modulePath + '/icons/reset.png"> \
-                 </div> \
-                 <div id="file-buttons" class="buttons"> \
-                   <div>File</div> \
-                   <img title="Email image" alt="" id="file-email" class="disabled" src="' + modulePath + '/icons/mail.png"> \
-                   <img title="Send image to clipboard" alt="" id="file-clipboard" class="disabled" src="' + modulePath + '/icons/clipboard.png"> \
-                   <img title="Download original image to your computer" alt="" id="file-download" src="' + modulePath + '/icons/download.png"> \
-                   <img title="Save edited image" alt="" id="file-save" src="' + modulePath + '/icons/floppy.png"> \
-                   <img title="Delete image" alt="" id="file-delete" src="' + modulePath + '/icons/delete.png"> \
-                 </div> \
-                 <div id="debug-buttons" class="buttons"> \
-                   <div>Debug</div> \
-                   <img title="Toggle status output" alt="" id="debug-status" src="' + modulePath + '/icons/bug.png">\
-                   <img title="Toggle debug messages" alt="" id="debug-messages" src="' + modulePath + '/icons/bug2.png"> \
-                 </div> \
-               </div> \
-               <div id="imager-canvas-wrapper"> \
-                 <canvas id="imager-canvas"></canvas> \
-               </div>  \
-             </div>  \
-             <div id="imager-brightness"> \
-               <table class="imager-sliders"> \
-                 <tr> \
-                   <td>Brightness</td> \
-                   <td><input id="slider-brightness" class="slider" type="range" min="-100" max="100" step="1" /></td> \
-                 </tr> \
-                 <tr> \
-                   <td>Contrast</td> \
-                   <td><input id="slider-contrast"   class="slider" type="range" min="-100" max="100" step="1" /></td> \
-                 </tr> \
-               </table> \
-               <button id="brightness-apply">Apply</button> \
-               <button id="brightness-reset">Reset</button> \
-               <button id="brightness-cancel">Cancel</button> \
-             </div> \
-             <div id="imager-color"> \
-               <table class="imager-sliders"> \
-                 <tr> \
-                   <td>Hue</td> \
-                   <td><input id="slider-hue"        class="slider" type="range" min="-180" max="180" step="1" /></td> \
-                 </tr> \
-                 <tr> \
-                   <td>Saturation</td> \
-                   <td><input id="slider-saturation" class="slider" type="range" min="-100" max="100" step="1" /></td> \
-                 </tr> \
-                 <tr> \
-                   <td>Lightness</td> \
-                   <td><input id="slider-lightness" class="slider" type="range" min="-100" max="100" step="1" /></td> \
-                 </tr> \
-               </table> \
-               <button id="color-apply">Apply</button> \
-               <button id="color-reset">Reset</button> \
-               <button id="color-cancel">Cancel</button> \
-             </div> \
-             <div id="imager-filesave"> \
-               <div class="title">Save file: <span id="save-file-name">bogus</span></div> \
-               <table id="resolution"> \
-                 <tr><td><input type="radio" name="resolution" value="screen"></td> \
-                     <td>Screen</td> \
-                     <td id="canvas-resolution"></td> \
-                     <td id="scale" rowspan="2"></td></tr> \
-                 <tr><td><input type="radio" name="resolution" value="image-cropped" disabled> \
-                     </td><td>Displayed Image</td> \
-                     <td id="image-display-resolution"></td></tr> \
-                 <tr><td><input type="radio" name="resolution" value="image-full" checked="checked"></td> \
-                     <td>Full Image</td> \
-                     <td id="image-full-resolution"> \
-                     </td><td></td></tr> \
-               </table> \
-               <button id="file-save-new">New File</button> \
-               <button id="file-save-overwrite">Overwrite</button> \
-               <button id="file-save-cancel">Cancel</button> \
-             </div> \
-             <div id="imager-status"></div> \
-             <div id="imager-info"> \
-               <div id="imager-info-content"></div> \
-               <div id="imager-info-buttons">  \
-                 <img title="Exit popup" alt="" id="imager-info-exit" src="' + modulePath + '/icons/redx.png"> \
-               </div> \
-             </div> \
-             <div id="imager-edit"> \
-               <div id="imager-edit-content"></div> \
-               <div id="imager-edit-buttons">  \
-                 <img title="Apply and exit" alt="" id="imager-edit-apply" src="' + modulePath + '/icons/checkmark.png"> \
-                 <img title="Exit popup" alt="" id="imager-edit-exit" src="' + modulePath + '/icons/redx.png"> \
-               </div> \
-             </div> \
-             <div id="imager-messages"></div> \
-             <canvas id="imager-canvas-org"></canvas> \
-             <img alt="" id="imager-busy" src="' + modulePath + '/icons/busy.gif"> \
-           </div>');
+//      $('#page').append(' \
+//         <div id="imager-wrapper420"> \
+//           <canvas id="imager-canvas-org"></canvas> \
+//           <img alt="" id="imager-busy" src="' + modulePath + '/icons/busy.gif"> \
+//         </div>');
         
     // Additional buttons for above, saved here
     //   <img title="Zoom to fit" alt="" id="zoom-fit" class="disabled" src="icons/zoom.png"><br> \

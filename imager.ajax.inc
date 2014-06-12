@@ -7,7 +7,7 @@
  */
 
 function displayEntity() {
-  $iconPath = drupal_get_path('module', 'imager') . '/icons';
+  $iconPath = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'imager') . '/icons';
   $uri       = urldecode($_POST['uri']);
   $cmp = extractPathComponents($uri);
   $puri = "public://$cmp[dir]/$cmp[filename].$cmp[suffix]";
@@ -20,10 +20,9 @@ function displayEntity() {
 //$user = user_load($file->field_who[und][0]['target_id']);
 //$file->field_who[und][0]['entity'] = $user;
   $viewMode = $_POST['viewMode'];
-  $modulePath = $_POST['modulePath'];
   $view = file_view($file,$viewMode);
 
-  $common = "class='imager-info-edit' src='$modulePath/icons/edit.png'";
+  $common = "class='imager-info-edit' src='$iconPath/edit.png'";
   $view['field_file_image_title_text']['#prefix'] = "<img id='imager-field-file-image-title-text' $common />";
   $view['field_who']['#prefix']                   = "<img id='imager-field-who' $common />";
   $view['field_how']['#prefix']                   = "<img id='imager-field-how' $common />";
@@ -34,13 +33,13 @@ function displayEntity() {
 
   // Geometry and filesize added by ecoMedia module - cannot be edited
   $view['field_geometry']['#prefix'] = "<img id='imager-field-geometry' " .
-            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+            "class='imager-info-edit' src='$iconPath/blank.png' />";
   $view['field_filename']['#prefix'] = "<img id='imager-field-filename' " .
-            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+            "class='imager-info-edit' src='$iconPath/blank.png' />";
   $view['field_owner']['#prefix']    = "<img id='imager-field-owner' " .
-            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+            "class='imager-info-edit' src='$iconPath/blank.png' />";
   $view['field_filesize']['#prefix'] = "<img id='imager-field-filesize' " .
-            "class='imager-info-edit' src='$modulePath/icons/blank.png' />";
+            "class='imager-info-edit' src='$iconPath/blank.png' />";
 
   $out['data'] = drupal_render($view);
   print json_encode($out);
@@ -61,7 +60,7 @@ function editFormLoad() {
   $file = file_load($fid);
 //$viewMode = $_POST['viewMode'];
 //$out['data'] = drupal_render(drupal_get_form('imager_file_entity_edit',$file));
-  $form_id = 'imager_file_entity_edit';
+  $form_id = 'file_entity_edit';
   $out['data'] = drupal_render(drupal_get_form($form_id,$file));
   print json_encode($out);
 }
