@@ -75,7 +75,7 @@ function imager_load_js_css($cssSelector,$viewMode) {
   global $imagerModulePath;
   $imagerModulePath = drupal_get_path('module', 'imager');
 //drupal_add_js ('misc/jquery.form.js',  array('weight' => 1001));
-  drupal_add_js ($imagerModulePath . '/js/jquery-ui-1.10.4/js/jquery-ui-1.10.4.min.js', array('weight' => 1002));
+  drupal_add_js ($imagerModulePath . '/js/jquery-ui-1.10.4.min.js', array('weight' => 1002));
   drupal_add_library ('system', 'drupal.ajax');
 
   drupal_add_js(

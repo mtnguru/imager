@@ -171,7 +171,7 @@
         }
         $elem.css({'left': left,
                    'top':  top});
-        $elem.hide().draggable({
+        $elem.draggable({
           stop: function(evt,ui) {
             var left = $(this).css('left');
             var top = $(this).css('top');
@@ -693,7 +693,8 @@
             $('#imager-info-content').html(response['data']);
             $('.imager-info-edit').click(function (evt) {
               var $field = this.id.replace('imager-','');
-              $imagerEdit.css('right',$(window).width() - evt.pageX + 10).css('top',evt.pageY);
+              var pageX = evt.pageX;
+              var pageY = evt.pageY;
               processAjax('imager/ajax/edit_form_field_load',
                           { action: 'edit-form-field-load',
                             uri: imagerSrc,
@@ -707,6 +708,7 @@
                 if (response['data']) {
                   $('#imager-edit-content').html(response['data']);
                 }
+                $imagerEdit.css('left',pageX - $imagerEdit.outerWidth() - 10).css('top',pageY);
                 $imagerEdit.show();
               });
             });
