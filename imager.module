@@ -211,6 +211,7 @@ function imager_page_alter(&$page) {
       'busy'       => _imagerBuildBusy(),
       'map'        => _imagerBuildMap(),
       'form'       => _imagerBuildForm(),
+      'confirm'    => _imagerBuildConfirm(),
     );
   }
 }
@@ -254,8 +255,9 @@ function _imagerBuildOverlay() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'mode_view'  => _imagerBuildButton(1,'mode-view','eye.png','Quick image viewing'),
-        'mode_lock'  => _imagerBuildButton(2,'mode-lock','lock.png','Lock image to screen'),
+        'mode_view'      => _imagerBuildButton(1,'mode-view','eye.png','Enable/Disable quick image viewing - view on hover'),
+        'mode_lock'      => _imagerBuildButton(2,'mode-lock','lock.png','Lock image to screen'),
+        'mode_configure' => _imagerBuildButton(3,'mode-configure','configure.png','Under Construction - Configure settings'),
       ),
       'view_buttons' => array(
         '#prefix' => '<div id="view-buttons" class="buttons">',
@@ -301,11 +303,11 @@ function _imagerBuildOverlay() {
           '#prefix' => '<div>',
           '#suffix' => '</div>',
         ),
-        'file_save'        => _imagerBuildButton(1,'file-save','floppy.png','Save edited image'),
-        'file_download'    => _imagerBuildButton(2,'file-download','download.png','Download image to local file system','disabled'),
-        'file_email'       => _imagerBuildButton(3,'file-email','mail.png','E-mail image','disabled'),
-        'file_clipboard'   => _imagerBuildButton(4,'file-clipboard','clipboard.png','Send image to clipboard','disabled'),
-        'file_delete'      => _imagerBuildButton(5,'file-delete','delete.png','Delete image'),
+        'file_database'    => _imagerBuildButton(1,'file-database','database_go.png','Save edited image to database'),
+        'file_delete'      => _imagerBuildButton(2,'file-delete','database_delete.png','Delete image from database'),
+        'file_download'    => _imagerBuildButton(3,'file-download','download.png','Download image to local file system'),
+        'file_email'       => _imagerBuildButton(4,'file-email','mail.png','Under Construction - E-mail image'),
+        'file_clipboard'   => _imagerBuildButton(5,'file-clipboard','clipboard.png','Send image to clipboard'),
       ),
       'debug_buttons' => array(
         '#prefix' => '<div id="debug-buttons" class="buttons">',
@@ -342,42 +344,35 @@ function _imagerBuildBrightness() {
   return array(
     '#prefix' => '<div id="imager-brightness">',
     '#suffix' => '</div>',
-    'table' => array(
-      '#theme' => 'table',
-      '#rows' => array(
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            t('Brightness'),
-            '<input id="slider-brightness" class="slider" type="range" min="-100" max="100" step="1" />',
+    'content' => array(
+      '#prefix' => '<div id="imager-brightness-content" class="imager-content">',
+      '#suffix' => '</div>',
+      'table' => array(
+        '#theme' => 'table',
+        '#rows' => array(
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              t('Brightness'),
+              '<input id="slider-brightness" class="slider" type="range" min="-100" max="100" step="1" />',
+            ),
           ),
-        ),
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            t('Contrast'),
-            '<input id="slider-contrast"   class="slider" type="range" min="-100" max="100" step="1" />',
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              t('Contrast'),
+              '<input id="slider-contrast"   class="slider" type="range" min="-100" max="100" step="1" />',
+            ),
           ),
         ),
       ),
     ),
-    'apply' => array(
-      '#prefix' => '<button id="brightness-apply">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Apply'),
-    ),
-    'reset' => array(
-      '#prefix' => '<button id="brightness-reset">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Reset'),
-    ),
-    'cancel' => array(
-      '#prefix' => '<button id="brightness-cancel">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Cancel'),
+    'buttons' => array(
+      '#prefix' => '<div id="imager-brightness-buttons" class="imager-buttons">',
+      '#suffix' => '</div>',
+      'apply'   => _imagerBuildButton(1,'brightness-apply', 'checkmark.png','Apply changes and exit'),
+      'reset'   => _imagerBuildButton(2,'brightness-reset', 'reset.png','Reset brightness and contrast'),
+      'cancel'  => _imagerBuildButton(3,'brightness-cancel','redx.png','Exit without applying changes'),
     ),
   );
 }
@@ -391,49 +386,42 @@ function _imagerBuildColor() {
   return array(
     '#prefix' => '<div id="imager-color">',
     '#suffix' => '</div>',
-    'table' => array(
-      '#theme' => 'table',
-      '#rows' => array(
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            t('Hue'),
-            '<input id="slider-hue" class="slider" type="range" min="-100" max="100" step="1" />',
+    'content' => array(
+      '#prefix' => '<div id="imager-color-content" class="imager-content">',
+      '#suffix' => '</div>',
+      'table' => array(
+        '#theme' => 'table',
+        '#rows' => array(
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              t('Hue'),
+              '<input id="slider-hue" class="slider" type="range" min="-100" max="100" step="1" />',
+            ),
           ),
-        ),
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            t('Saturation'), 
-            '<input id="slider-saturation" class="slider" type="range" min="-100" max="100" step="1" />',
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              t('Saturation'), 
+              '<input id="slider-saturation" class="slider" type="range" min="-100" max="100" step="1" />',
+            ),
           ),
-        ),
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            t('Lightness'),
-            '<input id="slider-lightness"  class="slider" type="range" min="-100" max="100" step="1" />',
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              t('Lightness'),
+              '<input id="slider-lightness"  class="slider" type="range" min="-100" max="100" step="1" />',
+            ),
           ),
         ),
       ),
     ),
-    'apply' => array(
-      '#prefix' => '<button id="color-apply">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Apply'),
-    ),
-    'reset' => array(
-      '#prefix' => '<button id="color-reset">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Reset'),
-    ),
-    'cancel' => array(
-      '#prefix' => '<button id="color-cancel">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Cancel'),
+    'buttons' => array(
+      '#prefix' => '<div id="imager-brightness-buttons" class="imager-buttons">',
+      '#suffix' => '</div>',
+      'apply'   => _imagerBuildButton(1,'color-apply', 'checkmark.png','Apply changes and exit'),
+      'reset'   => _imagerBuildButton(2,'color-reset', 'reset.png','Reset hue, saturation and lightness'),
+      'cancel'  => _imagerBuildButton(3,'color-cancel','redx.png','Exit without applying changes'),
     ),
   );
 }
@@ -447,59 +435,84 @@ function _imagerBuildFilesave() {
   return array(
     '#prefix' => '<div id="imager-filesave">',
     '#suffix' => '</div>',
-    'title'   => array(
-      '#prefix' => '<div class="title">',
+    'content' => array(
+      '#prefix' => '<div id="imager-filesave-content" class="imager-content">',
       '#suffix' => '</div>',
-      '#type' => 'markup',
-      '#markup' => t('Save file: <span id="save-file-name">bogus</span>'),
-    ),
-    'table' => array(
-      '#theme' => 'table',
-      '#rows' => array(
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            '<input type="radio" name="resolution" value="screen" />',
-            t('Screen'),
-            array('id' => 'canvas-resolution'),
-            array('id' => 'scale', 'rowspan' => 2),
-          ),
+      'title'   => array(
+        '#weight' => 1,
+        '#prefix' => '<div class="title">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => t('<span id="save-file-title">bogus</span>'),
+      ),
+      'messages' => array(
+        '#weight' => 2,
+        '#prefix' => '<div id="imager-filesave-messages">',
+        '#suffix' => '</div>',
+      ),
+      'filename' => array(
+        '#weight' => 3,
+        '#prefix' => '<div id="imager-filesave-filename-container">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => "<span>File name:</span><input id='imager-filesave-filename' type='text'></input>",
+      ),
+      'table' => array(
+        '#weight' => 4,
+        '#theme' => 'table',
+        '#header' => array(
+          ' ',
+          'Image',
+          'Resolution',
+          'Geometry',
+          'Ratio'
         ),
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            '<input type="radio" name="resolution" value="image-cropped" disabled>',
-            t('Display Image'),
-            array('id' => 'image-display-resolution'),
+        '#rows' => array(
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              '<input type="radio" name="resolution" value="screen" />',
+              t('Displayed'),
+              t('Display'),
+              array('id' => 'canvas-resolution'),
+              array('id' => 'scale', 'rowspan' => 2),
+            ),
           ),
-        ),
-        array(
-          'no_striping' => TRUE,
-          'data' => array(
-            '<input type="radio" name="resolution" value="image-full" checked="checked"',
-            t('Full Image'),
-            array('id' => 'image-full-resolution'),
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              '<input type="radio" name="resolution" value="image-cropped checked="checked" />',
+              t('Displayed'),
+              t('Image'),
+              array('id' => 'image-display-resolution'),
+            ),
+          ),
+          array(
+            'no_striping' => TRUE,
+            'data' => array(
+              '<input type="radio" name="resolution" value="image-full" />',
+              t('Full'),
+              t('Image'),
+              array('id' => 'image-full-resolution'),
+            ),
           ),
         ),
       ),
     ),
-    'new' => array(
-      '#prefix' => '<button id="file-save-new">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('New'),
-    ),
-    'overwrite' => array(
-      '#prefix' => '<button id="file-save-overwrite">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Overwrite'),
-    ),
-    'cancel' => array(
-      '#prefix' => '<button id="file-save-cancel">',
-      '#suffix' => '</button>',
-      '#type' => 'markup',
-      '#markup' => t('Cancel'),
+    'buttons' => array(
+      '#prefix'   => '<div id="imager-filesave-buttons" class="imager-buttons">',
+      '#suffix'   => '</div>',
+      'email'     => _imagerBuildButton(1,'filesave-email',    'mail.png',    'Email image and exit'),
+      'clipboard' => _imagerBuildButton(2,'filesave-clipboard','clipboard.png','Send image to clipboard and exit'),
+      'file_download'    => array (
+        '#weight' => 3,
+        '#prefix' => '<a id="filesave-download">',
+        '#suffix' => '</a>',
+        'image'    => _imagerBuildButton(3,'filesave-download-image','download.png','Download image to local file system'),
+      ),
+      'new'       => _imagerBuildButton(4,'filesave-new',      'database_add.png','Create new database entry and exit'),
+      'overwrite' => _imagerBuildButton(5,'filesave-overwrite','database_go.png', 'Overwrite existing database entry'),
+      'cancel'    => _imagerBuildButton(6,'filesave-cancel',   'redx.png',     'Cancel saving file'),
     ),
   );
 }
@@ -513,8 +526,19 @@ function _imagerBuildStatus() {
   return array(
     '#prefix' => '<div id="imager-status">',
     '#suffix' => '</div>',
-    '#type'   => 'markup',
-    '#markup' => 'Placeholder for status popup',
+    'content' => array(
+      '#prefix' => '<div id="imager-status-content" class="imager-content">',
+      '#suffix' => '</div>',
+      '#weight' => 1,
+      '#type'   => 'markup',
+      '#markup' => 'Placeholder for status popup',
+    ),
+    'buttons' => array(
+      '#prefix' => '<div id="imager-status-buttons" class="imager-buttons">',
+      '#suffix' => '</div>',
+      '#weight' => 2,
+      'exit'  => _imagerBuildButton(1,'imager-status-exit','redx.png','Exit Status dialog'),
+    ),
   );
 }
 
@@ -528,14 +552,14 @@ function _imagerBuildInfo() {
     '#prefix' => '<div id="imager-info">',
     '#suffix' => '</div>',
     'content' => array(
-      '#prefix' => '<div id="imager-info-content">',
+      '#prefix' => '<div id="imager-info-content" class="imager-content">',
       '#suffix' => '</div>',
       '#weight' => 1,
       '#type'   => 'markup',
       '#markup' => 'Placeholder for information popup',
     ),
     'buttons' => array(
-      '#prefix' => '<div id="imager-info-buttons">',
+      '#prefix' => '<div id="imager-info-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
       'exit'  => _imagerBuildButton(1,'imager-info-exit','redx.png','Exit Information dialog'),
@@ -553,17 +577,17 @@ function _imagerBuildEdit() {
     '#prefix' => '<div id="imager-edit">',
     '#suffix' => '</div>',
     'content' => array(
-      '#prefix' => '<div id="imager-edit-content">',
+      '#prefix' => '<div id="imager-edit-content" class="imager-content">',
       '#suffix' => '</div>',
       '#weight' => 1,
       '#type'   => 'markup',
       '#markup' => 'Placeholder for edit popup',
     ),
     'buttons' => array(
-      '#prefix' => '<div id="imager-edit-buttons">',
+      '#prefix' => '<div id="imager-edit-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
-      'apply'  => _imagerBuildButton(1,'imager-edit-apply','checkmark.png','Apply changes and exit'),
+      'apply'  => _imagerBuildButton(1,'imager-edit-apply','database_go.png','Apply changes and exit'),
       'exit'   => _imagerBuildButton(2,'imager-edit-exit','redx.png','Exit Edit dialog'),
     ),
   );
@@ -578,8 +602,18 @@ function _imagerBuildMessages() {
   return array(
     '#prefix' => '<div id="imager-messages">',
     '#suffix' => '</div>',
-    '#type'   => 'markup',
-    '#markup' => 'Placeholder for messages popup',
+    'content' => array(
+      '#prefix' => '<div id="imager-messages-content" class="imager-content">',
+      '#suffix' => '</div>',
+      '#weight' => 1,
+      '#type'   => 'markup',
+      '#markup' => 'Placeholder for messages popup',
+    ),
+    'buttons' => array(
+      '#prefix' => '<div id="imager-filesave-buttons" class="imager-buttons">',
+      '#suffix' => '</div>',
+      'exit'   => _imagerBuildButton(2,'imager-messages-exit','redx.png','Exit Messages dialog'),
+    ),
   );
 }
 
@@ -621,15 +655,15 @@ function _imagerBuildMap() {
     '#prefix' => '<div id="imager-map">',
     '#suffix' => '</div>',
     'content' => array(
-      '#prefix' => '<div id="imager-map-content">',
+      '#prefix' => '<div id="imager-map-content" class="imager-content">',
       '#suffix' => '</div>',
       '#weight' => 1,
       '#type'   => 'markup',
       '#markup' => '<h3>Interactive Map - Under Construction</h3>' .
-                   '<p>Full interactive map with markers showing all photos on originating page.  The current image will be centered and highlighted with a different color.</p><img alt="" id="imager-map-image" src="' . $GLOBALS['base_url'] . '/' . $imagerModulePath . '/icons/waterworld.png">',
+                   '<p>The plan is to put a full interactive map with markers showing all photos on originating page.  The current image\'s marker will be centered and highlighted with a different color.</p><img alt="" id="imager-map-image" src="' . $GLOBALS['base_url'] . '/' . $imagerModulePath . '/icons/fakemap.png">',
     ),
     'buttons' => array(
-      '#prefix' => '<div id="imager-map-buttons">',
+      '#prefix' => '<div id="imager-map-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
       'exit'   => _imagerBuildButton(2,'imager-map-exit','redx.png','Exit Map dialog'),
@@ -668,7 +702,31 @@ function _imagerBuildForm() {
   return $div;
 }
 
-
+function _imagerBuildConfirm() {
+  global $imagerModulePath;
+  return array(
+    '#prefix' => '<div id="imager-confirm">',
+    '#suffix' => '</div>',
+    'content' => array(
+      '#prefix' => '<div id="imager-confirm-content" class="imager-content">',
+      '#suffix' => '</div>',
+      '#weight' => 1,
+      '#type'   => 'markup',
+      '#markup' => '<p>Placeholder for confirm dialog</p>',
+    ),
+    'buttons-wrapper' => array(
+      '#prefix' => '<div id="imager-confirm-buttons-wrapper">',
+      '#suffix' => '</div>',
+      '#weight' => 2,
+      'buttons' => array(
+        '#prefix' => '<div id="imager-confirm-buttons" class="imager-buttons">',
+        '#suffix' => '</div>',
+        'apply'   => _imagerBuildButton(1,'imager-confirm-apply','checkmark.png','Apply action'),
+        'exit'    => _imagerBuildButton(2,'imager-confirm-exit','redx.png','Do nothing and exit dialog'),
+      ),
+    ),
+  );
+}
 
 /**
  * Page callback: Form constructor for the file edit form.

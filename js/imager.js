@@ -35,6 +35,7 @@
     var $imagerCanvas2;    // canvas with original full image - never shown
     var $imagerInfo;       // popup for displaying text information
     var $imagerMap;        // popup for displaying map showing locations of images
+    var $imagerConfirm;    // popup for confirming actions - delete image
     var $imagerEdit;       // popup for displaying text information
     var $imagerBrightness; // brightness slider popup
     var $imagerColor;      // hsl color slider popup
@@ -55,8 +56,11 @@
     var editMode = 0;      // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
     var elapsed = 0;       // # elapsed msec since last mouse up
     var fullScreen = 0;    // Are we currently in full screen mode
-    var editField = '';      // Name of current field being edited
-    var editFieldType = '';  // Type of field currently being edited
+    var editField = '';    // Name of current field being edited
+    var editFieldType = '';// Type of field currently being edited
+    var fileSaveMode = ''; // Mode for saving files - drupal, local, clipboard, email
+    var confirmMode = '';  // Mode for the confirmation dialog - deleteFile
+    var messageTimeout;    // Message timeout function - needed for clearTimeout
 
     var mw;  // Maximum canvas width
     var mh;  // Maximum canvas height
@@ -121,6 +125,10 @@
       $imagerMap.hide();
       initDraggable($imagerMap,'info_map',5,5);
       
+      $imagerConfirm       = $('#imager-confirm');
+      $imagerConfirm.hide();
+      initDraggable($imagerConfirm,'confirm_location',5,5);
+      
       $imagerEdit       = $('#imager-edit');
       $imagerEdit.hide();
       initDraggable($imagerEdit,'edit_location',0,0);
@@ -150,6 +158,10 @@
       $imagerBusy.hide();
 
       $('#imager-form').empty();
+
+      if (localStorage.quickView === "TRUE") {
+        $('#mode-view').addClass('checked');
+      }
 
       $thumbnails   = $(Drupal.settings.imager.cssSelector);
       if ($thumbnails.length == 0) return; // No thumbnails found, exit 
@@ -206,9 +218,9 @@
 //      ptCUlT = ctx.transformedPoint(0,0);
 //      ptCLrT = ctx.transformedPoint(cw,ch);
       if (localStorage.imagerShowStatus === "FALSE") return;
-      $imagerStatus.html(
+      $('#imager-status-content').html(
         '<div>Image file: ' + decodeURIComponent(imagerSrc.split('/').reverse()[0]) + '</div>' +
-        '<span>' +
+        '<div class="imager-col">' +
           '<table>' +
             '<tr><th>Name</th><th>Value</th></tr>' +
             '<tr><td>View Mode</td><td>'   + viewMode + '</td></tr>' +
@@ -224,8 +236,8 @@
             '<tr><td>Saturation</td><td>'  + parseInt(saturation*100)/100 + '</td></tr>' +
             '<tr><td>Lightness</td><td>'   + parseInt(lightness*100)/100 + '</td></tr>' +
           '</table>' +
-        '</span>' +
-        '<span>' +
+        '</div>' +
+        '<div class="imager-col">' +
           '<table>' +
             '<tr><th>Name</th><th>Width</th><th>Height</th></tr>' +
             '<tr><td>Maximum Canvas</td><td>'   + parseInt(mw) + '</td><td>' + parseInt(mh) + '</td></tr>' +
@@ -233,8 +245,8 @@
             '<tr><td>Displayed Image</td><td>'  + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
             '<tr><td>Full Image</td><td>'+ iw + '</td><td>' + ih + '</td></tr>' +
           '</table>' +
-        '</span>' +
-        '<span>' +
+        '</div>' +
+        '<div class="imager-col">' +
           '<table>' +
             '<tr><th>Name</th><th>X</th><th>Y</th></tr>' +
             '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>'  + parseInt(ptNowC.y) + '</td></tr>' +
@@ -244,7 +256,7 @@
             '<tr><td>Upper Left Canvas Tx</td><td>'    + parseInt(ptCUlT.x)   + '</td><td>' + parseInt(ptCUlT.y)   + '</td></tr>' +
             '<tr><td>Lower Right Canvas Tx</td><td>'   + parseInt(ptCLrT.x)   + '</td><td>' + parseInt(ptCLrT.y)   + '</td></tr>' +
           '</table>' +
-        '</span>'
+        '</div>'
       );
     };
 
@@ -291,7 +303,6 @@
       ptDownC.y = ch/2;
       $imagerCanvas.attr({width:  cw,
                        height: ch});
-  //  setViewMode(0);
       setEditMode(0);
       ptNowC.x=0;    
       ptNowC.y=0;
@@ -698,6 +709,7 @@
 * @returns {undefined}
 */
     function getInfo() {
+      $imagerBusy.show();
       processAjax('imager/ajax/display_entity',
                   { action: 'display-entity',
                     uri: imagerSrc,
@@ -713,6 +725,8 @@
             var clientX = evt.clientX;
             var clientY = evt.clientY;
             // Display edit popup - render current field from default edit form  
+            $imagerBusy.show();
+            displayMessage('Contacting Server ... loading form field');
             processAjax('imager/ajax/edit_form_field_load',  
                         { action: 'edit-form-field-load',
                           uri: imagerSrc,
@@ -865,19 +879,19 @@
       switch (newMode) {
         case 0:   // #mode-view
           if (viewMode == 2) enablePanZoom();      
-          $('#mode-view').addClass('checked');
+//        $('#mode-view').addClass('checked');
           $('#mode-lock').removeClass('checked');
           $('#mode-crop').removeClass('checked');
           break;
         case 1:   // #mode-lock
           if (viewMode == 2) enablePanZoom();      
-          $('#mode-view').removeClass('checked');
+//        $('#mode-view').removeClass('checked');
           $('#mode-lock').addClass('checked');
           $('#mode-crop').removeClass('checked');
           break;
         case 2:   // #mode-crop
           if (viewMode < 2) enableCrop();
-          $('#mode-view').removeClass('checked');
+//        $('#mode-view').removeClass('checked');
           $('#mode-lock').addClass('checked');
           $('#mode-crop').addClass('checked');
           break;
@@ -990,8 +1004,20 @@
     $imagerMap.hide();
     $imagerStatus.hide();
     $imagerMessages.hide();
-    setViewMode(0);
+    $imagerConfirm.hide();
+    setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
     setEditMode(0);
+  }
+
+
+  function displayMessage(msg) {
+    $imagerMessages.show();
+    $('#imager-messages-content').html(msg);
+    if (localStorage['imagerShowDebug'] === "FALSE") {
+       messageTimeout = setTimeout(function() {
+         $imagerMessages.hide();
+       },5000);
+    }
   }
 
 /**
@@ -1071,12 +1097,12 @@
         }
       });
       // click on #image-ques - ajax call to bring in image description
-      $imagerStatus.click(function(evt) {
+      $('#imager-status-exit').click(function(evt) {
         $imagerStatus.hide();
         $('#debug-status').removeClass('checked');
         localStorage['imagerShowStatus'] = "FALSE";
       });
-      $imagerMessages.click(function(evt) {
+      $('#imager-messages-exit').click(function(evt) {
         $imagerMessages.hide();
         $('#debug-messages').removeClass('checked');
         localStorage['imagerShowDebug'] = "FALSE";
@@ -1146,6 +1172,8 @@
             alert('Unknown editFieldType ' + editFieldType);
             break;
         }
+        $imagerBusy.show();
+        displayMessage('Saving ...');
         processAjax('imager/ajax/save_file_entity_field',
                     { action: 'save-file-entity-field',
                       field: editField,
@@ -1156,16 +1184,6 @@
           var status = response['status'];
           getInfo();
         });
-        $imagerMessages.show().html(out);
-  //      $elems = $('#imager-edit-content select');
-  //      if ($elems.length) {
-  //        var out = '';
-  //        $elems.each(function (index,value) {
-  //          out += "another";
-  //        });
-  //        alert("select " + out);
-  //      }
-
         // extract value from popup, update database and re-render?
         // or do I re-render a single field.
       });
@@ -1174,8 +1192,13 @@
     // div#mode-buttons event handlers
       // click on #mode-view - set mode back to view=0
       $('#mode-view').click(function() {
-        setViewMode(0);
-        updateStatus();
+        if (localStorage.quickView === "FALSE") {
+          localStorage.quickView = "TRUE";
+          $(this).addClass('checked');
+        } else {
+          localStorage.quickView = "FALSE";
+          $(this).removeClass('checked');
+        }
       });
 
       // click on #mode-lock - set mode to edit=1
@@ -1292,45 +1315,106 @@
       $('#slider-lightness').change(function()  { adjustColor($imagerCanvas2,$imagerCanvas);});
 
     // div#file-buttons click event handlers
-      $('#file-save').click(function () {
+      function initFileSave(saveMode,saveTitle,filename,message) {
+        fileSaveMode = saveMode;
         setViewMode(1);
-        $('#save-file-name').text(decodeURIComponent(imagerSrc.split('/').reverse()[0]));
+        $('#imager-filesave-filename').val(filename);
+        $('#imager-filesave-messages').html("<p>" + message + "</p>");
+        $('#save-file-title').text(saveTitle);
         $('#canvas-resolution').html(cw + 'x' + ch);
         $('#image-display-resolution').html(parseInt(ptCLrT.x - ptCUlT.x) + 'x' + parseInt(ptCLrT.y - ptCUlT.y));
         $('#image-full-resolution').html(iw + 'x' + ih);
         $('#scale').html(parseInt(cscale * 100) / 100);
         $imagerFilesave.show();
+      };
+      $('#file-database').click(function () {
+        $('#filesave-clipboard').hide();
+        $('#filesave-email').hide();
+        $('#filesave-download').hide();
+        $('#filesave-new').show();
+        $('#filesave-overwrite').show();
+        $('#imager-filesave-filename-container').show();
+        initFileSave('database',"Save image to database",decodeURIComponent(imagerSrc).replace(/^.*\/files\//),'');
       });
-      $('#file-save-new').click(function () {
+      $('#file-download').click(function () {
+        $('#filesave-clipboard').hide();
+        $('#filesave-email').hide();
+        $('#filesave-download').show();
+        $('#filesave-new').hide();
+        $('#filesave-overwrite').hide();
+        $('#imager-filesave-filename-container').show();
+        initFileSave('download',"Download image to local file system",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
+                     'The download feature is under development.<br>It does not work in all browsers and is intermittent.');
+      });
+      $('#file-email').click(function () {
+        $('#filesave-clipboard').hide();
+        $('#filesave-email').show();
+        $('#filesave-download').hide();
+        $('#filesave-new').hide();
+        $('#filesave-overwrite').hide();
+        $('#imager-filesave-filename-container').hide();
+        initFileSave('email',"Email image",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
+                     'The email feature is under development.');
+      });
+      $('#file-clipboard').click(function () {
+        $('#filesave-clipboard').show();
+        $('#filesave-email').hide();
+        $('#filesave-download').hide();
+        $('#filesave-new').hide();
+        $('#filesave-overwrite').hide();
+        $('#imager-filesave-filename-container').hide();
+        initFileSave('clipboard','Send image to clipboard','image.png',
+                     'The clipboard feature is under development.<br>It does not work in all browsers.');
+      });
+
+      $('#filesave-new').click(function () {
         saveFile(false);
+        $imagerBusy.hide();
         $imagerFilesave.hide();
       });
-      $('#file-save-overwrite').click(function () {
+      $('#filesave-overwrite').click(function () {
         saveFile(true);
+        $imagerBusy.hide();
         $imagerFilesave.hide();
       });
-      $('#file-save-cancel').click(function () {
+      $('#filesave-download').click(function () {
+        $imagerBusy.show();
+        displayMessage('Extracting Image...');
+        this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
+        this.href = getImage($('input[name="resolution"]:checked').val(),true);
+        $imagerBusy.hide();
+        $imagerFilesave.hide();
+      });
+      $('#filesave-clipboard').click(function () {
+        displayMessage('Sending the image to the clipboard is under construction');
+      });
+      $('#filesave-email').click(function () {
+        displayMessage('Email feature is under construction');
+      });
+      $('#filesave-cancel').click(function () {
         $imagerFilesave.hide();
         redraw();
       });
       $('#file-delete').click(function () {
-        deleteFile();
-        $imagerFilesave.hide();
-        $imagerInfo.hide();
-        $imagerEdit.hide();
-        //$imagerEdit.hide();
-        $imagerOverlay.hide();
-        $imagerStatus.hide();
+        confirmMode = 'deleteFile';
+        $('#imager-confirm-content').html('<h4>Are you sure you want to permanently delete this image?</h4>');
+        $imagerConfirm.show();
       });
 
-      $imagerMessages.click(function (evt) {
-        $(this).hide();
+      $('#imager-confirm-apply').click(function () {
+        switch (confirmMode) {
+          case 'deleteFile': 
+            deleteFile();
+            hidePopups();
+            break;
+        }
       });
-      $('#file-download').click(function() {
-        window.open(imagerSrc);
+      $('#imager-confirm-exit').click(function () {
+        $imagerConfirm.hide();
       });
 
-    //div#debug-buttons event handlers
+
+      //div#debug-buttons event handlers
       // toggle debug
       $('#debug-status').click(function(evt) {
         if (localStorage.imagerShowStatus === "FALSE") {
@@ -1342,7 +1426,7 @@
           $(this).removeClass('checked');
           $imagerStatus.hide();
         }
-        $imagerMessages.append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>');
+//      $('#imager-messages-content').append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>');
         updateStatus();
       });
       $('#debug-messages').click(function(evt) {
@@ -1350,7 +1434,7 @@
         if (localStorage.imagerShowDebug === "TRUE") {
           $(this).addClass('checked');
           $imagerMessages.show();
-          $imagerMessages.empty();
+          $('#imager-messages-content').empty();
         } else {
           $(this).removeClass('checked');
           $imagerMessages.hide();
@@ -1393,7 +1477,7 @@
             if (viewMode > 0) return false;
             imagerSrc = $(this).parent().attr('href'); // the parent element MUST be a link to the image to load
             imagerTitle = $(this).attr('data-title');
-            setViewMode(0);
+            setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
             changeImage(imagerSrc,evt);
           },
           out: function(evt) {
@@ -1405,20 +1489,17 @@
             var el3 = $(el).closest('#imager-status');
             var el4 = $(el).closest('#imager-map');
             var el5 = $(el).closest('#imager-messages');
+            var el6 = $(el).closest('#imager-confirm');
             if (el === $imagerOverlay[0] || 
                 el1.length || 
                 el2.length || 
                 el3.length || 
                 el4.length || 
-                el5.length) {
+                el5.length || 
+                el6.length) {
     //        console.debug("image mouseleave image has focus");
             } else {
-              $imagerOverlay.hide();
-              $imagerInfo.hide();
-              $imagerEdit.hide();
-              //$imagerEdit.hide();
-              setViewMode(0);
-              setEditMode(0);
+              hidePopups();
               updateStatus();
     //        console.debug("image mouseleave image doesn't have focus ");
             }
@@ -1431,29 +1512,82 @@
 
 /**
 * 
-* @param {type} overwrite
 * @returns {undefined}
 */
-    function saveFile(overwrite) {
+    function getImage(stream) {
       var img;
+      var pt;
       var saveMode;
-      $imagerBusy.show();
-      ctx2.setTransform(1,0,0,1,0,0);
+      var mimeType = "";
+      if (imagerSrc.match(/\.png$/i)) {
+        mimeType = "image/png";
+      } else if (imagerSrc.match(/\.jpe*g$/i)){
+        mimeType = "image/jpeg";
+      }
       switch (saveMode = $('input[name="resolution"]:checked').val()) {
         case 'screen':
-          img = $imagerCanvas[0].toDataURL();
+          img = $imagerCanvas[0].toDataURL(mimeType);
           break;
         case 'image-cropped':
-        case 'image-full':
+          ctx2.setTransform(1,0,0,1,0,0);
+          var ncw;
+          var nch;
           if (rotation == 0 || rotation == 180) {
-            $imagerCanvas2.attr({width:  iw,      // Set canvas to same size as image
-                              height: ih});
+            ncw = Math.abs(ptCLrT.x-ptCUlT.x),
+            nch = Math.abs(ptCLrT.y-ptCUlT.y),
+            $imagerCanvas2.attr({width:  ncw,      // Set canvas to same size as image
+                                 height: nch});
+            if (rotation == 0)  {
+//            ctx2.rotate(angleInRadians(rotation));
+              pt = ctx.transformedPoint(0,0);
+              ctx2.drawImage(cimg,-pt.x,
+                                  -pt.y);
+
+            } else { // rotation == 180
+              ctx2.translate(ncw,nch);
+              ctx2.rotate(angleInRadians(rotation));
+              pt = ctx.transformedPoint(cw,ch);
+              ctx2.drawImage(cimg,-pt.x,
+                                  -pt.y);
+            }
+          } else {
+            ncw = Math.abs(ptCLrT.y-ptCUlT.y),
+            nch = Math.abs(ptCLrT.x-ptCUlT.x),
+            $imagerCanvas2.attr({width:  ncw,      // Set canvas to same size as image
+                                 height: nch});
+            if (rotation == 90) {
+              ctx2.translate(ncw,0);
+              ctx2.rotate(angleInRadians(rotation));
+              pt = ctx.transformedPoint(cw,0);   // Find Upper left corner of canvas in original image
+              ctx2.drawImage(cimg,-pt.x,   // parseInt(pt1.x),
+                                  -pt.y);  // parseInt(pt2.y),
+            } else {
+              ctx2.translate(0,nch);
+              ctx2.rotate(angleInRadians(rotation));
+              pt = ctx.transformedPoint(0,ch);   // Find Upper left corner of canvas in original image
+              ctx2.drawImage(cimg,-pt.x,
+                                  -pt.y);
+            }
+          }
+          img = $imagerCanvas2[0].toDataURL(mimeType);
+          break;
+        case 'image-full':
+          var tcw;
+          var tch;
+          ctx2.setTransform(1,0,0,1,0,0);
+          if (rotation == 0 || rotation == 180) {
+            tcw = iw;
+            tch = ih
+            $imagerCanvas2.attr({width:  tcw,      // Set canvas to same size as image
+                                 height: tch});
             if (rotation == 180)  {
               ctx2.translate(iw,ih);
             }
           } else {
-            $imagerCanvas2.attr({width:  ih,      // Set canvas to same size as image
-                              height: iw});
+            tcw = ih;
+            tch = iw
+            $imagerCanvas2.attr({width:  tcw,      // Set canvas to same size as image
+                                 height: tch});
             if (rotation == 90) {
               ctx2.translate(ih,0);
             } else {
@@ -1461,12 +1595,22 @@
             }
           }
           ctx2.rotate(angleInRadians(rotation));
-          ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
-  
-          img = $imagerCanvas2[0].toDataURL();
+          ctx2.drawImage(cimg,0,0);                 // Copy full image into canvas
+          img = $imagerCanvas2[0].toDataURL(mimeType);
           break;
       }
-      $imagerMessages.show().removeClass('error').html('Saving Image...');
+      if (stream) {
+        img.replace(mimeType, "image/octet-stream");
+      }
+      return img;
+    };
+
+
+    function saveFile(overwrite) {
+      displayMessage('Extracting Image...');
+      $imagerBusy.show();
+      var img = getImage($('input[name="resolution"]:checked').val(),false);
+      displayMessage('Saving Image...');
       processAjax('imager/ajax/save_file',
                   { overwrite: overwrite,
                     action: 'save-file',
@@ -1476,7 +1620,7 @@
                   });
     };
     function deleteFile() {
-      $imagerMessages.show().removeClass('error').html('Deleting Image...');
+      displayMessage('Deleting Image...');
       processAjax('imager/ajax/delete_file',
                   { action: 'delete-file',
                     uri: imagerSrc,
@@ -1559,7 +1703,6 @@
 */
     function processAjax(path,postData,processFunc) {
       postData['siteName']   = Drupal.settings.imager.siteName;
-      $imagerMessages.show().empty();
 //      if (localStorage['imagerShowDebug'] === "TRUE") {
 //        $imagerMessages.append("<h2>Process action: " + postData.action + "</h2>" +
 //          "<div>" + JSON.stringify(postData).substr(1,256) + "</div>\n");
@@ -1569,6 +1712,7 @@
         url:   Drupal.settings.basePath + '?q=' + path, 
         data: postData, 
         success: function (response_json) {
+          clearTimeout(messageTimeout);
           $imagerBusy.hide();
           var response = JSON.parse(response_json);
           var display = false;
@@ -1585,25 +1729,26 @@
           }
 
           if (display) {
-            $imagerMessages.show().removeClass('error').html(out);
+            $imagerMessages.show();
+            $('#imager-messages-content').html(out);
           }
           if (processFunc) processFunc(response);   // Execute users function
           if (localStorage['imagerShowDebug'] === "FALSE") {
             setTimeout(function() {
               $imagerMessages.hide();
-            },5000);
+            },3000);
           }
         },
         error: function(evt) {
           $imagerBusy.hide();
-          $imagerMessages.show()
-                      .addClass('error')
-                      .html('<p>Error: ' + evt.status + ': ' + evt.statusText + 
-                            '<br>Action: ' + postData.action + '</p>');
+          clearTimeout(messageTimeout);
+          $imagerMessages.show();
+          $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText + 
+                                             '<br>Action: ' + postData.action + '</p>');
           if (processFunc) processFunc(response,evt);   // Execute users error function
           if (localStorage['imagerShowDebug'] === "FALSE") {
             setTimeout(function() {
-              $imagerMessages.removeClass('error').hide();
+              $imagerMessages.hide();
             },10000);
           }
         }

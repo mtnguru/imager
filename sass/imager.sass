@@ -53,21 +53,33 @@ $darkergrey:  #444
         background-color: $grey
       .specific
         background-color: $darkgrey
+    #file-buttons
+      margin-bottom: 70px
     #debug-buttons
       z-index: 999
       position: absolute
       bottom: 5px
-.imgareaselect-outer
+
+.imager-buttons
+  position: absolute
+  bottom: 5px
+  right: 5px
+  background-color: $lightgrey
+
+.imager-content
+  margin-bottom: 35px
 
 #imager-status
+  padding: 5px
   position: fixed
   z-index: 1004
   background-color: $grey
   font-size: 80%
-  div
+  #imager-status-content
     text-align: center
-  span
+  .imager-col
     float: left
+    margin: 5px
   table
     border-spacing: 0
     margin: 0
@@ -75,6 +87,7 @@ $darkergrey:  #444
 #imager-info
   position: fixed
   z-index: 1005
+  padding: 5px
   max-width: 600px
   background-color: $grey
   .title
@@ -104,6 +117,7 @@ $darkergrey:  #444
 #imager-edit
   max-width: 700px
   position: fixed
+  padding: 5px
   background-color: $greyer
   z-index: 1010
   .description
@@ -117,15 +131,23 @@ $darkergrey:  #444
     border-radius: 0
     body
       background-image: none
-  #imager-edit-buttons
-    float: right
-    z-index: 1100
-    background-color: $lightgrey
-    img
-      float: left
+
+#imager-confirm
+  max-width: 700px
+  position: fixed
+  background-color: $greyer
+  z-index: 1010
+  .imager-content
+    margin: 0
+  #imager-confirm-buttons
+    position: static
+    margin: 0 auto
+    width: 53px
+    float: none
 
 #imager-map
   max-width: 800px
+  padding: 5px
   position: fixed
   background-color: $greyer
   z-index: 1003
@@ -153,6 +175,7 @@ $darkergrey:  #444
 
 
 #imager-filesave
+  padding: 5px
   position: fixed
   z-index: 1040
   padding: 10px
@@ -160,9 +183,6 @@ $darkergrey:  #444
   #resolution
     margin: 0 auto 10px
     width: auto
-  .title
-    font-weight: bold
-    margin: 10px
 #imager-brightness,
 #imager-color
   position: fixed
