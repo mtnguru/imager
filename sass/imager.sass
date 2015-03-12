@@ -18,18 +18,23 @@ $darkergrey:  #444
   table
     background-color: $grey
     border-collapse: separate
-    border-spacing: 3px
+    border-spacing: 2px
+    td
+      line-height: 1
+      border-top: 0px
+      padding: 2px
     th
       color: $lightgrey
       background-color: $darkgrey
 #imager-overlay.fullscreen
   width: 100%
 #imager-overlay
+  display: none
   background: $greyer
-  z-index: 1000
+  z-index: 1010
   position: fixed
-  top: 5px
-  left: 5px
+  top: 0px
+  left: 0px
   overflow: auto
   button
     background-color: $lightgrey
@@ -54,11 +59,11 @@ $darkergrey:  #444
       .specific
         background-color: $darkgrey
     #file-buttons
-      margin-bottom: 70px
+      margin-bottom: 65px
     #debug-buttons
-      z-index: 999
+      z-index: 1009
       position: absolute
-      bottom: 5px
+      bottom: 3px
 
 .imager-buttons
   position: absolute
@@ -70,23 +75,32 @@ $darkergrey:  #444
   margin-bottom: 35px
 
 #imager-status
-  padding: 5px
+  display: none
   position: fixed
-  z-index: 1004
+  z-index: 1014
   background-color: $grey
+  color: cyan
   font-size: 80%
   #imager-status-content
     text-align: center
-  .imager-col
+  .imager-status-col
     float: left
-    margin: 5px
+    margin: 3px 3px 25px
+  .imager-status-file
+    color: white 
+    
   table
     border-spacing: 0
-    margin: 0
+    margin-bottom: 6px
+    th
+      padding: 2px 4px
+    td
+      padding: 0 4px
 
 #imager-info
+  display: none
   position: fixed
-  z-index: 1005
+  z-index: 1015
   padding: 5px
   max-width: 600px
   background-color: $grey
@@ -99,10 +113,15 @@ $darkergrey:  #444
   .error
     background-color: $red
     color: white
+  .field-name-sfield-owner, 
+  .field-name-sfield-filename, 
+  .field-name-sfield-filesize, 
+  .field-name-sfield-geometry 
+    float: none
+    clear: both
   #imager-info-buttons
     float: right
-    z-index: 1100
-    background-color: $lightgrey
+    z-index: 1110
     img
       float: left
   #imager-info-geometry
@@ -115,17 +134,20 @@ $darkergrey:  #444
       float: left
 
 #imager-edit
+  display: none
   max-width: 700px
   position: fixed
-  padding: 5px
+  padding: 10px
   background-color: $greyer
-  z-index: 1010
+  z-index: 1020
+  .form-item
+    margin: 0
   .description
     font-style: italic
     margin-top: 10px
-    max-width: 300px
+    max-width: 500px
   .form-text 
-    max-width: 650px
+    width: 500px
   table.cke_editor
     background-color: #ccc
     border-radius: 0
@@ -133,10 +155,11 @@ $darkergrey:  #444
       background-image: none
 
 #imager-confirm
+  display: none
   max-width: 700px
   position: fixed
   background-color: $greyer
-  z-index: 1010
+  z-index: 1020
   .imager-content
     margin: 0
   #imager-confirm-buttons
@@ -146,16 +169,17 @@ $darkergrey:  #444
     float: none
 
 #imager-map
+  display: none
   max-width: 800px
   padding: 5px
   position: fixed
   background-color: $greyer
-  z-index: 1003
+  z-index: 1013
   .description
     max-width: 300px
   #imager-map-buttons
     float: right
-    z-index: 1100
+    z-index: 1110
     background-color: $lightgrey
     img
       float: left
@@ -165,8 +189,9 @@ $darkergrey:  #444
   background-color: $red
   background-image: none
 #imager-messages
+  display: none
   position: fixed
-  z-index: 1010
+  z-index: 1020
   font-size: 80%
   .info
   h2
@@ -175,24 +200,29 @@ $darkergrey:  #444
 
 
 #imager-filesave
+  display: none
   padding: 5px
   position: fixed
-  z-index: 1040
+  z-index: 1050
   padding: 10px
   background-color: $grey
+  #imager-filesave-filename
+    width: 30em
+    font-size: 90%
   #resolution
     margin: 0 auto 10px
     width: auto
 #imager-brightness,
 #imager-color
+  display: none
   position: fixed
-  z-index: 1040
+  z-index: 1050
   background-color: $grey
   .error
     background-color: $red
   .slider
     -webkit-appearance: none
-    z-index: 1050
+    z-index: 1060
   #slider-hue
     background: linear-gradient(to right,red,orange,yellow,green,cyan,blue,purple)
 
@@ -207,16 +237,28 @@ $darkergrey:  #444
     background-position: 0 0, 0 100%
     background-repeat: no-repeat
  
-.clicktoexit
-  margin-top: 10px
-  color: $lightgrey
-  float: right
+#imager-email
+  display: none
+  table
+    margin: 0 auto
+    width: auto
+  padding: 5px
+  position: fixed
+  z-index: 1050
+  input
+    width: 97%
+  padding: 10px
+  background-color: $grey
+  #resolution
+    margin: 0 auto 10px
+    width: auto
 
 #imager-busy
+  display: none
   position: fixed
   top: 400px
   left: 600px
-  z-index: 1100    
+  z-index: 1110    
 
 
 .field-name-field-detail 

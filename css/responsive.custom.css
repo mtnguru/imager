@@ -1,76 +1,51 @@
 /*
-Syntax error: File to import not found or unreadable: base.
-              Load paths:
-                /home/eco/sites/e2/modules/imager/sass
-                /var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/blueprint/stylesheets
-                /var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets
-                Compass::SpriteImporter
-        on line 3 of /home/eco/sites/e2/modules/imager/sass/responsive.custom.scss
-
-1: /home/eco/sites/e2/modules/imager/sass/responsive.custom.scss
-
-Backtrace:
-/home/eco/sites/e2/modules/imager/sass/responsive.custom.scss:3
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/import_node.rb:67:in `rescue in import'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/import_node.rb:45:in `import'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/import_node.rb:28:in `imported_file'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/import_node.rb:37:in `css_import?'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:217:in `visit_import'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/base.rb:37:in `visit'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:100:in `visit'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/base.rb:53:in `map'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/base.rb:53:in `visit_children'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/base.rb:37:in `block in visit'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:128:in `visit_root'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/base.rb:37:in `visit'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:100:in `visit'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/visitors/perform.rb:7:in `visit'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/tree/root_node.rb:20:in `render'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/engine.rb:315:in `_render'
-/var/lib/gems/1.9.1/gems/sass-3.2.10/lib/sass/engine.rb:262:in `render'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:140:in `block (2 levels) in compile'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:126:in `timed'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:139:in `block in compile'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/logger.rb:45:in `red'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:138:in `compile'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:118:in `compile_if_required'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:103:in `block (2 levels) in run'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:101:in `each'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:101:in `block in run'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:126:in `timed'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/compiler.rb:100:in `run'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/commands/watch_project.rb:147:in `recompile'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/path.rb:73:in `call'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/path.rb:73:in `run_callback'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/path.rb:55:in `callback_action'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/path.rb:35:in `update'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/state/directory.rb:39:in `block in modified'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/state/directory.rb:37:in `each'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/state/directory.rb:37:in `modified'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/state/directory.rb:18:in `refresh'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:17:in `block (2 levels) in run'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:17:in `each'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:17:in `block in run'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:15:in `loop'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:15:in `run'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm/monitor.rb:26:in `run'
-/var/lib/gems/1.9.1/gems/fssm-0.2.10/lib/fssm.rb:70:in `monitor'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/commands/watch_project.rb:87:in `perform'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/commands/base.rb:18:in `execute'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/commands/project_base.rb:19:in `execute'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/exec/sub_command_ui.rb:43:in `perform!'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/lib/compass/exec/sub_command_ui.rb:15:in `run!'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/bin/compass:30:in `block in <top (required)>'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/bin/compass:44:in `call'
-/var/lib/gems/1.9.1/gems/compass-0.12.2/bin/compass:44:in `<top (required)>'
-/usr/local/bin/compass:23:in `load'
-/usr/local/bin/compass:23:in `<main>'
-*/
-body:before {
-  white-space: pre;
-  font-family: monospace;
-  content: "Syntax error: File to import not found or unreadable: base.\A               Load paths:\A                 /home/eco/sites/e2/modules/imager/sass\A                 /var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/blueprint/stylesheets\A                 /var/lib/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets\A                 Compass::SpriteImporter\A         on line 3 of /home/eco/sites/e2/modules/imager/sass/responsive.custom.scss\A \A 1: /home/eco/sites/e2/modules/imager/sass/responsive.custom.scss"; }
+ * responsive.custom.css is for custom media queries that are not set via the
+ * theme settings, such as cascading media queries.
+ *
+ * By default all the other responsive stylesheets used in Adaptivetheme use a
+ * "stacking method", however cascading media queries use a waterfall method so
+ * you can leverage the cascade and inheritance for all browsers that support
+ * media queries, regardless of screen size.
+ *
+ * @SEE http://zomigi.com/blog/essential-considerations-for-crafting-quality-media-queries/#mq-overlap-stack
+ *
+ * NOTE: this file loads by default, to disable got to your theme settings and
+ * look under the "CSS" settings tab.
+ */
+/*
+ * Really small screens and up
+ */
+/* @media only screen and (min-width: 220px) {} */
+/*
+ * Smartphone sizes and up
+ */
+/* @media only screen and (min-width: 320px) {} */
+/*
+ * Smartphone sizes and down
+ */
+@media only screen and (max-width: 480px) {
+  /* 
+   * Float Region blocks example:
+   * In smaller screen sizes we can remove the float and widths so all blocks
+   * stack instead of displaying horizonally. The selector used here is an
+   * "attribute selector" which will match on any float block class. Use your
+   * inspector or Firebug to get the classes from the page output if you need
+   * more granular control over block alignment and stacking.
+   * 
+   * "Float Region blocks" is an extension for floating blocks in regions, see
+   * your themes appearance settings, under the Extensions tab.
+   */
+  /* line 50, ../sass/responsive.custom.scss */
+  .region[class*="float-blocks"] .block {
+    float: none;
+    width: 100%;
+  }
+}
+/*
+ * Tablet sizes and up
+ */
+/* @media only screen and (min-width: 768px) {} */
+/*
+ * Desktops/laptops and up
+ */
+/* @media only screen and (min-width: 1025px) {} */

@@ -21,12 +21,11 @@
  */
 
 (function ($) {
-  var imager;
-
-  Drupal.imager = function(){
+  window.imager = function(){
 
 //  localStorage.clear();
-    var modulePath  = Drupal.settings.imager.modulePath;   // Path to the imager module
+    var modulePath;         // Path to the imager module
+    var settings = {};
     var $thumbnails;
    
     var $imagerWrapper;    // Wrapper around all imager html divs
@@ -58,7 +57,8 @@
     var fullScreen = 0;    // Are we currently in full screen mode
     var editField = '';    // Name of current field being edited
     var editFieldType = '';// Type of field currently being edited
-    var fileSaveMode = ''; // Mode for saving files - drupal, local, clipboard, email
+    var fileSaveMode = ''; // Mode for saving files - drupal, local, clipboard
+    var imageResMode = ''; // Save what resolution - canvas, cropped image, full image
     var confirmMode = '';  // Mode for the confirmation dialog - deleteFile
     var messageTimeout;    // Message timeout function - needed for clearTimeout
 
@@ -75,6 +75,7 @@
     var vh;  // Image viewport height
 
     var rotation;  // 0, 90, 180, 270 
+    var initScale = 1;
     var scaleFactor = 1.04;
     var cscale;
     var dragging = false;
@@ -97,17 +98,9 @@
     var ptNowC  = {}; // Current point, varies with use    - canvas
     var ptNowT  = {}; // Current point, varies with use    - transformed
 
-    function _init() {
-      $imagerCanvas     = $('#imager-canvas');
-      ctx  = $imagerCanvas[0].getContext('2d');
-      ias = $imagerCanvas.imgAreaSelect({
-        instance: true,
-        disable: true,
-        handles: true,
-        autoHide: false,
-        hide: true,
-        show: true,
-      });
+    function _init(opts) {
+      settings = opts;
+      modulePath = settings.modulePath;
 
       $imagerCanvas2    = $('#imager-canvas-org');
       $imagerCanvas2.hide();   // This is never displayed, it is used to save images temporarily
@@ -161,14 +154,28 @@
 
       if (localStorage.quickView === "TRUE") {
         $('#mode-view').addClass('checked');
+      } else {
+        viewMode = 1;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
       }
 
-      $thumbnails   = $(Drupal.settings.imager.cssSelector);
+      $thumbnails   = $(settings.cssSelector);
       if ($thumbnails.length == 0) return; // No thumbnails found, exit 
+
+      $imagerCanvas     = $('#imager-canvas');
+      ctx  = $imagerCanvas[0].getContext('2d');
+      ias = $imagerCanvas.imgAreaSelect({
+        instance: true,
+        disable: true,
+        handles: true,
+        autoHide: false,
+        hide: true,
+        show: true,
+      });
+
       initEvents();
 
       trackTransforms(ctx);  // Create transform history
-      enablePanZoom();
+      enablePanZoom(); 
     }
 
     function _attach() {
@@ -219,8 +226,8 @@
 //      ptCLrT = ctx.transformedPoint(cw,ch);
       if (localStorage.imagerShowStatus === "FALSE") return;
       $('#imager-status-content').html(
-        '<div>Image file: ' + decodeURIComponent(imagerSrc.split('/').reverse()[0]) + '</div>' +
-        '<div class="imager-col">' +
+        '<div class="imager-status-file">Image file: ' + decodeURIComponent(imagerSrc.split('/').reverse()[0]) + '</div>' +
+        '<div class="imager-status-col">' +
           '<table>' +
             '<tr><th>Name</th><th>Value</th></tr>' +
             '<tr><td>View Mode</td><td>'   + viewMode + '</td></tr>' +
@@ -228,7 +235,7 @@
             '<tr><td>Full Screen</td><td>' + fullScreen + '</td></tr>' +
             '<tr><td>Distance</td><td>'    + parseInt(distance) + '</td></tr>' +
             '<tr><td>Elapsed</td><td>'     + elapsed/1000 + '</td></tr>' +
-            '<tr><td>Zoom</td><td>'        + parseInt(cscale*100)/100 + '</td></tr>' +
+            '<tr><td>Zoom</td><td>'        + parseInt(cscale*10000)/10000 + '</td></tr>' +
             '<tr><td>Rotation</td><td>'    + rotation + '</td></tr>' +
             '<tr><td>Brightness</td><td>'  + brightness + '</td></tr>' +
             '<tr><td>Contrast</td><td>'    + contrast + '</td></tr>' +
@@ -237,7 +244,7 @@
             '<tr><td>Lightness</td><td>'   + parseInt(lightness*100)/100 + '</td></tr>' +
           '</table>' +
         '</div>' +
-        '<div class="imager-col">' +
+        '<div class="imager-status-col">' +
           '<table>' +
             '<tr><th>Name</th><th>Width</th><th>Height</th></tr>' +
             '<tr><td>Maximum Canvas</td><td>'   + parseInt(mw) + '</td><td>' + parseInt(mh) + '</td></tr>' +
@@ -245,8 +252,8 @@
             '<tr><td>Displayed Image</td><td>'  + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
             '<tr><td>Full Image</td><td>'+ iw + '</td><td>' + ih + '</td></tr>' +
           '</table>' +
-        '</div>' +
-        '<div class="imager-col">' +
+//      '</div>' +
+//      '<div class="imager-status-col">' +
           '<table>' +
             '<tr><th>Name</th><th>X</th><th>Y</th></tr>' +
             '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>'  + parseInt(ptNowC.y) + '</td></tr>' +
@@ -286,19 +293,20 @@
       iw = cimg.width;
       ih = cimg.height;
       if (fullScreen) {
-        mw = $(window).width()  - 70; // Maximum canvas width
-        mh = $(window).height() - 20; // Maximum canvas height
+        mw = $(window).width()  - 45; // Maximum canvas width
+        mh = $(window).height() - 10; // Maximum canvas height
         cw=mw;
         ch=mh;
         hscale = ch/ih;
         vscale = cw/iw;
         cscale = (hscale < vscale) ? hscale : vscale;
       } else {
-        mw = $(window).width()  - 100; // Maximum canvas width
-        mh = $(window).height() - 20; // Maximum canvas height
+        mw = $(window).width()  - 95; // Maximum canvas width
+        mh = $(window).height() - 6; // Maximum canvas height
         calcCanvasDims(iw,ih);
         cscale = cw/iw;
       }
+      initScale = cscale;
       ptDownC.x = cw/2;    // Just in case 
       ptDownC.y = ch/2;
       $imagerCanvas.attr({width:  cw,
@@ -309,7 +317,7 @@
       ctx.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
       ctx.clearRect(0,0,cw,ch);        // Clear the canvas
       rotation = 0;
-      scale(cscale);                          // Set initial scaling to fit
+      scale(cscale,false);                          // Set initial scaling to fit
     }
 
     // When image is loaded - load event is fired
@@ -325,7 +333,11 @@
     var redraw = function(){
       ptCUlT = ctx.transformedPoint(0,0);
       ptCLrT = ctx.transformedPoint($imagerCanvas[0].width,$imagerCanvas[0].height);
-      cscale = cw / (ptCLrT.x - ptCUlT.x);
+      if ((rotation == 0) || (rotation == 180)) {
+        cscale = cw / Math.abs(ptCLrT.x - ptCUlT.x);
+      } else {
+        cscale = cw / Math.abs(ptCLrT.y - ptCUlT.y);
+      }
       ctx.clearRect(ptCUlT.x,
                     ptCUlT.y,
                     ptCLrT.x-ptCUlT.x,
@@ -365,7 +377,7 @@
       }
       if (rotation == 0 || rotation == 180) {
         calcCanvasDims(iw,ih);
-        $imagerCanvas.attr({width:  cw,
+        $imagerCanvas.attr({width: cw,
                            height: ch});
         cscale=cw/iw;
         ptNowC.x=cw/2; 
@@ -382,7 +394,7 @@
       } else {
         calcCanvasDims(ih,iw);
         $imagerCanvas.attr({width:  cw,
-                           height: ch});
+                            height: ch});
         cscale=cw/ih;
         ptNowC.x=cw/2; 
         ptNowC.y=ch/2;
@@ -390,12 +402,12 @@
         ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
         if (rotation == 90) {
           ctx.translate(cw,0);
-          ctx.rotate(angleInRadians(rotation));
         } else {
           ctx.translate(0,ch);
-          ctx.rotate(angleInRadians(rotation));
         }
+        ctx.rotate(angleInRadians(rotation));
       }
+      initScale = cscale;
       ctx.scale(cscale,cscale);
       redraw();
       showPopups();
@@ -406,15 +418,25 @@
     };
     
     var zoom = function(clicks){
-      scale(Math.pow(scaleFactor,clicks));
+      scale(Math.pow(scaleFactor,clicks),true);
       redraw();
     };
 
-    var scale = function(factor) {
+    var scale = function(factor,checkScale) {
+      if (checkScale && factor < 1) {
+        if (cscale * factor < initScale) {
+          factor = initScale / cscale;
+        }
+      }
       ptNowT = ctx.transformedPoint(ptNowC.x,ptNowC.y);
       ctx.translate(ptNowT.x,ptNowT.y);
       ctx.scale(factor,factor);
       ctx.translate(-ptNowT.x,-ptNowT.y);
+      var npt;
+      if (npt = outOfBounds()) {
+//      ctx.restore();
+        ctx.translate(npt.x,npt.y);
+      }
     };
 
   /*
@@ -688,19 +710,54 @@
       updateStatus();
       $imagerBusy.hide();
     }
-    // check if panning or zooming is causing image to to leave a margin at edges
-    // Work in progress, currently does nothing
-    var outOfBounds = function(evt) {
-      ptCUlT = ctx.transformedPoint(0,0);
-      ptCLrT = ctx.transformedPoint(cw,ch);
-      if (ptCUlT.x < 0) {
+
+    /**
+     * Check if panning or zooming is causing image to leave a margin at edges
+     * If so calculate the translation necessary to move image back to the edge.
+     * 
+     * @returns {window.imager.outOfBounds.npt}
+     */
+    var outOfBounds = function() {
+      var npt = {'x': 0, 
+                 'y': 0};
+      if (rotation == 0 || rotation == 180) {
+        if (rotation == 0) {
+          ptCUlT = ctx.transformedPoint(0,0);
+          ptCLrT = ctx.transformedPoint(cw,ch);
+        } else {
+          ptCUlT = ctx.transformedPoint(cw,ch);
+          ptCLrT = ctx.transformedPoint(0,0);
+        }
+      } else {
+        if (rotation == 90) {
+          ptCUlT = ctx.transformedPoint(cw,0);
+          ptCLrT = ctx.transformedPoint(0,ch);
+        } else {
+          ptCUlT = ctx.transformedPoint(0,ch);
+          ptCLrT = ctx.transformedPoint(cw,0);
+        }
       }
-      if (ptCUlT.y < 0) {
+      var x1 = ptCUlT.x;
+      var y1 = ptCUlT.y;
+      var x2 = iw - ptCLrT.x;
+      var y2 = ih - ptCLrT.y;
+      if (x2 < 0) {
+        $('#imager-messages-content').append('<p>outOfBounds - right:' + x2 + '</p>');
+        npt.x = -x2
       }
-      if (ptCLrT.x < 0) {
+      if (y2 < 0) {
+        $('#imager-messages-content').append('<p>outOfBounds - bottom:' + y2 + '</p>');
+        npt.y = -y2
       }
-      if (ptCLrT.y < 0) {
+      if (x1 < 0) {
+        $('#imager-messages-content').append('<p>outOfBounds - left:' + ptCUlT.x + '</p>');
+        npt.x = ptCUlT.x;
       }
+      if (y1 < 0) {
+        $('#imager-messages-content').append('<p>outOfBounds - top:' + ptCUlT.y + '</p>');
+        npt.y = ptCUlT.y;
+      }
+      if (npt.x || npt.y) return npt;
       return undefined;
     };
 
@@ -710,10 +767,10 @@
 */
     function getInfo() {
       $imagerBusy.show();
-      processAjax('imager/ajax/display_entity',
+      processAjax(settings.actions.displayEntity.url,
                   { action: 'display-entity',
                     uri: imagerSrc,
-                    viewMode: Drupal.settings.imager.viewMode,
+                    viewMode: settings.actions.displayEntity.args.viewMode,
                   },function(response) {
         var status = response['status'];
         var txt = "";
@@ -727,7 +784,7 @@
             // Display edit popup - render current field from default edit form  
             $imagerBusy.show();
             displayMessage('Contacting Server ... loading form field');
-            processAjax('imager/ajax/edit_form_field_load',  
+            processAjax(settings.actions.editFormFieldLoad.url,  
                         { action: 'edit-form-field-load',
                           uri: imagerSrc,
                           field: editField,
@@ -738,13 +795,35 @@
               if (response['data']) {
                 $('#imager-edit-content').html(response['data']['rendered']);
                 editFieldType = response['data']['type'];
-                Drupal.attachBehaviors('#imager-edit-content div');
+                if (settings.attachBehaviors) {
+                  settings.attachBehaviors('#imager-edit-content div');
+                }
               }
               
               $imagerEdit.css('left',clientX - $imagerEdit.outerWidth() - 10).css('top',clientY);
               $imagerEdit.show();
             });
           });
+        }
+      });
+    }
+
+/**
+* 
+* @returns {undefined}
+*/
+    function getMap() {
+      $imagerBusy.show();
+      processAjax(settings.actions.displayMap.url,
+                  { action: 'display-map',
+                    uri: imagerSrc,
+                    viewMapMode: settings.actions.displayMap.args.viewMapMode,
+                  },function(response) {
+        var status = response['status'];
+        var txt = "";
+        $imagerMap.removeClass('error').show();
+        if (response['data']) {
+          $('#imager-map-content').html(response['data']);
         }
       });
     }
@@ -784,13 +863,13 @@
       ptNowT = ctx.transformedPoint(ptNowC.x,ptNowC.y);
       if (dragging){
         distance = Math.sqrt((Math.pow(ptDownC.x - ptNowC.x,2)) + (Math.pow(ptDownC.y - ptNowC.y,2)))
-  //    ctx.save();
+        ctx.save();
         ctx.translate(ptNowT.x-ptDownT.x,ptNowT.y-ptDownT.y);
-  //    var npt;   // recommended x and y motions that won't go out of bounds
-  //    if (npt = outOfBounds(evt)) {
-  //      ctx.restore();
-  //      ctx.translate(npt.x-ptDownT.x,npt.y-ptDownT.y);
-  //    }
+        var npt;   // recommended x and y motions that won't go out of bounds
+        if (npt = outOfBounds()) {
+          ctx.restore();
+          ctx.translate(ptNowT.x-ptDownT.x+npt.x,ptNowT.y-ptDownT.y+npt.y);
+        }
         redraw();
       }
       updateStatus();
@@ -806,11 +885,11 @@
       var now = new Date();      // get current time
       elapsed = now - lastup;
       lastup = now;
-      if (distance < 6) {              // if we are not panning then we are clicking
+      if (distance < 20) {              // if we are not panning then we are clicking
         if (evt.ctrlKey) {
           zoom(evt.shiftKey ? -1 : 1 );  // click could zoom here to zoom, 
         } else {
-          if (elapsed < 250) {  // if double click than hide #imagerOverlay
+          if (elapsed < 1000) {  // if double click than hide #imagerOverlay
             if (fullScreen) {
               screenfull.exit();
               setFullScreen(false);
@@ -831,7 +910,7 @@
 * @returns {Boolean}
 */
     function mouseWheel(evt){
-      var delta = evt.wheelDelta ? evt.wheelDelta/10 : evt.detail ? -evt.detail : 0;
+      var delta = evt.wheelDelta ? evt.wheelDelta/10 : -evt.detail ? evt.detail : 0;
       if (delta) zoom(delta);
       return evt.preventDefault() && false;
     };
@@ -879,20 +958,14 @@
       switch (newMode) {
         case 0:   // #mode-view
           if (viewMode == 2) enablePanZoom();      
-//        $('#mode-view').addClass('checked');
-          $('#mode-lock').removeClass('checked');
           $('#mode-crop').removeClass('checked');
           break;
-        case 1:   // #mode-lock
+        case 1:   // #mode-lock - now mode not #mode-view
           if (viewMode == 2) enablePanZoom();      
-//        $('#mode-view').removeClass('checked');
-          $('#mode-lock').addClass('checked');
           $('#mode-crop').removeClass('checked');
           break;
         case 2:   // #mode-crop
           if (viewMode < 2) enableCrop();
-//        $('#mode-view').removeClass('checked');
-          $('#mode-lock').addClass('checked');
           $('#mode-crop').addClass('checked');
           break;
       };
@@ -957,11 +1030,11 @@
       if (newMode) {
         fullScreen = true;
         $imagerWrapper.addClass('fullscreen');
-        $('#view-fullscreen').addClass('checked');
+        $('#mode-fullscreen').addClass('checked');
       } else {
         $imagerWrapper.removeClass('fullscreen');
         fullScreen = false;
-        $('#view-fullscreen').removeClass('checked');
+        $('#mode-fullscreen').removeClass('checked');
       }
       setTimeout(function() {
         setViewMode(1);
@@ -1119,6 +1192,7 @@
         $imagerEdit.hide(); 
         var out = '';
         var value = '';
+        var format = '';
         switch (editFieldType) {
           case 'radios':
             var $elems = $('#imager-edit-content input');
@@ -1134,11 +1208,24 @@
             value = $elems[0].value;
             break;
           case 'textarea':
+            // Find which editor is in use
             var $elems = $('#imager-edit-content select');
-            var $elems = $('#imager-edit-content textarea.form-textarea');
-            $elems.each(function (index,elem) {
-              value = $(elem).val();   // Last one wins - this is what we want
-            });
+            var editor = $elems[0].value;
+            format = editor;
+            if (editor == "panopoly_wysiwyg_text") {
+              id = Drupal.wysiwyg.activeId;
+              value = tinyMCE.get(id).getContent();
+            } else if (editor == 'full_html') {
+              var $elems = $('#imager-edit-content textarea.form-textarea');
+              $elems.each(function (index,elem) {
+                value = $(elem).val();   // Last one wins - this is what we want
+              });
+            } else if (editor == 'plain_text') {
+              var $elems = $('#imager-edit-content textarea.form-textarea');
+              $elems.each(function (index,elem) {
+                value = $(elem).val();   // Last one wins - this is what we want
+              });
+            }
             break;
           case 'date_combo':
             var $elems = $('#imager-edit-content input');
@@ -1174,11 +1261,12 @@
         }
         $imagerBusy.show();
         displayMessage('Saving ...');
-        processAjax('imager/ajax/save_file_entity_field',
+        processAjax(settings.actions.saveFileEntityField.url,
                     { action: 'save-file-entity-field',
                       field: editField,
                       fieldType: editFieldType,
                       value: value,
+                      format: format,
                       uri: imagerSrc,
                     },function(response) {
           var status = response['status'];
@@ -1195,16 +1283,12 @@
         if (localStorage.quickView === "FALSE") {
           localStorage.quickView = "TRUE";
           $(this).addClass('checked');
+          setViewMode(0);
         } else {
           localStorage.quickView = "FALSE";
           $(this).removeClass('checked');
+          setViewMode(1);
         }
-      });
-
-      // click on #mode-lock - set mode to edit=1
-      $('#mode-lock').click(function() {
-        setViewMode(1);
-        updateStatus();
       });
 
       // click on #mode-crop - set mode to edit=2
@@ -1219,6 +1303,24 @@
       });
 
     // div#view-buttons event handlers
+      $('#view-edit').click(function() {
+
+      });
+      $('#view-browser').click(function() {
+        displayMessage('Extracting Image...');
+        $imagerBusy.show();
+        var img = getImage($('image-cropped').val(),false);
+        displayMessage('Saving Image...');
+        processAjax(settings.actions.viewBrowser.url,
+                    { action: 'view-browser',
+                      uri: imagerSrc,
+                      imgBase64: img 
+                    }, function (response) {
+                      address = '';
+                      path = response['data']['imagePath'];
+                      window.open(path,'_blank');
+                    });
+      });
       $('#view-zoom-fit').click(function() {
         ptNowC.x = ptDownC.x
         ptNowC.y = ptDownC.y;
@@ -1239,7 +1341,7 @@
         ptNowC.y = ptDownC.y;
         zoom(-1);
       });
-      $('#view-fullscreen').click(function() {
+      $('#mode-fullscreen').click(function() {
         if (screenfull.enabled) {
           // We can use `this` since we want the clicked element
           screenfull.toggle($imagerWrapper[0]);
@@ -1276,8 +1378,7 @@
         if (localStorage.imagerShowMap === "FALSE") {
           localStorage.imagerShowMap = "TRUE";
           $(this).addClass('checked');
-          $imagerMap.show();
-  //        getMap();
+          getMap();
         } else {
           localStorage.imagerShowMap = "FALSE";
           $(this).removeClass('checked');
@@ -1301,11 +1402,13 @@
       $('#color-cancel').click(function()      { setEditMode(0);  redraw();});
       $('#color-reset').click(function()       { resetColor();}); 
       // Rotate
-      $('#edit-left').click(function()         { rotate(-90); });
-      $('#edit-right').click(function()        { rotate(90); });
+      $('#edit-ccw').click(function()          { rotate(-90); });
+      $('#edit-cw').click(function()           { rotate(90); });
       // Crop
       $('#edit-crop').click(crop);
-      $('#view-reset').click(function(evt)     { changeImage(imagerSrc,evt); });
+      $('#view-reset').click(function(evt)     { 
+         changeImage(imagerSrc,evt); 
+      });
 
       // brightness/contrast and HSL slider change events 
       $('#slider-contrast').change(function()   { adjustBrightness($imagerCanvas2,$imagerCanvas);});
@@ -1318,66 +1421,72 @@
       function initFileSave(saveMode,saveTitle,filename,message) {
         fileSaveMode = saveMode;
         setViewMode(1);
+        $('#imager-filesave-title').text(saveTitle);
         $('#imager-filesave-filename').val(filename);
         $('#imager-filesave-messages').html("<p>" + message + "</p>");
-        $('#save-file-title').text(saveTitle);
         $('#canvas-resolution').html(cw + 'x' + ch);
         $('#image-display-resolution').html(parseInt(ptCLrT.x - ptCUlT.x) + 'x' + parseInt(ptCLrT.y - ptCUlT.y));
         $('#image-full-resolution').html(iw + 'x' + ih);
         $('#scale').html(parseInt(cscale * 100) / 100);
         $imagerFilesave.show();
       };
+
+    // click on save to database
       $('#file-database').click(function () {
-        $('#filesave-clipboard').hide();
-        $('#filesave-email').hide();
-        $('#filesave-download').hide();
-        $('#filesave-new').show();
-        $('#filesave-overwrite').show();
+        $('#imager-filesave-email').hide();
+        $('#imager-filesave-clipboard').hide();
+        $('#imager-filesave-download').hide();
+        $('#imager-filesave-new').show();
+        $('#imager-filesave-overwrite').show();
         $('#imager-filesave-filename-container').show();
         initFileSave('database',"Save image to database",decodeURIComponent(imagerSrc).replace(/^.*\/files\//),'');
       });
+
+    // click on download
       $('#file-download').click(function () {
-        $('#filesave-clipboard').hide();
-        $('#filesave-email').hide();
-        $('#filesave-download').show();
-        $('#filesave-new').hide();
-        $('#filesave-overwrite').hide();
+        $('#imager-filesave-email').hide();
+        $('#imager-filesave-clipboard').hide();
+        $('#imager-filesave-download').show();
+        $('#imager-filesave-new').hide();
+        $('#imager-filesave-overwrite').hide();
         $('#imager-filesave-filename-container').show();
         initFileSave('download',"Download image to local file system",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
                      'The download feature is under development.<br>It does not work in all browsers and is intermittent.');
       });
+
       $('#file-email').click(function () {
-        $('#filesave-clipboard').hide();
-        $('#filesave-email').show();
-        $('#filesave-download').hide();
-        $('#filesave-new').hide();
-        $('#filesave-overwrite').hide();
-        $('#imager-filesave-filename-container').hide();
+        $('#imager-filesave-email').show();
+        $('#imager-filesave-clipboard').hide();
+        $('#imager-filesave-download').hide();
+        $('#imager-filesave-new').hide();
+        $('#imager-filesave-overwrite').hide();
+        $('#imager-filesave-filename-container').show();
         initFileSave('email',"Email image",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
-                     'The email feature is under development.');
+                     'Email Image to somewhere');
       });
+
       $('#file-clipboard').click(function () {
-        $('#filesave-clipboard').show();
-        $('#filesave-email').hide();
-        $('#filesave-download').hide();
-        $('#filesave-new').hide();
-        $('#filesave-overwrite').hide();
+        $('#imager-filesave-email').show();
+        $('#imager-filesave-clipboard').show();
+        $('#imager-filesave-download').hide();
+        $('#imager-filesave-new').hide();
+        $('#imager-filesave-overwrite').hide();
         $('#imager-filesave-filename-container').hide();
         initFileSave('clipboard','Send image to clipboard','image.png',
                      'The clipboard feature is under development.<br>It does not work in all browsers.');
       });
 
-      $('#filesave-new').click(function () {
+      $('#imager-filesave-new').click(function () {
         saveFile(false);
         $imagerBusy.hide();
         $imagerFilesave.hide();
       });
-      $('#filesave-overwrite').click(function () {
+      $('#imager-filesave-overwrite').click(function () {
         saveFile(true);
         $imagerBusy.hide();
         $imagerFilesave.hide();
       });
-      $('#filesave-download').click(function () {
+      $('#imager-filesave-download').click(function () {
         $imagerBusy.show();
         displayMessage('Extracting Image...');
         this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
@@ -1385,13 +1494,16 @@
         $imagerBusy.hide();
         $imagerFilesave.hide();
       });
-      $('#filesave-clipboard').click(function () {
+      $('#imager-filesave-clipboard').click(function () {
+        $imagerCanvas.select();
         displayMessage('Sending the image to the clipboard is under construction');
       });
-      $('#filesave-email').click(function () {
-        displayMessage('Email feature is under construction');
+      $('#imager-filesave-email').click(function () {
+        saveFile(false);
+        $imagerBusy.hide();
+        $imagerFilesave.hide();
       });
-      $('#filesave-cancel').click(function () {
+      $('#imager-filesave-cancel').click(function () {
         $imagerFilesave.hide();
         redraw();
       });
@@ -1448,7 +1560,13 @@
 
         // Add image to imgs array
         imgs[nimgs] = {};
-        imgs[nimgs]['src']   = $(this).parent().attr('href');
+
+        imgs[nimgs]['src'] = getImagePath(this)
+
+//      var	str = "Visit Microsoft!";
+//      var res = str.replace(/microsoft/i, "W3Schools"); 
+//      imgs[nimgs]['src']   = ($(this).attr('src')).replace(;
+        
         imgs[nimgs]['title'] = $(this).attr('data-title');
         nimgs++;
 
@@ -1458,7 +1576,7 @@
         // User clicks in thumbnail image
         $(this).click(function(evt) {
           if (viewMode == 1) {   // if the overlay is locked, select this image
-            imagerSrc = $(this).parent().attr('href');
+            imagerSrc = getImagePath(this);
             imagerTitle = $(this).attr('data-title');
             changeImage(imagerSrc,evt);
           } else {               // if the overlay is not locked, then lock it?
@@ -1475,7 +1593,7 @@
         $(this).hoverIntent({
           over: function(evt) {
             if (viewMode > 0) return false;
-            imagerSrc = $(this).parent().attr('href'); // the parent element MUST be a link to the image to load
+            imagerSrc = getImagePath(this);
             imagerTitle = $(this).attr('data-title');
             setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
             changeImage(imagerSrc,evt);
@@ -1511,20 +1629,54 @@
     }
 
 /**
+ * Given a thumbnail, determine the path of the full image
+ * If '/styles/' is part of the path then simply remove /styles/ and the next two path components
+ * otherwise look for the parent element to be a link to the full image 
+ *
+ * @param {type} thumbnail
+ * @returns path to full image
+ */
+    function getImagePath(thumbnail) {
+      var path = decodeURIComponent($(thumbnail).attr('src'));
+      var npath;
+      // If the image has "/styles/" in it's path
+      // then create the large image path by modifying the thumbnail path
+      if (path.indexOf('/styles/')) {
+        var sindex = path.indexOf('styles');
+        var index = sindex;
+        var slashes = 0;
+        while (slashes < 3) {
+           index++;
+           if (path.charAt(index) == '/') { 
+             slashes++;
+           }
+        }
+        var tindex = path.indexOf('?itok');
+        if (tindex) {
+          npath = path.substr(0,sindex) + path.substr(index + 1, tindex - index - 1);
+        } else {
+          npath = path.substr(0,sindex) + path.substr(index + 1);
+        }
+      } else if ($(thumbnail).parent().attr('href')) {
+        npath = $(thumbnail).parent().attr('href');
+      }
+      return npath;
+    }
+
+/**
 * 
 * @returns {undefined}
 */
     function getImage(stream) {
       var img;
       var pt;
-      var saveMode;
       var mimeType = "";
       if (imagerSrc.match(/\.png$/i)) {
         mimeType = "image/png";
       } else if (imagerSrc.match(/\.jpe*g$/i)){
         mimeType = "image/jpeg";
       }
-      switch (saveMode = $('input[name="resolution"]:checked').val()) {
+      switch (imageResMode = $('input[name="resolution"]:checked').val()) {
         case 'screen':
           img = $imagerCanvas[0].toDataURL(mimeType);
           break;
@@ -1606,22 +1758,73 @@
     };
 
 
+    function emailFile() {
+      displayMessage('Extracting Image...');
+      $imagerBusy.show();
+      var img = getImage($('input[name="resolution"]:checked').val(),false);
+      displayMessage('Saving Image...');
+      processAjax(settings.actions.emailFile.url,
+                  { action: 'email-file',
+                    saveMode: fileSaveMode,
+                    uri: imagerSrc,
+                    imgBase64: img 
+                  });
+    }
     function saveFile(overwrite) {
       displayMessage('Extracting Image...');
       $imagerBusy.show();
       var img = getImage($('input[name="resolution"]:checked').val(),false);
       displayMessage('Saving Image...');
-      processAjax('imager/ajax/save_file',
-                  { overwrite: overwrite,
-                    action: 'save-file',
-                    saveMode: saveMode,
-                    uri: imagerSrc,
-                    imgBase64: img 
-                  });
+      if (fileSaveMode == 'database') {
+        processAjax(settings.actions.saveFile.url,
+                    { overwrite: overwrite,
+                      action: 'save-file',
+                      saveMode: fileSaveMode,
+                      uri: imagerSrc,
+                      imgBase64: img 
+                    });
+
+      } else if (fileSaveMode == 'email') {
+        processAjax(settings.actions.emailFile.url,
+                    { action: 'email',
+                      saveMode: fileSaveMode,
+                      uri: imagerSrc,
+                      imgBase64: img 
+                    },function (response) {
+                      address = '';
+                      path = response['data']['attachPath'];
+                      body = response['data']['body'];
+                      subject = response['data']['subject'];
+                      var mailto_link = 'mailto:' + address + 
+                                        '?subject=' + encodeURIComponent(subject) + 
+                                        '&body=' + encodeURIComponent(body) +
+                                        '&attachment=' + path;
+
+                      window.location.href = mailto_link;
+//                    win = window.open(mailto_link, 'emailWindow');
+//                    if (win && win.open && !win.closed) win.close();
+                    });
+      } else if (fileSaveMode == 'clipboard') {
+        processAjax(settings.actions.clipboard.url,
+                    { overwrite: overwrite,
+                      action: 'clipboard',
+                      saveMode: fileSaveMode,
+                      uri: imagerSrc,
+                      imgBase64: img 
+                    });
+      } else if (fileSaveMode == 'download') {
+        processAjax(settings.actions.download.url,
+                    { action: 'download',
+                      saveMode: fileSaveMode,
+                      uri: imagerSrc,
+                      imgBase64: img 
+                    });
+      }
     };
+
     function deleteFile() {
       displayMessage('Deleting Image...');
-      processAjax('imager/ajax/delete_file',
+      processAjax(settings.actions.deleteFile.url,
                   { action: 'delete-file',
                     uri: imagerSrc,
                   });
@@ -1701,15 +1904,15 @@
 * @param {type} processFunc
 * @returns {undefined}
 */
-    function processAjax(path,postData,processFunc) {
-      postData['siteName']   = Drupal.settings.imager.siteName;
+    function processAjax(url,postData,processFunc) {
+      postData['filePath']   = settings.filePath;
 //      if (localStorage['imagerShowDebug'] === "TRUE") {
 //        $imagerMessages.append("<h2>Process action: " + postData.action + "</h2>" +
 //          "<div>" + JSON.stringify(postData).substr(1,256) + "</div>\n");
 //      }
       $.ajax({
         type: "POST",
-        url:   Drupal.settings.basePath + '?q=' + path, 
+        url:   url, 
         data: postData, 
         success: function (response_json) {
           clearTimeout(messageTimeout);
@@ -1758,15 +1961,5 @@
       init:   _init,
       attach: _attach,
     };
-  };
-
-  Drupal.behaviors.imager = {
-    attach: function (context,settings) {
-      $('#imager-wrapper').once(function() {
-        imager = Drupal.imager();
-        imager.init();
-      });
-      imager.attach();
-    },
   };
 })(jQuery);

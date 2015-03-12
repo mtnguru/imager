@@ -2,17 +2,17 @@
 /**
  * @file
  * Provides full image viewing and editing capability from a page of thumbnails
- */  
+ */
 
 /**
- * Implement hook_init
+ * Implement hook_init().
  */
 function imager_init( ) {
   return;
 }
 
 /**
- * Implement hook_menu
+ * Implement hook_menu().
  */
 function imager_menu( ) {
   $items = array();
@@ -21,17 +21,44 @@ function imager_menu( ) {
   $items['imager/ajax/display_entity'] = array(
     'title' => 'Display file_entity',
     'description' => 'Retrieve a rendered file_entity',
-    'page callback' => 'displayEntity',
+    'page callback' => 'imagerDisplayEntity',
+    'file' => 'imager.ajax.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['imager/ajax/display_map'] = array(
+    'title' => 'Display Map',
+    'description' => 'Display a map of where this image was taken',
+    'page callback' => 'imagerDisplayMap',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
   // Overwrite or save a new image file and the file_entity
-  $items['imager/ajax/save_file'] = array(                                         
+  $items['imager/ajax/save_file'] = array(
     'title' => 'Save edited image file',
     'description' => 'Save an edited image file back into Drupal',
-    'page callback' => 'saveFile',
+    'page callback' => 'imagerSaveFile',
+    'file' => 'imager.ajax.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['imager/ajax/email_file'] = array(
+    'title' => 'Email edited image file',
+    'description' => 'Start users default email client with subject, body and image attached',
+    'page callback' => 'imagerEmailFile',
+    'file' => 'imager.ajax.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['imager/ajax/view_browser'] = array(
+    'title' => 'View Image natively in Browser',
+    'description' => 'Same image so it can be displayed natively in browser, then copied or printed',
+    'page callback' => 'imagerViewBrowser',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
@@ -41,7 +68,7 @@ function imager_menu( ) {
   $items['imager/ajax/edit_form_load'] = array(
     'title' => 'Retrieve the edit form for a file_entity',
     'description' => 'Retrieve the edit form for a file_entity',
-    'page callback' => 'editFormLoad',
+    'page callback' => 'imagerEditFormLoad',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
@@ -51,27 +78,27 @@ function imager_menu( ) {
   $items['imager/ajax/edit_form_field_load'] = array(
     'title' => 'Retrieve a field from the edit form',
     'description' => 'Retrieve a field from the edit form',
-    'page callback' => 'editFormFieldLoad',
+    'page callback' => 'imagerEditFormFieldLoad',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
   // Delete a file_entity and it's image file
-  $items['imager/ajax/delete_file'] = array(                                         
+  $items['imager/ajax/delete_file'] = array(
     'title' => 'Delete a file_entity from Drupal',
     'description' => 'Delete a file_entity from Drupal',
-    'page callback' => 'deleteFile',
+    'page callback' => 'imagerDeleteFile',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
   // Save a file_entity field
-  $items['imager/ajax/save_file_entity_field'] = array( 
+  $items['imager/ajax/save_file_entity_field'] = array(
     'title' => 'Save file_entity field',
     'description' => 'Save a file_entity field',
-    'page callback' => 'saveFileEntityField',
+    'page callback' => 'imagerSaveFileEntityField',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
@@ -83,61 +110,66 @@ function imager_menu( ) {
 
 /**
  * Load JavaScript and CSS files
- * 
+ *
  * @todo drupal_add_js/css is being deprecated in D8 - use #attached instead
- *  
- * @global type $imagerModulePath 
- * @param type $cssSelector
+ *
+ * @global type $_imager_path
+ * @param type $css_selector
  *   Finds thumbnails to add to image list - JQuery selector
- * @param type $viewMode
+ * @param type $view_mode
  *   View mode to render file_entities in - Default imager
  */
-function imager_load_js_css($cssSelector,$viewMode) {
+function imager_load_js_css($css_selector, $view_mode) {
   global $user;
-  global $imagerModulePath;
+  global $_imager_path;
 
-  $imagerModulePath = drupal_get_path('module', 'imager');
-  drupal_add_js ($imagerModulePath . '/js/jquery-ui-1.10.4.min.js', array('weight' => 1002));
-  drupal_add_library ('system', 'drupal.ajax');
-
+  $_imager_path = drupal_get_path('module', 'imager');
+  drupal_add_js($_imager_path . '/js/jquery-ui-1.10.4.min.js', array('weight' => 1002));
   drupal_add_js(
     array(
       'imager' => array(
-        'modulePath'  => $imagerModulePath,
-        'cssSelector' => $cssSelector,
-        'viewMode'    => $viewMode,
-        'siteName'    => preg_replace('/\//','',$GLOBALS['base_path']),
+        'module_path'   => $_imager_path,
+        'file_path'     => $_SERVER['DOCUMENT_ROOT'] . '/' . variable_get('file_public_path', ''),
+        'css_selector'  => $css_selector,
+        'view_mode'     => $view_mode,
+        'view_map_mode' => $view_mode . '_map',
       ),
-    ),
-    'setting'
-  );
-  drupal_add_js ($imagerModulePath . '/js/hoverintent.js',          array('weight' => 1003));
-  drupal_add_js ($imagerModulePath . '/js/jquery.imgareaselect.js', array('weight' => 1005));
-  drupal_add_js ($imagerModulePath . '/js/screenfull.js',           array('weight' => 1007));
-  drupal_add_js ($imagerModulePath . '/js/imager.js',               array('weight' => 1009));
+    ), 'setting');
+  drupal_add_js($_imager_path . '/js/hoverintent.js',          array('weight' => 1003));
+  drupal_add_js($_imager_path . '/js/jquery.imgareaselect.js', array('weight' => 1005));
+  drupal_add_js($_imager_path . '/js/screenfull.js',           array('weight' => 1007));
+  drupal_add_js($_imager_path . '/js/imager.js',               array('weight' => 1009));
+  drupal_add_js($_imager_path . '/js/imager.drupal.js',        array('weight' => 1011));
 
-  drupal_add_css($imagerModulePath . '/css/imgareaselect-animated.css');
-  drupal_add_css($imagerModulePath . '/css/imager.css');
+  drupal_add_css($_imager_path . '/css/imgareaselect-animated.css');
+  drupal_add_css($_imager_path . '/css/imager.css');
 }
 
 /**
- * Implement HOOK_views_pre_view
- * 
+ * Implement HOOK_views_pre_view().
+ *
  * Determine if this view needs imager module, if so load it
  */
 function imager_views_pre_view(&$view, &$display_id, &$args) {
-  if (preg_match('/media_gallery/',$view->name)) {
-    imager_load_js_css('.imager > a > img','media_imager');
+  if (preg_match('/imager/', $view->display['default']->display_options['css_class'])) {
+    if (!preg_match('/browser/', $view->name)) {
+      imager_load_js_css('.imager-thumbnail img', 'media_imager');
+    }
   }
   return;
 }
 
+/**
+ *
+ * @param type $view
+ * @return type
+ */
 function imager_views_pre_render(&$view) {
   return;
 }
 
 /**
- * Implement HOOK_theme
+ * Implement HOOK_theme().
  */
 function imager_theme() {
   return array(
@@ -149,9 +181,9 @@ function imager_theme() {
 
 /**
  * Construct render array for a button
- * 
- * @todo Use buttons instead of images - is this function necessary? 
- * 
+ *
+ * @todo Use buttons instead of images - is this function necessary?
+ *
  * @param type $weight
  * @param type $id
  * @param type $src
@@ -159,7 +191,7 @@ function imager_theme() {
  * @param type $classes
  * @return type
  */
-function _imagerBuildButton($weight,$id,$src,$title,$classes = '') {
+function _imagerBuildButton($weight, $id, $src, $title, $classes = '') {
   $item = array(
     '#id'  => $id,
     '#weight' => $weight,
@@ -173,29 +205,29 @@ function _imagerBuildButton($weight,$id,$src,$title,$classes = '') {
 
 /**
  * Render a button
- *  
+ *
  * @param type $variables
  * @return type
  */
 function theme_imager_add_button($variables) {
   $element = $variables['element'];
   return '<img id="' . $element['#id'] .
-         '" src="' . $GLOBALS["base_url"] . '/' . $GLOBALS["theme_path"] . '/icons/' . $element["#src"] . 
+         '" src="' . $GLOBALS["base_url"] . '/' . $GLOBALS["theme_path"] . '/icons/' . $element["#src"] .
          '" alt="" title="' . $element['#title'] . '" class="' . $element['#classes'] . '">';
 }
 
 
 /**
- * Implement HOOK_page_alter
- * 
+ * Implement HOOK_page_alter().
+ *
  * Create render arrays for imager popup
- * 
+ *
  * @todo Is there an earlier hook better suited for this?
  */
 function imager_page_alter(&$page) {
-  global $imagerModulePath;
-  if (isset($imagerModulePath)) {
-    $page['footer']['imager_wrapper'] = array(
+  global $_imager_path;
+  if (isset($_imager_path)) {
+    $page['content']['imager_wrapper'] = array(
       '#prefix' => '<div id="imager-wrapper">',
       '#suffix' => '</div>',
       '#weight' => -100,
@@ -217,12 +249,12 @@ function imager_page_alter(&$page) {
 }
 
 /**
- * Build render array for Large Image popup 
- * 
+ * Build render array for Large Image popup
+ *
  * @return type render_array
  */
 function _imagerBuildOverlay() {
-  return array ( 
+  return array(
     '#prefix' => '<div id="imager-overlay">',
     '#suffix' => '</div>',
     'button_wrapper' => array(
@@ -240,9 +272,9 @@ function _imagerBuildOverlay() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'image_left'  => _imagerBuildButton(1,'image-left','left_arrow.png','View image to the left'),
-        'image_right' => _imagerBuildButton(2,'image-right','right_arrow.png','View image to the right'),
-        'image_exit'  => _imagerBuildButton(3,'image-exit','redx.png','Exit image popup'),
+        'image_left'  => _imagerBuildButton(1, 'image-left', 'left_arrow.png', 'View image to the left'),
+        'image_right' => _imagerBuildButton(2, 'image-right', 'right_arrow.png', 'View image to the right'),
+        'image_exit'  => _imagerBuildButton(3, 'image-exit', 'redx.png', 'Exit image popup'),
       ),
       'mode_buttons' => array(
         '#prefix' => '<div id="mode-buttons" class="buttons">',
@@ -255,9 +287,10 @@ function _imagerBuildOverlay() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'mode_view'      => _imagerBuildButton(1,'mode-view','eye.png','Enable/Disable quick image viewing - view on hover'),
-        'mode_lock'      => _imagerBuildButton(2,'mode-lock','lock.png','Lock image to screen'),
-        'mode_configure' => _imagerBuildButton(3,'mode-configure','configure.png','Under Construction - Configure settings'),
+        'mode_view'      => _imagerBuildButton(1, 'mode-view', 'eye.png', 'Enable/Disable quick image viewing - view on hover'),
+//      'mode_lock'      => _imagerBuildButton(2, 'mode-lock', 'lock.png', 'Lock image to screen'),
+        'mode_fullscreen' => _imagerBuildButton(3, 'mode-fullscreen', 'fullscreen.png', 'View image full screen'),
+        'mode_configure' => _imagerBuildButton(4, 'mode-configure', 'configure.png', 'Under Construction - Configure settings'),
       ),
       'view_buttons' => array(
         '#prefix' => '<div id="view-buttons" class="buttons">',
@@ -268,12 +301,14 @@ function _imagerBuildOverlay() {
           '#markup' => t('View'),
           '#prefix' => '<div>',
           '#suffix' => '</div>',
+          '#weight' => 0,
         ),
-        'view_zoom_in'    => _imagerBuildButton(1,'view-zoom-in','zoomin.png','Zoom into the image'),
-        'view_zoom_out'   => _imagerBuildButton(2,'view-zoom-out','zoomout.png','Zoom out of the image'),
-        'view_fullscreen' => _imagerBuildButton(3,'view-fullscreen','fullscreen.png','View image full screen'),
-        'view_info'       => _imagerBuildButton(4,'view-info','information.png','View Image information'),
-        'view_map'        => _imagerBuildButton(5,'view-map','map.png','View map showing image locations for page'),
+        'view_browser'    => _imagerBuildButton(1, 'view-browser', 'view.png', 'View image alone in Browser, useful when printing'),
+        'view_info'       => _imagerBuildButton(2, 'view-info', 'information.png', 'View Image information'),
+        'view_map'        => _imagerBuildButton(3, 'view-map', 'map.png', 'View map showing image locations for page'),
+//      'view_edit'       => _imagerBuildButton(4, 'view-edit', 'edit.png', 'Edit image title, categories, etc.'),
+        'view_zoom_in'    => _imagerBuildButton(5, 'view-zoom-in', 'zoomin.png', 'Zoom into the image'),
+        'view_zoom_out'   => _imagerBuildButton(6, 'view-zoom-out', 'zoomout.png', 'Zoom out of the image'),
       ),
       'edit_buttons' => array(
         '#prefix' => '<div id="edit-buttons" class="buttons">',
@@ -285,13 +320,13 @@ function _imagerBuildOverlay() {
           '#prefix' => '<div>',
           '#suffix' => '</div>',
         ),
-        'mode_crop'       => _imagerBuildButton(1,'mode-crop','frame.png','Start crop - select area to crop'),
-        'edit_crop'       => _imagerBuildButton(2,'edit-crop','scissors.png','Crop selected area'),
-        'edit_brightness' => _imagerBuildButton(3,'edit-brightness','contrast.png','Edit brightness and contrast'),
-        'edit_color'      => _imagerBuildButton(4,'edit-color','color_wheel.png','Edit Hue, Saturation and Lightness'),
-        'edit_left'       => _imagerBuildButton(5,'edit-left','rotate-left.png','Rotate image 90 degrees counter-clockwise'),
-        'edit_right'      => _imagerBuildButton(6,'edit-right','rotate-right.png','Rotate image 90 degrees clockwise'),
-        'edit_reset'      => _imagerBuildButton(7,'view-reset','reset.png','Reset the image back to the original'),
+        'mode_crop'       => _imagerBuildButton(1, 'mode-crop', 'frame.png', 'Start crop - select area to crop'),
+        'edit_crop'       => _imagerBuildButton(2, 'edit-crop', 'scissors.png', 'Crop selected area'),
+        'edit_brightness' => _imagerBuildButton(3, 'edit-brightness', 'contrast.png', 'Edit brightness and contrast'),
+        'edit_color'      => _imagerBuildButton(4, 'edit-color', 'color_wheel.png', 'Edit Hue, Saturation and Lightness'),
+        'edit_ccw'        => _imagerBuildButton(5, 'edit-ccw', 'rotate-left.png', 'Rotate image 90 degrees counter-clockwise'),
+        'edit_cw'         => _imagerBuildButton(6, 'edit-cw', 'rotate-right.png', 'Rotate image 90 degrees clockwise'),
+        'view_reset'      => _imagerBuildButton(7, 'view-reset', 'reset.png', 'Reset the image back to the original'), // 'edit-reset' does not work.  It must be used by another program
       ),
       'file_buttons' => array(
         '#prefix' => '<div id="file-buttons" class="buttons">',
@@ -303,11 +338,11 @@ function _imagerBuildOverlay() {
           '#prefix' => '<div>',
           '#suffix' => '</div>',
         ),
-        'file_database'    => _imagerBuildButton(1,'file-database','database_go.png','Save edited image to database'),
-        'file_delete'      => _imagerBuildButton(2,'file-delete','database_delete.png','Delete image from database'),
-        'file_download'    => _imagerBuildButton(3,'file-download','download.png','Download image to local file system'),
-        'file_email'       => _imagerBuildButton(4,'file-email','mail.png','Under Construction - E-mail image'),
-        'file_clipboard'   => _imagerBuildButton(5,'file-clipboard','clipboard.png','Send image to clipboard'),
+        'file_database'    => _imagerBuildButton(1, 'file-database', 'database_go.png', 'Save edited image to database'),
+        'file_delete'      => _imagerBuildButton(2, 'file-delete', 'database_delete.png', 'Delete image from database'),
+        'file_download'    => _imagerBuildButton(3, 'file-download', 'download.png', 'Download image to local file system'),
+        'file_email'       => _imagerBuildButton(4, 'file-email', 'mail.png', 'E-mail image'),
+//      'file_clipboard'   => _imagerBuildButton(5, 'file-clipboard', 'clipboard.png', 'Send image to clipboard'),
       ),
       'debug_buttons' => array(
         '#prefix' => '<div id="debug-buttons" class="buttons">',
@@ -319,8 +354,8 @@ function _imagerBuildOverlay() {
           '#prefix' => '<div>',
           '#suffix' => '</div>',
         ),
-        'debug_status'   => _imagerBuildButton(1,'debug-status','bug.png','Toggle status output'),
-        'debug_messages' => _imagerBuildButton(2,'debug-messages','bug2.png','Toggle debug messages'),
+        'debug_status'   => _imagerBuildButton(1, 'debug-status', 'bug.png', 'Toggle status output'),
+        'debug_messages' => _imagerBuildButton(2, 'debug-messages', 'bug2.png', 'Toggle debug messages'),
       ),
     ),
     'imager_canvas_wrapper' => array(
@@ -332,12 +367,12 @@ function _imagerBuildOverlay() {
         '#suffix' => '</canvas>',
       ),
     ),
-  ); 
+  );
 }
 
 /**
- * Build render array for brightness/contrast slidebar popup 
- * 
+ * Build render array for brightness/contrast slidebar popup
+ *
  * @return type render_array
  */
 function _imagerBuildBrightness() {
@@ -349,6 +384,7 @@ function _imagerBuildBrightness() {
       '#suffix' => '</div>',
       'table' => array(
         '#theme' => 'table',
+        '#attributes' => array('class' => 'table-no-striping'),
         '#rows' => array(
           array(
             'no_striping' => TRUE,
@@ -370,16 +406,16 @@ function _imagerBuildBrightness() {
     'buttons' => array(
       '#prefix' => '<div id="imager-brightness-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
-      'apply'   => _imagerBuildButton(1,'brightness-apply', 'checkmark.png','Apply changes and exit'),
-      'reset'   => _imagerBuildButton(2,'brightness-reset', 'reset.png','Reset brightness and contrast'),
-      'cancel'  => _imagerBuildButton(3,'brightness-cancel','redx.png','Exit without applying changes'),
+      'apply'   => _imagerBuildButton(1, 'brightness-apply',  'checkmark.png', 'Apply changes and exit'),
+      'reset'   => _imagerBuildButton(2, 'brightness-reset',  'reset.png', 'Reset brightness and contrast'),
+      'cancel'  => _imagerBuildButton(3, 'brightness-cancel', 'redx.png', 'Exit without applying changes'),
     ),
   );
 }
 
 /**
- * Build render array for HSL slider popup 
- * 
+ * Build render array for HSL slider popup
+ *
  * @return type render_array
  */
 function _imagerBuildColor() {
@@ -391,6 +427,7 @@ function _imagerBuildColor() {
       '#suffix' => '</div>',
       'table' => array(
         '#theme' => 'table',
+        '#attributes' => array('class' => 'table-no-striping'),
         '#rows' => array(
           array(
             'no_striping' => TRUE,
@@ -402,7 +439,7 @@ function _imagerBuildColor() {
           array(
             'no_striping' => TRUE,
             'data' => array(
-              t('Saturation'), 
+              t('Saturation'),
               '<input id="slider-saturation" class="slider" type="range" min="-100" max="100" step="1" />',
             ),
           ),
@@ -419,17 +456,17 @@ function _imagerBuildColor() {
     'buttons' => array(
       '#prefix' => '<div id="imager-brightness-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
-      'apply'   => _imagerBuildButton(1,'color-apply', 'checkmark.png','Apply changes and exit'),
-      'reset'   => _imagerBuildButton(2,'color-reset', 'reset.png','Reset hue, saturation and lightness'),
-      'cancel'  => _imagerBuildButton(3,'color-cancel','redx.png','Exit without applying changes'),
+      'apply'   => _imagerBuildButton(1, 'color-apply', 'checkmark.png', 'Apply changes and exit'),
+      'reset'   => _imagerBuildButton(2, 'color-reset',  'reset.png', 'Reset hue, saturation and lightness'),
+      'cancel'  => _imagerBuildButton(3, 'color-cancel', 'redx.png', 'Exit without applying changes'),
     ),
   );
 }
 
 /**
- * Build render array for File Save popup
- *  
- * @return type render_array
+ * Build the form to save a file to local file system or back into Drupal
+ *
+ * @return type
  */
 function _imagerBuildFilesave() {
   return array(
@@ -440,10 +477,7 @@ function _imagerBuildFilesave() {
       '#suffix' => '</div>',
       'title'   => array(
         '#weight' => 1,
-        '#prefix' => '<div class="title">',
-        '#suffix' => '</div>',
-        '#type' => 'markup',
-        '#markup' => t('<span id="save-file-title">bogus</span>'),
+        '#markup' => t('<h2 id="imager-filesave-title">bogus</h2>'),
       ),
       'messages' => array(
         '#weight' => 2,
@@ -455,71 +489,82 @@ function _imagerBuildFilesave() {
         '#prefix' => '<div id="imager-filesave-filename-container">',
         '#suffix' => '</div>',
         '#type' => 'markup',
-        '#markup' => "<span>File name:</span><input id='imager-filesave-filename' type='text'></input>",
+        '#markup' => "<div>File name:</div><input id='imager-filesave-filename' type='text' />",
       ),
-      'table' => array(
-        '#weight' => 4,
-        '#theme' => 'table',
-        '#header' => array(
-          ' ',
-          'Image',
-          'Resolution',
-          'Geometry',
-          'Ratio'
-        ),
-        '#rows' => array(
-          array(
-            'no_striping' => TRUE,
-            'data' => array(
-              '<input type="radio" name="resolution" value="screen" />',
-              t('Displayed'),
-              t('Display'),
-              array('id' => 'canvas-resolution'),
-              array('id' => 'scale', 'rowspan' => 2),
-            ),
-          ),
-          array(
-            'no_striping' => TRUE,
-            'data' => array(
-              '<input type="radio" name="resolution" value="image-cropped checked="checked" />',
-              t('Displayed'),
-              t('Image'),
-              array('id' => 'image-display-resolution'),
-            ),
-          ),
-          array(
-            'no_striping' => TRUE,
-            'data' => array(
-              '<input type="radio" name="resolution" value="image-full" />',
-              t('Full'),
-              t('Image'),
-              array('id' => 'image-full-resolution'),
-            ),
-          ),
-        ),
-      ),
+      'table' => _imagerBuildResTable(4),
     ),
     'buttons' => array(
       '#prefix'   => '<div id="imager-filesave-buttons" class="imager-buttons">',
       '#suffix'   => '</div>',
-      'email'     => _imagerBuildButton(1,'filesave-email',    'mail.png',    'Email image and exit'),
-      'clipboard' => _imagerBuildButton(2,'filesave-clipboard','clipboard.png','Send image to clipboard and exit'),
-      'file_download'    => array (
+      'clipboard' => _imagerBuildButton(2, 'imager-filesave-clipboard', 'clipboard.png', 'Send image to clipboard and exit'),
+      'file_download'    => array(
         '#weight' => 3,
         '#prefix' => '<a id="filesave-download">',
         '#suffix' => '</a>',
-        'image'    => _imagerBuildButton(3,'filesave-download-image','download.png','Download image to local file system'),
+        'image'    => _imagerBuildButton(3, 'imager-filesave-download', 'download.png', 'Download image to local file system'),
       ),
-      'new'       => _imagerBuildButton(4,'filesave-new',      'database_add.png','Create new database entry and exit'),
-      'overwrite' => _imagerBuildButton(5,'filesave-overwrite','database_go.png', 'Overwrite existing database entry'),
-      'cancel'    => _imagerBuildButton(6,'filesave-cancel',   'redx.png',     'Cancel saving file'),
+      'email'     => _imagerBuildButton(4, 'imager-filesave-email',    'mail.png', 'Email image using default email client'),
+      'new'       => _imagerBuildButton(4, 'imager-filesave-new',      'database_add.png', 'Create new database entry and exit'),
+      'overwrite' => _imagerBuildButton(5, 'imager-filesave-overwrite', 'database_go.png', 'Overwrite existing database entry'),
+      'cancel'    => _imagerBuildButton(6, 'imager-filesave-cancel',    'redx.png',      'Cancel saving file'),
+    ),
+  );
+}
+
+
+/**
+ *
+ * @param type $weight
+ * @return type
+ */
+function _imagerBuildResTable($weight) {
+  return array(
+    '#weight' => $weight,
+    '#attributes' => array('class' => 'table-no-striping'),
+    '#theme' => 'table',
+    '#header' => array(
+//    ' ',
+//    'Image',
+//    'Resolution',
+//    'Geometry',
+//    'Ratio'
+    ),
+    '#rows' => array(
+      array(
+        'no_striping' => TRUE,
+        'data' => array(
+          '<input type="radio" name="resolution" value="screen" />',
+          t('Displayed'),
+          t('Display'),
+          array('id' => 'canvas-resolution'),
+          array('id' => 'scale', 'rowspan' => 2),
+        ),
+      ),
+      array(
+        'no_striping' => TRUE,
+        'data' => array(
+          '<input type="radio" name="resolution" value="image-cropped" checked="checked" />',
+          t('Displayed'),
+          t('Image'),
+          array('id' => 'image-display-resolution'),
+        ),
+      ),
+      array(
+        'no_striping' => TRUE,
+        'data' => array(
+          '<input type="radio" name="resolution" value="image-full" />',
+          t('Full'),
+          t('Image'),
+          array('id' => 'image-full-resolution'),
+        ),
+      ),
     ),
   );
 }
 
 /**
  * Build render array for current Status popup
- *  
+ *
  * @return type render_array
  */
 function _imagerBuildStatus() {
@@ -537,14 +582,14 @@ function _imagerBuildStatus() {
       '#prefix' => '<div id="imager-status-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
-      'exit'  => _imagerBuildButton(1,'imager-status-exit','redx.png','Exit Status dialog'),
+      'exit'  => _imagerBuildButton(1, 'imager-status-exit', 'redx.png', 'Exit Status dialog'),
     ),
   );
 }
 
 /**
- * Build render array for information dialog - displays rendered file_entity 
- * 
+ * Build render array for information dialog - displays rendered file_entity
+ *
  * @return type render_array
  */
 function _imagerBuildInfo() {
@@ -562,14 +607,14 @@ function _imagerBuildInfo() {
       '#prefix' => '<div id="imager-info-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
-      'exit'  => _imagerBuildButton(1,'imager-info-exit','redx.png','Exit Information dialog'),
+      'exit'  => _imagerBuildButton(1, 'imager-info-exit', 'redx.png', 'Exit Information dialog'),
     ),
   );
 }
 
 /**
  * Build render array for file_entity field editing popup
- *  
+ *
  * @return type render_array
  */
 function _imagerBuildEdit() {
@@ -587,15 +632,15 @@ function _imagerBuildEdit() {
       '#prefix' => '<div id="imager-edit-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
-      'apply'  => _imagerBuildButton(1,'imager-edit-apply','database_go.png','Apply changes and exit'),
-      'exit'   => _imagerBuildButton(2,'imager-edit-exit','redx.png','Exit Edit dialog'),
+      'apply'  => _imagerBuildButton(1, 'imager-edit-apply', 'database_go.png', 'Apply changes and exit'),
+      'exit'   => _imagerBuildButton(2, 'imager-edit-exit', 'redx.png', 'Exit Edit dialog'),
     ),
   );
 }
 
 /**
  * Build render array for Ajax and PHP debug message dialog
- *  
+ *
  * @return type render_array
  */
 function _imagerBuildMessages() {
@@ -612,14 +657,14 @@ function _imagerBuildMessages() {
     'buttons' => array(
       '#prefix' => '<div id="imager-filesave-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
-      'exit'   => _imagerBuildButton(2,'imager-messages-exit','redx.png','Exit Messages dialog'),
+      'exit'   => _imagerBuildButton(2, 'imager-messages-exit', 'redx.png', 'Exit Messages dialog'),
     ),
   );
 }
 
 /**
- * Build render array for hidden second canvas - used to save images  
- * 
+ * Build render array for hidden second canvas - used to save images
+ *
  * @return type render_array
  */
 function _imagerBuildCanvas() {
@@ -630,27 +675,27 @@ function _imagerBuildCanvas() {
 }
 
 /**
- * Build render array for Busy indicator - busy.gif  
- * 
- * @global type $imagerModulePath
+ * Build render array for Busy indicator - busy.gif
+ *
+ * @global type $_imager_path
  * @return type render_array
  */
 function _imagerBuildBusy() {
-  global $imagerModulePath;
+  global $_imager_path;
   return array(
     '#type'   => 'markup',
-    '#markup' => '<img alt="" id="imager-busy" src="' . $GLOBALS['base_url'] . '/' . $imagerModulePath . '/icons/busy.gif">',
+    '#markup' => '<img alt="" id="imager-busy" src="' . $GLOBALS['base_url'] . '/' . $_imager_path . '/icons/busy.gif">',
   );
 }
 
 /**
  * Build render array for map popup
- *  
- * @global type $imagerModulePath
+ *
+ * @global type $_imager_path
  * @return type render_array
  */
 function _imagerBuildMap() {
-  global $imagerModulePath;
+  global $_imager_path;
   return array(
     '#prefix' => '<div id="imager-map">',
     '#suffix' => '</div>',
@@ -660,13 +705,13 @@ function _imagerBuildMap() {
       '#weight' => 1,
       '#type'   => 'markup',
       '#markup' => '<h3>Interactive Map - Under Construction</h3>' .
-                   '<p>The plan is to put a full interactive map with markers showing all photos on originating page.  The current image\'s marker will be centered and highlighted with a different color.</p><img alt="" id="imager-map-image" src="' . $GLOBALS['base_url'] . '/' . $imagerModulePath . '/icons/fakemap.png">',
+                   '<p>The plan is to put a full interactive map with markers showing all photos on originating page.  The current image\'s marker will be centered and highlighted with a different color.</p><img alt="" id="imager-map-image" src="' . $GLOBALS['base_url'] . '/' . $_imager_path . '/icons/fakemap.png">',
     ),
     'buttons' => array(
       '#prefix' => '<div id="imager-map-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       '#weight' => 2,
-      'exit'   => _imagerBuildButton(2,'imager-map-exit','redx.png','Exit Map dialog'),
+      'exit'   => _imagerBuildButton(2, 'imager-map-exit', 'redx.png', 'Exit Map dialog'),
     ),
   );
 }
@@ -674,36 +719,53 @@ function _imagerBuildMap() {
 
 /**
  * Load the file_entity_edit form - default form for image file type
- * 
+ *
  * Loading the full form as the page loads ensures all javascript libraries are
- * also loaded.  Complex file_entity edit forms use a lot of additional files:
+ * also loaded.  Complex file_entity_edit forms use a lot of additional files:
  * - date popup
  * - autocomplete - entity reference
  * - ckeditor
  * - hierarchical select
  * - ...
- *  
+ *
  * @todo This form isn't used and is removed by imager.js.  A better approach
  * is to only load the necessary JavaScript and CSS files and not
  * render the form.
- * 
+ *
  * @return type render_array
  */
 function _imagerBuildForm() {
-  $form_id = 'file_entity_edit';
-  $file = file_load(243);
-  $form = drupal_get_form($form_id,$file);
+  module_load_include('inc', 'file_entity', 'file_entity.pages');
+  $file = file_load(299);  // load media file 1 - an image
+  $form_id = "file_entity_edit";
+  $title1 = drupal_get_title();
+  $form = drupal_get_form($form_id, $file);
+  drupal_set_title($title1);
+
   $div = array(
     '#prefix' => '<div id="imager-form">',
     '#suffix' => '</div>',
-    '#type'   => 'markup',
-    '#markup' => drupal_render($form),
+    'editform' => $form,
   );
   return $div;
+
+// or we can render it ourselves
+//drupal_render($form);
+//$div = array(
+//  '#prefix' => '<div id="imager-form">',
+//  '#suffix' => '</div>',
+//  '#type'   => 'markup',
+//  '#markup' => "shazam",
+//);
 }
 
+/**
+ * 
+ * @global type $_imager_path
+ * @return type
+ */
 function _imagerBuildConfirm() {
-  global $imagerModulePath;
+  global $_imager_path;
   return array(
     '#prefix' => '<div id="imager-confirm">',
     '#suffix' => '</div>',
@@ -721,8 +783,8 @@ function _imagerBuildConfirm() {
       'buttons' => array(
         '#prefix' => '<div id="imager-confirm-buttons" class="imager-buttons">',
         '#suffix' => '</div>',
-        'apply'   => _imagerBuildButton(1,'imager-confirm-apply','checkmark.png','Apply action'),
-        'exit'    => _imagerBuildButton(2,'imager-confirm-exit','redx.png','Do nothing and exit dialog'),
+        'apply'   => _imagerBuildButton(1, 'imager-confirm-apply', 'checkmark.png', 'Apply action'),
+        'exit'    => _imagerBuildButton(2, 'imager-confirm-exit', 'redx.png', 'Do nothing and exit dialog'),
       ),
     ),
   );
@@ -822,7 +884,7 @@ function imager_file_entity_edit($form, &$form_state) {
 //  '#default_value' => file_uri_scheme($file->uri),
   );
 
-  // File user information for administrators.
+  // File user information for administrators/
   $form['user'] = array(
     '#type' => 'fieldset',
     '#access' => user_access('administer files'),
@@ -891,4 +953,28 @@ function imager_file_entity_edit($form, &$form_state) {
 
   return $form;
 }
+
+/**
+ * Implements HOOK_entity_info_alter().
+ * @param type $entity_info
+ */
+function imager_entity_info_alter(&$entity_info) {
+  //Not sure if it's still an issue, but a previous commenter noted that Media module only recognizes view modes with the prefix media_. Also, as you can see by the entity type 'file', this is for after the switch-to-file-entity patch.
+  $entity_info['file']['view modes']['media_imager'] = array(
+    'label' => t('Imager'),
+    'custom settings' => TRUE,
+  );
+  $entity_info['file']['view modes']['media_imager_map'] = array(
+    'label' => t('Imager Map'),
+    'custom settings' => TRUE,
+  );
+}
+
+/**
+ * Implement hook_field_attach_view_alter().
+ */
+function imager_field_attach_view_alter(&$output, $context) {
+  return;
+}
+
 
