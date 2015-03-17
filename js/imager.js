@@ -1,3 +1,4 @@
+
 /**
  * @file
  * JavaScript library to popup full image viewer/editor from images on pages

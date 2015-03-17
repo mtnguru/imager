@@ -1,3 +1,4 @@
+
 /**
  * @file
  * JavaScript library to view and edit images from thumbnails
