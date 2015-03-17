@@ -281,7 +281,6 @@ function imager_save_file() {
  * Write the file to the P drive.  I can mount that but they need the path,
  */
 function imager_email_file() {
-  global $user;
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
@@ -324,7 +323,7 @@ function imager_email_file() {
     $body .= "Content: " . taxonomy_term_load($tid)->name . "\n";
   }
   $tid = $file->field_image_content['und'][0]['tid'];
-  $body .= "\nThank you,\n   " . $user->name . "\n";
+  $body .= "\nThank you,\n   " . $GLOBALS['user'] . "\n";
 
   $out['data']['attachPath'] = "$ddir$slash$ps[filename].$ps[suffix]";
   $out['data']['body'] = $body;
@@ -341,7 +340,6 @@ function imager_email_file() {
  * Write the file to the P drive.  I can mount that but they need the path,
  */
 function imager_view_browser() {
-  global $user;
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
@@ -497,7 +495,7 @@ function _imager_get_fid($puri) {
 function _imager_make_uniq_filepath($dir, $cmp) {
   $n = 0;
   do {
-    $n++;
+    ++$n;
     $path = "$dir/$cmp[dir]$cmp[filename]_$n.$cmp[suffix]";
   } while (file_exists($path));
   return $cmp['filename'] . "_" . $n;

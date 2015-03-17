@@ -16,8 +16,6 @@ function imager_init() {
  * Implement hook_menu().
  */
 function imager_menu() {
-  $items = array();
-
   // Retrieve a rendered file_entity
   $items['imager/ajax/display_entity'] = array(
     'title' => 'Display file_entity',
@@ -200,11 +198,11 @@ function imager_page_alter(&$page) {
       '#prefix' => '<div id="imager-wrapper">',
       '#suffix' => '</div>',
       '#weight' => -100,
-      '#attached' => array (
-        'library' => array (
+      '#attached' => array(
+        'library' => array(
           array('system', 'ui.draggable'),
         ),
-        'js' => array (
+        'js' => array(
           $_imager_path . '/js/hoverintent.js',
           $_imager_path . '/js/jquery.imgareaselect.min.js',
           $_imager_path . '/js/screenfull.js',
@@ -213,7 +211,7 @@ function imager_page_alter(&$page) {
           array(
             'type' => 'setting',
             'data' => array(
-              'imager' => array (
+              'imager' => array(
                 'modulePath' => $_imager_path,
                 'filePath' => $_SERVER['DOCUMENT_ROOT'] . '/' . variable_get('file_public_path', ''),
                 'cssSelector' => $_imager_css_selector,

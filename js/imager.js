@@ -1,6 +1,6 @@
 /**
  * @file
- * JavaScript library to view and edit images from thumbnails
+ * JavaScript library to popup full image viewer/editor from images on pages
  * 
  * Provides image viewer:
  * - Hover over a thumbnail and a popup appears of the full image
