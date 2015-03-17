@@ -762,9 +762,9 @@
     };
 
 /**
-* 
-* @returns {undefined}
-*/
+ * 
+ * @returns {undefined}
+ */
     function getInfo() {
       $imagerBusy.show();
       processAjax(settings.actions.displayEntity.url,
@@ -911,7 +911,7 @@
 */
     function mouseWheel(evt){
       var delta = evt.wheelDelta ? evt.wheelDelta/10 : -evt.detail ? evt.detail : 0;
-      if (delta) zoom(delta);
+      if (delta) zoom(-delta);
       return evt.preventDefault() && false;
     };
 

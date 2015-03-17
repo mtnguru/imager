@@ -7,10 +7,3 @@ dependencies[] = entity
 dependencies[] = views
 
 files[]  = imager.module
-
-; Information added by drupal.org packaging script on 2011-07-04
-version = "7.x-1.x-dev"
-core = "7.x"
-project = "ecosleuth"
-datestamp = "1309739296"
-

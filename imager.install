@@ -1,7 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Displays message upon successful installation of module
+ */
+
 /**
 * Implements hook_install().
 */
-function mymodule_install() {
+function imager_install() {
   $t = get_t();
   drupal_set_message($t("Imager module successfull installed - no configuration options are available - yet"));
 }
+
