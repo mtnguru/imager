@@ -21,6 +21,10 @@
  * - Emailed from Drupal
  */
 
+/**
+ * Wrap file in JQuery();
+ * @param {type} $
+ */
 (function ($) {
   window.imager = function(){
 
@@ -29,6 +33,7 @@
     var settings = {};
     var $thumbnails;
    
+    // Elements
     var $imagerWrapper;    // Wrapper around all imager html divs
     var $imagerOverlay;    // Div containing the popup image and buttons
     var $imagerCanvas;     // canvas with current displayed image
@@ -63,6 +68,7 @@
     var confirmMode = '';  // Mode for the confirmation dialog - deleteFile
     var messageTimeout;    // Message timeout function - needed for clearTimeout
 
+    // Dimensions
     var mw;  // Maximum canvas width
     var mh;  // Maximum canvas height
 
@@ -75,6 +81,7 @@
     var vw;  // Image viewport width
     var vh;  // Image viewport height
 
+    // Status 
     var rotation;  // 0, 90, 180, 270 
     var initScale = 1;
     var scaleFactor = 1.04;
@@ -88,6 +95,7 @@
     var lightness = 0;
     var saturation = 0;
 
+    // Points
     var ptDownC = {}; // Last place mouse button was released - canvas 
     var ptDownT = {}; // Last place mouse button was released - transformed
     var ptSUlC  = {}; // Crop Selection Upper Left corner  - canvas
@@ -100,7 +108,7 @@
     var ptNowT  = {}; // Current point, varies with use    - transformed
 
     function _init(opts) {
-      settings = opts;
+      settings = opts;   // Why do I make a local copy?  
       modulePath = settings.modulePath;
 
       $imagerCanvas2    = $('#imager-canvas-org');
@@ -721,50 +729,70 @@
     var outOfBounds = function() {
       var npt = {'x': 0, 
                  'y': 0};
-      if (rotation == 0 || rotation == 180) {
-        if (rotation == 0) {
+      var pw;
+      var ph;
+      switch (rotation) {
+        case 0:
           ptCUlT = ctx.transformedPoint(0,0);
           ptCLrT = ctx.transformedPoint(cw,ch);
-        } else {
-          ptCUlT = ctx.transformedPoint(cw,ch);
-          ptCLrT = ctx.transformedPoint(0,0);
-        }
-      } else {
-        if (rotation == 90) {
+          pw = iw * cscale;
+          ph = ih * cscale;
+          break;
+        case 90:
           ptCUlT = ctx.transformedPoint(cw,0);
           ptCLrT = ctx.transformedPoint(0,ch);
-        } else {
+          pw = ih * cscale;
+          ph = iw * cscale;
+          break;
+        case 180:
+          ptCUlT = ctx.transformedPoint(cw,ch);
+          ptCLrT = ctx.transformedPoint(0,0);
+          pw = iw * cscale;
+          ph = ih * cscale;
+          break;
+        case 270:
           ptCUlT = ctx.transformedPoint(0,ch);
           ptCLrT = ctx.transformedPoint(cw,0);
-        }
+          pw = ih * cscale;
+          ph = iw * cscale;
+          break;
       }
+      var msg = '<p>outOfBounds - cw: ' + cw + '  pw: ' + pw + '</p>';
+      msg += '<p>outOfBounds - ch: ' + ch + '  ph: ' + ph + '</p>';
       var x1 = ptCUlT.x;
       var y1 = ptCUlT.y;
       var x2 = iw - ptCLrT.x;
       var y2 = ih - ptCLrT.y;
-      if (x2 < 0) {
-        $('#imager-messages-content').append('<p>outOfBounds - right:' + x2 + '</p>');
-        npt.x = -x2
-      }
-      if (y2 < 0) {
-        $('#imager-messages-content').append('<p>outOfBounds - bottom:' + y2 + '</p>');
-        npt.y = -y2
-      }
+      // @todo - When image is smaller than the canvas the image flips back and forth.
+//    if (cw < pw) {   // @todo
+        if (x2 < 0) {
+          msg += '<p>outOfBounds - right:' + x2 + '</p>';
+          npt.x = -x2
+        }
+//    }
+//    if (ch < ph) {
+        if (y2 < 0) {
+          msg += '<p>outOfBounds - bottom:' + y2 + '</p>';
+          npt.y = -y2
+        }
+//    }
       if (x1 < 0) {
-        $('#imager-messages-content').append('<p>outOfBounds - left:' + ptCUlT.x + '</p>');
+        msg += '<p>outOfBounds - left:' + ptCUlT.x + '</p>';
         npt.x = ptCUlT.x;
       }
       if (y1 < 0) {
-        $('#imager-messages-content').append('<p>outOfBounds - top:' + ptCUlT.y + '</p>');
+        msg += '<p>outOfBounds - top:' + ptCUlT.y + '</p>';
         npt.y = ptCUlT.y;
+      }
+      if (msg) {
+        $('#imager-messages-content').html(msg);
       }
       if (npt.x || npt.y) return npt;
       return undefined;
     };
 
 /**
- * 
- * @returns {undefined}
+ * Use AJAX to retrieve a rendered file entity and display in a popup dialog.
  */
     function getInfo() {
       $imagerBusy.show();
@@ -810,8 +838,10 @@
     }
 
 /**
+* Use AJAX to get a map showing where the image was taken.
 * 
-* @returns {undefined}
+* This isn't working yet.  Most likely problem is JavaScript files are not
+* getting loaded through AJAX.  Not sure if this is even possible.
 */
     function getMap() {
       $imagerBusy.show();
@@ -829,19 +859,19 @@
       });
     }
 
-    /**
-     * 
-     * @param {type} evt
-     * @returns {undefined}
-     */
+/**
+  *  
+  * @param {type} evt
+  */
     function mouseDown (evt){
       document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
       ptDownC.x = evt.offsetX || (evt.pageX - $imagerCanvas[0].offsetLeft);
-      if (evt.offsetY) {              // This is kludgy, pageY work intermittently, I think it's
-                                             // because the div has position: fixed and is out of sequence
+      // @todo - pageY works intermittently
+      //         Seems to be related to the div having css 'position: fixed'
+      if (evt.offsetY) {
         ptDownC.y = evt.offsetY || (evt.pageY - $imagerCanvas[0].offsetTop);
       } else {
-        ptDownC.y = evt.layerY + $imagerCanvas[0].offsetTop;  // This works for me, I'm not sure the calc is correct
+        ptDownC.y = evt.layerY + $imagerCanvas[0].offsetTop;  
       }
       ptDownT = ctx.transformedPoint(ptDownC.x,ptDownC.y);
       dragging = true;
@@ -850,9 +880,9 @@
     };
 
 /**
+* Move the image when mouse is moved.
 * 
 * @param {type} evt
-* @returns {undefined}
 */
     function mouseMove(evt){
       ptNowC.x = evt.offsetX || (evt.pageX - $imagerCanvas[0].offsetLeft);
@@ -877,20 +907,20 @@
     }
 
 /**
-* 
+* User released mouse button, either execute zoom or close the viewer
+*  
 * @param {type} evt
-* @returns {undefined}
 */
     function mouseUp(evt){
       dragging = false;
-      var now = new Date();      // get current time
+      var now = new Date();
       elapsed = now - lastup;
       lastup = now;
-      if (distance < 20) {              // if we are not panning then we are clicking
+      if (distance < 20) {       // if mouse didn't move between clicks
         if (evt.ctrlKey) {
-          zoom(evt.shiftKey ? -1 : 1 );  // click could zoom here to zoom, 
+          zoom(evt.shiftKey ? -1 : 1 );
         } else {
-          if (elapsed < 1000) {  // if double click than hide #imagerOverlay
+          if (elapsed < 750) {  // if double click
             if (fullScreen) {
               screenfull.exit();
               setFullScreen(false);
@@ -917,8 +947,7 @@
     };
 
 /**
-* 
-* @returns {undefined}
+* Enable events for panning and zooming and disable cropping events.
 */
     function enablePanZoom() {
       // canvas#image-canvas event handlers
@@ -931,8 +960,7 @@
     }
 
 /**
-* 
-* @returns {undefined}
+* Enable events for cropping and disable events for cropping and zooming.
 */
     function enableCrop() {
       $imagerCanvas[0].removeEventListener('mousedown',mouseDown);
@@ -950,9 +978,9 @@
     }
 
 /**
+* Set the current view mode. 
 * 
 * @param {type} newMode
-* @returns {undefined}
 */
     function setViewMode(newMode) {
       if (fullScreen && newMode == 0) newMode = 1;
@@ -974,8 +1002,7 @@
     };
 
 /**
-* 
-* @returns {undefined}
+* Save the current image into a second offscreen canvas. 
 */
     function setInitialImage() {
       $imagerCanvas2.attr({width:  cw,     // Set image to be full size
@@ -985,10 +1012,10 @@
     }
 
 /**
-* 
-* @param {type} newMode
-* @returns {undefined}
-*/
+ * Set image editing mode - none, brightness, hsl. 
+ * 
+ * @param {type} newMode
+ */
     function setEditMode(newMode) {
       editMode = newMode;
       switch (editMode) {
@@ -1023,9 +1050,9 @@
     }
 
 /**
+* Toggle full screen mode and draw image.
 * 
 * @param {type} newMode
-* @returns {undefined}
 */
     function setFullScreen(newMode) {
       if (newMode) {
@@ -1044,8 +1071,7 @@
       },250);
     }
 /**
-* 
-* @returns {undefined}
+* Display any popups that are enabled. 
 */
   function showPopups() {
     $imagerOverlay.show();
@@ -1068,8 +1094,7 @@
   }
 
 /**
-* 
-* @returns {undefined}
+* Hide all popups and the main viewer window. 
 */
   function hidePopups() {
     $imagerOverlay.hide();
@@ -1095,9 +1120,13 @@
   }
 
 /**
+* Given an image, find the next or previous image.
 * 
 * @param {type} src
+*   Source image.
 * @param {type} offset
+*   Number of images.
+* 
 * @returns {Drupal.behaviors.imager.attach.imagerSrc|String|src}
 */
     function findImage(src,offset) {
@@ -1116,6 +1145,11 @@
       return undefined;
     };
 
+/**
+ * Set handlers for all events.
+ * 
+ * @todo This function is 500 lines long and needs restructuring.
+ */
     function initEvents() {
       // div#imager-overlay event handlers
       // click on #imager-overlay - hide it, set mode back to view=0
@@ -1488,10 +1522,10 @@
         $imagerFilesave.hide();
       });
       $('#imager-filesave-download').click(function () {
-        $imagerBusy.show();
-        displayMessage('Extracting Image...');
-        this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
-        this.href = getImage($('input[name="resolution"]:checked').val(),true);
+        saveFile(false);
+//      displayMessage('Extracting Image...');
+//      this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
+//      this.href = getImage($('input[name="resolution"]:checked').val(),true);
         $imagerBusy.hide();
         $imagerFilesave.hide();
       });
@@ -1626,15 +1660,18 @@
           sensitivity: 2,
           interval: 50
         });   // thumbnail.hoverIntent
-      });   // thumbnails.each()
-    }
+      });  // thumbnails.each()
+    }   // function initEvents()
 
 /**
- * Given a thumbnail, determine the path of the full image
- * If '/styles/' is part of the path then simply remove /styles/ and the next two path components
- * otherwise look for the parent element to be a link to the full image 
+ * Given the path to a thumbnail determine the path of the full image
+ * 
+ * If '/styles/' is part of the path then simply remove /styles/ 
+ * and the next two path components.
+ * Otherwise look for the parent element to be a link to the full image.
  *
  * @param {type} thumbnail
+ * 
  * @returns path to full image
  */
     function getImagePath(thumbnail) {
@@ -1665,9 +1702,12 @@
     }
 
 /**
-* 
-* @returns {undefined}
-*/
+ * Create a Data URI from the current image. 
+ * 
+ * @param {boolean} stream
+ * 
+ * @returns {Data URI - image is embedded}
+ */
     function getImage(stream) {
       var img;
       var pt;
@@ -1758,19 +1798,6 @@
       return img;
     };
 
-
-    function emailFile() {
-      displayMessage('Extracting Image...');
-      $imagerBusy.show();
-      var img = getImage($('input[name="resolution"]:checked').val(),false);
-      displayMessage('Saving Image...');
-      processAjax(settings.actions.emailFile.url,
-                  { action: 'email-file',
-                    saveMode: fileSaveMode,
-                    uri: imagerSrc,
-                    imgBase64: img 
-                  });
-    }
     function saveFile(overwrite) {
       displayMessage('Extracting Image...');
       $imagerBusy.show();
@@ -1834,9 +1861,9 @@
 
 
 /**
+* Track the history of transforms done to this image.
 * 
 * @param {type} ctx
-* @returns {undefined}
 */
     function trackTransforms(ctx){
       var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
@@ -1900,10 +1927,12 @@
     };   // trackTransforms
 
 /**
+* Process all AJAX requests.
+* 
+* @todo Drupal probably has an API for this.
 * 
 * @param {type} postData
 * @param {type} processFunc
-* @returns {undefined}
 */
     function processAjax(url,postData,processFunc) {
       postData['filePath']   = settings.filePath;
@@ -1957,7 +1986,8 @@
           }
         }
       });
-    };
+    }; // processAjax()
+
     return {
       init:   _init,
       attach: _attach,
