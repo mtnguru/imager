@@ -219,7 +219,7 @@ function _imager_get_paths($uri) {
  *
  * @param type $uri
  */
-function imager_save_file() {
+function imager_save_image() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
@@ -235,8 +235,8 @@ function imager_save_file() {
 
   // save the image to a tmp file
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
-  saveImage($tmp_path);
-  convertImage($tmp_path, $ps['npath']);
+  _imager_save_image($tmp_path);
+  _imager_convert_image($tmp_path, $ps['npath']);
 
   // doesn't actually overwrite,
   if ($overwrite == "true") {
@@ -284,7 +284,7 @@ function imager_email_file() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
-  $host = gethostname();
+  $host = gethostname();  
   if ($host == "saphira") {
     $ldir = "/home/ds/mail";
     $ddir = "/home/ds/mail";
@@ -301,8 +301,8 @@ function imager_email_file() {
   $ps = _imager_get_paths($uri);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
   $image_path = "$ldir$slash$ps[filename].$ps[suffix]";
-  saveImage($tmp_path);
-  convertImage($tmp_path, $image_path);
+  _imager_save_image($tmp_path);
+  _imager_convert_image($tmp_path, $image_path);
 
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
@@ -348,8 +348,8 @@ function imager_view_browser() {
   $ps = _imager_get_paths($uri);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
   $image_path = "$_SERVER[DOCUMENT_ROOT]/images/$ps[filename].$ps[suffix]";
-  saveImage($tmp_path);
-  convertImage($tmp_path, $image_path);
+  _imager_save_image($tmp_path);
+  _imager_convert_image($tmp_path, $image_path);
 
   $path = $GLOBALS['base_root'] . '/images/' . $ps['filename'] . "." . $ps['suffix'];
   $out['data']['image_path'] = $path;

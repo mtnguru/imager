@@ -36,10 +36,10 @@ function imager_menu() {
     'type' => MENU_CALLBACK,
   );
   // Overwrite or save a new image file and the file_entity
-  $items['imager/ajax/save_file'] = array(
+  $items['imager/ajax/save_image'] = array(
     'title' => 'Save edited image file',
     'description' => 'Save an edited image file back into Drupal',
-    'page callback' => 'imager_save_file',
+    'page callback' => 'imager_save_image',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
@@ -116,6 +116,7 @@ function imager_views_pre_view(&$view, &$display_id, &$args) {
   global $_imager_view_mode;
   if (preg_match('/imager/', $view->display['default']->display_options['css_class'])) {
     if (!preg_match('/browser/', $view->name)) {
+      drupal_add_library('system', 'ui.draggable');
       $_imager_css_selector = '.imager-thumbnail img';
       $_imager_view_mode    = 'media_imager';
     }
