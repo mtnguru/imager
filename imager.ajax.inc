@@ -21,7 +21,7 @@ function imager_display_entity() {
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
-  dpm($file, 'imager_display_entity - $file');
+//dpm($file, 'imager_display_entity - $file');
   $view = file_view($file, check_plain($_POST['viewMode']));
 
   $icon_path = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'imager') . '/icons';
@@ -85,7 +85,7 @@ function imager_edit_form_load() {
 /**
  * Search a form element's render array and determine what #type it is.
  *
- * @todo This is a kludge, there has to be a property or API that can return the #type
+ * @todo This is a kludge, look for a property or API that can return the #type
  *
  * @param type $elem
  * @param type $level
@@ -390,7 +390,7 @@ function imager_save_field_entity_field() {
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
   //dpm($file,'imagerSaveFileEntityField - $file');
-  dpm(check_plain($_POST), 'POST');
+  //dpm(check_plain($_POST), 'POST');
   switch ($field_type) {
     case 'hierarchical_select':
       $file->{$field_name}['und'][0]['tid'] = check_plain($_POST['value']);
@@ -415,12 +415,12 @@ function imager_save_field_entity_field() {
       else {
         // otherwise its a normal text field
         $vals = str_getcsv(check_plain($_POST['value']), ",", '"');
-        dpm($vals, 'vals - str_getcsv');
-        dpm($file, 'vals - $file');
+//      dpm($vals, 'vals - str_getcsv');
+//      dpm($file, 'vals - $file');
         unset($file->{$field_name}['und']);
         foreach ($vals as $key => $value) {
           $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid;
-          dpm($tid, "tid");
+//        dpm($tid, "tid");
           $file->{$field_name}['und'][$key]['tid'] = $tid;
         }
       }

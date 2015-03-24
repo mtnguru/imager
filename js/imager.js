@@ -52,7 +52,7 @@
     var nimgs = 0;         // number of images
     var imagerSrc = '';    // src path for current image
     var imagerTitle = '';  // Image title from attr data-title
-    var viewMode = 0;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
+    var viewMode = 1;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
     var editMode = 0;      // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
     var elapsed = 0;       // # elapsed msec since last mouse up
     var fullScreen = 0;    // Are we currently in full screen mode
@@ -956,6 +956,11 @@
 */
     function setViewMode(newMode) {
       if (fullScreen && newMode == 0) newMode = 1;
+      // @todo - Temporarily disable quick view until hoverintent can be fixed
+      // for default default JQuery 1.6?
+      if (newMode == 0) {
+        newMode = 1;
+      }
       switch (newMode) {
         case 0:   // #mode-view
           if (viewMode == 2) enablePanZoom();      
@@ -1591,7 +1596,7 @@
         // mouse enters thumbnail image
         // un-hide div#imager-overlay and display new image
         var timer;
-        $(this).hoverIntent({
+/*      $(this).hoverIntent({
           over: function(evt) {
             if (viewMode > 0) return false;
             imagerSrc = getImagePath(this);
@@ -1625,7 +1630,7 @@
           },
           sensitivity: 2,
           interval: 50
-        });   // thumbnail.hoverIntent
+        });   // thumbnail.hoverIntent */
       });   // thumbnails.each()
     }
 

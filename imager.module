@@ -237,7 +237,7 @@ function imager_page_alter(&$page) {
       'canvasorg' => _imagerBuildCanvas(),
       'busy' => _imagerBuildBusy(),
 //    'map' => _imagerBuildMap(),
-      'form' => _imagerBuildForm(),
+//    'form' => _imagerBuildForm(),
       'confirm' => _imagerBuildConfirm(),
     );
   }
@@ -269,9 +269,10 @@ function _imagerBuildOverlay() {
         ),
         'image_left' => _imagerBuildButton(1, 'image-left', 'left_arrow.png', t('View image to the left')),
         'image_right' => _imagerBuildButton(2, 'image-right', 'right_arrow.png', t('View image to the right')),
-        'image_exit' => _imagerBuildButton(3, 'image-exit', 'redx.png', t('Exit image popup')),
+        'mode_fullscreen' => _imagerBuildButton(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
+        'image_exit' => _imagerBuildButton(4, 'image-exit', 'redx.png', t('Exit image popup')),
       ),
-      'mode_buttons' => array(
+/*    'mode_buttons' => array(
         '#prefix' => '<div id="mode-buttons" class="buttons">',
         '#suffix' => '</div>',
         '#weight' => 2,
@@ -282,11 +283,10 @@ function _imagerBuildOverlay() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'mode_view' => _imagerBuildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
+//      'mode_view' => _imagerBuildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
 //      'mode_lock' => _imagerBuildButton(2, 'mode-lock', 'lock.png', t('Lock image to screen'),
-        'mode_fullscreen' => _imagerBuildButton(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
-        'mode_configure' => _imagerBuildButton(4, 'mode-configure', 'configure.png', t('Under Construction - Configure settings')),
-      ),
+//      'mode_configure' => _imagerBuildButton(4, 'mode-configure', 'configure.png', t('Under Construction - Configure settings')),
+      ), */
       'view_buttons' => array(
         '#prefix' => '<div id="view-buttons" class="buttons">',
         '#suffix' => '</div>',
@@ -516,14 +516,15 @@ function _imagerBuildFilesave() {
 function _imagerBuildResTable($weight) {
   return array(
     '#weight' => $weight,
+    '#type' => 'table',
     '#attributes' => array('class' => 'table-no-striping'),
     '#theme' => 'table',
     '#header' => array(
-      //    ' ',
-      //    'Image',
-      //    'Resolution',
-      //    'Geometry',
-      //    'Ratio'
+//          t(' '),      // @todo Uncommenting these lines causes PHP error.
+//          t('Image'),
+//          t('Resolution'),
+//          t('Geometry'),
+//          t('Ratio')
     ),
     '#rows' => array(
       array(
@@ -979,3 +980,110 @@ function imager_field_attach_view_alter(&$output, $context) {
   return;
 }
 
+/**
+ * Implement hook_file_view_alter
+ */
+function imager_file_view_alter(&$build,$type) {
+  if ($build['#view_mode'] !== 'media_imager') {
+    return $build;
+  }
+  $file = $build['#file'];
+  $geometry = $file->metadata['width'] . ' x ' . $geometry = $file->metadata['height'];
+
+  if ($file->filesize > 1000000) {
+    $filesize = (round($file->filesize / 100000) / 10) . ' MB';
+  } else {
+    $filesize = (round($file->filesize / 100) / 10) . ' KB';
+  }
+
+  if (isset($build['field_description'])) {   
+    $build['field_description']['#prefix'] = '<br>';
+  }
+  $build['sfield_filename'] = array(
+    '#access' => 1,
+    '#bundle' => 'image',
+    '#entity_type' => 'file',
+    '#field_name' => 'sfield_filename',
+    '#field_type' => 'text',
+    '#formatter' => 'text_default',
+    '#items' => array ('anything'),
+    '#prefix' => '<br>',
+    '#label_display' => 'inline',
+    '#theme' => 'field',
+    '#title' => 'File Name',
+    '#optional' => true,
+    '#weight' => 20,
+    0 => array(
+      '#markup' => $file->filename,
+    ),
+  );
+  $build['sfield_owner'] = array(
+    '#access' => 1,
+    '#bundle' => 'image',
+    '#entity_type' => 'file',
+    '#field_name' => 'sfield_owner',
+    '#field_type' => 'text',
+    '#formatter' => 'text_default',
+    '#items' => array ('anything'),
+    '#label_display' => 'inline',
+    '#theme' => 'field',
+    '#title' => 'File Owner',
+    '#optional' => true,
+    '#weight' => 21,
+    0 => array(
+      '#markup' => user_load($file->uid)->name,
+    ),
+  );
+  $build['sfield_filesize'] = array(
+    '#access' => 1,
+    '#bundle' => 'image',
+    '#entity_type' => 'file',
+    '#field_name' => 'sfield_filesize',
+    '#field_type' => 'text',
+    '#formatter' => 'text_default',
+    '#items' => array ('anything'),
+    '#label_display' => 'inline',
+    '#theme' => 'field',
+    '#title' => 'File Size',
+    '#optional' => true,
+    '#weight' => 23,
+    0 => array(
+      '#markup' => $filesize,
+    ),
+  );
+  $build['sfield_geometry'] = array(
+    '#access' => 1,
+    '#bundle' => 'image',
+    '#entity_type' => 'file',
+    '#field_name' => 'sfield_geometry',
+    '#field_type' => 'text',
+    '#formatter' => 'text_default',
+    '#items' => array ('anything'),
+    '#label_display' => 'inline',
+    '#theme' => 'field',
+    '#title' => 'Geometry',
+    '#optional' => true,
+    '#weight' => 24,
+    0 => array(
+      '#markup' => $geometry,
+    ),
+  );
+  $build['sfield_fid'] = array(
+    '#access' => 1,
+    '#bundle' => 'image',
+    '#entity_type' => 'file',
+    '#field_name' => 'sfield_fid',
+    '#field_type' => 'text',
+    '#formatter' => 'text_default',
+    '#items' => array ('anything'),
+    '#label_display' => 'inline',
+    '#theme' => 'field',
+    '#title' => 'File ID',
+    '#optional' => true,
+    '#weight' => 25,
+    0 => array(
+      '#markup' => $file->fid,
+    ),
+  );
+  return;
+}

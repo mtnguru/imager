@@ -2,164 +2,175 @@
  * imager.sass
  */
 /* line 18, ../sass/imager.sass */
+#imager-wrapper {
+  color: black;
+  background-color: #eeeeee;
+}
+/* line 21, ../sass/imager.sass */
 #imager-wrapper table {
-  background-color: #aaaaaa;
+  background-color: #cccccc;
   border-collapse: separate;
   border-spacing: 2px;
 }
-/* line 22, ../sass/imager.sass */
+/* line 25, ../sass/imager.sass */
 #imager-wrapper table td {
   line-height: 1;
   border-top: 0px;
   padding: 2px;
 }
-/* line 26, ../sass/imager.sass */
+/* line 29, ../sass/imager.sass */
 #imager-wrapper table th {
   color: #cccccc;
   background-color: #666666;
 }
 
-/* line 29, ../sass/imager.sass */
+/* line 32, ../sass/imager.sass */
 #imager-overlay.fullscreen {
   width: 100%;
 }
 
-/* line 31, ../sass/imager.sass */
+/* line 34, ../sass/imager.sass */
 #imager-overlay {
-  display: none;
-  background: #888888;
   z-index: 1010;
   position: fixed;
   top: 0px;
   left: 0px;
   overflow: auto;
+  padding: 3px;
+  background-color: #eeeeee;
 }
-/* line 39, ../sass/imager.sass */
+/* line 42, ../sass/imager.sass */
 #imager-overlay button {
   background-color: #cccccc;
 }
-/* line 41, ../sass/imager.sass */
+/* line 44, ../sass/imager.sass */
 #imager-overlay #imager-canvas-wrapper {
   float: left;
 }
-/* line 43, ../sass/imager.sass */
+/* line 46, ../sass/imager.sass */
 #imager-overlay #imager-canvas-wrapper #imager-canvas-org {
   display: hidden;
 }
-/* line 46, ../sass/imager.sass */
+/* line 49, ../sass/imager.sass */
 #imager-overlay #button-wrapper {
   float: left;
 }
-/* line 48, ../sass/imager.sass */
+/* line 51, ../sass/imager.sass */
 #imager-overlay #button-wrapper div {
   text-align: center;
 }
-/* line 50, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons {
-  color: black;
-  background-color: #cccccc;
-}
 /* line 53, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons img {
-  display: block;
+#imager-overlay #button-wrapper .buttons {
+  background-color: #cccccc;
+  padding: 3px;
+  margin: 0 2px 2px 0;
+  text-align: center;
+  font-size: 75%;
 }
-/* line 55, ../sass/imager.sass */
+/* line 59, ../sass/imager.sass */
+#imager-overlay #button-wrapper .buttons img {
+  border-radius: 4px;
+  display: block;
+  padding: 3px;
+  margin: 0 auto;
+}
+/* line 64, ../sass/imager.sass */
 #imager-overlay #button-wrapper .buttons .checked {
   background-color: #eeeeee;
 }
-/* line 57, ../sass/imager.sass */
+/* line 66, ../sass/imager.sass */
 #imager-overlay #button-wrapper .buttons .disabled {
   background-color: #aaaaaa;
 }
-/* line 59, ../sass/imager.sass */
+/* line 68, ../sass/imager.sass */
 #imager-overlay #button-wrapper .buttons .specific {
   background-color: #666666;
 }
-/* line 61, ../sass/imager.sass */
+/* line 70, ../sass/imager.sass */
 #imager-overlay #button-wrapper #file-buttons {
   margin-bottom: 65px;
 }
-/* line 63, ../sass/imager.sass */
+/* line 72, ../sass/imager.sass */
 #imager-overlay #button-wrapper #debug-buttons {
   z-index: 1009;
   position: absolute;
-  bottom: 3px;
+  bottom: 7px;
 }
 
-/* line 68, ../sass/imager.sass */
+/* line 77, ../sass/imager.sass */
 .imager-buttons {
   position: absolute;
   bottom: 5px;
   right: 5px;
   background-color: #cccccc;
 }
+/* line 82, ../sass/imager.sass */
+.imager-buttons img {
+  padding: 4px;
+}
 
-/* line 74, ../sass/imager.sass */
+/* line 85, ../sass/imager.sass */
 .imager-content {
   margin-bottom: 35px;
 }
 
-/* line 77, ../sass/imager.sass */
+/* line 88, ../sass/imager.sass */
 #imager-status {
-  display: none;
   position: fixed;
   z-index: 1014;
   background-color: #aaaaaa;
-  color: cyan;
-  font-size: 80%;
 }
-/* line 84, ../sass/imager.sass */
+/* line 92, ../sass/imager.sass */
 #imager-status #imager-status-content {
   text-align: center;
 }
-/* line 86, ../sass/imager.sass */
+/* line 94, ../sass/imager.sass */
 #imager-status .imager-status-col {
   float: left;
   margin: 3px 3px 25px;
 }
-/* line 89, ../sass/imager.sass */
+/* line 97, ../sass/imager.sass */
 #imager-status .imager-status-file {
   color: white;
 }
-/* line 92, ../sass/imager.sass */
+/* line 100, ../sass/imager.sass */
 #imager-status table {
   border-spacing: 0;
   margin-bottom: 6px;
 }
-/* line 95, ../sass/imager.sass */
+/* line 103, ../sass/imager.sass */
 #imager-status table th {
   padding: 2px 4px;
 }
-/* line 97, ../sass/imager.sass */
+/* line 105, ../sass/imager.sass */
 #imager-status table td {
-  padding: 0 4px;
+  padding: 3px;
 }
 
-/* line 100, ../sass/imager.sass */
+/* line 108, ../sass/imager.sass */
 #imager-info {
-  display: none;
   position: fixed;
   z-index: 1015;
   padding: 5px;
+  min-width: 200px;
   max-width: 600px;
-  background-color: #aaaaaa;
+  background-color: #eeeeee;
 }
-/* line 107, ../sass/imager.sass */
+/* line 115, ../sass/imager.sass */
 #imager-info .title {
-  color: #444444;
   text-align: center;
   word-wrap: break-word;
 }
-/* line 111, ../sass/imager.sass */
+/* line 118, ../sass/imager.sass */
 #imager-info .filename {
   text-align: center;
 }
-/* line 113, ../sass/imager.sass */
+/* line 120, ../sass/imager.sass */
 #imager-info .error {
   background-color: red;
   color: white;
 }
-/* line 116, ../sass/imager.sass */
+/* line 123, ../sass/imager.sass */
 #imager-info .field-name-sfield-owner,
 #imager-info .field-name-sfield-filename,
 #imager-info .field-name-sfield-filesize,
@@ -167,75 +178,74 @@
   float: none;
   clear: both;
 }
-/* line 122, ../sass/imager.sass */
+/* line 129, ../sass/imager.sass */
 #imager-info #imager-info-buttons {
   float: right;
   z-index: 1110;
 }
-/* line 125, ../sass/imager.sass */
+/* line 132, ../sass/imager.sass */
 #imager-info #imager-info-buttons img {
   float: left;
 }
-/* line 127, ../sass/imager.sass */
+/* line 134, ../sass/imager.sass */
 #imager-info #imager-info-geometry {
   clear: both;
 }
-/* line 130, ../sass/imager.sass */
+/* line 137, ../sass/imager.sass */
 #imager-info #imager-info-content img.imager-info-edit {
   float: left;
   clear: both;
 }
-/* line 133, ../sass/imager.sass */
+/* line 140, ../sass/imager.sass */
 #imager-info #imager-info-content section {
   float: left;
 }
 
-/* line 136, ../sass/imager.sass */
+/* line 143, ../sass/imager.sass */
 #imager-edit {
-  display: none;
   max-width: 700px;
   position: fixed;
   padding: 10px;
   background-color: #888888;
   z-index: 1020;
 }
-/* line 143, ../sass/imager.sass */
+/* line 149, ../sass/imager.sass */
 #imager-edit .form-item {
   margin: 0;
 }
-/* line 145, ../sass/imager.sass */
+/* line 151, ../sass/imager.sass */
 #imager-edit .description {
   font-style: italic;
   margin-top: 10px;
   max-width: 500px;
 }
-/* line 149, ../sass/imager.sass */
+/* line 155, ../sass/imager.sass */
 #imager-edit .form-text {
   width: 500px;
 }
-/* line 151, ../sass/imager.sass */
+/* line 157, ../sass/imager.sass */
 #imager-edit table.cke_editor {
   background-color: #cccccc;
   border-radius: 0;
 }
-/* line 154, ../sass/imager.sass */
+/* line 160, ../sass/imager.sass */
 #imager-edit table.cke_editor body {
   background-image: none;
 }
 
-/* line 157, ../sass/imager.sass */
+/* line 163, ../sass/imager.sass */
 #imager-confirm {
-  display: none;
   max-width: 700px;
   position: fixed;
-  background-color: #888888;
   z-index: 1020;
+  background-color: #aaaaaa;
+  padding: 0 10px;
 }
-/* line 163, ../sass/imager.sass */
+/* line 169, ../sass/imager.sass */
 #imager-confirm .imager-content {
   margin: 0;
 }
-/* line 165, ../sass/imager.sass */
+/* line 171, ../sass/imager.sass */
 #imager-confirm #imager-confirm-buttons {
   position: static;
   margin: 0 auto;
@@ -243,106 +253,102 @@
   float: none;
 }
 
-/* line 171, ../sass/imager.sass */
+/* line 177, ../sass/imager.sass */
 #imager-map {
-  display: none;
   max-width: 800px;
   padding: 5px;
   position: fixed;
   background-color: #888888;
   z-index: 1013;
 }
-/* line 178, ../sass/imager.sass */
+/* line 183, ../sass/imager.sass */
 #imager-map .description {
   max-width: 300px;
 }
-/* line 180, ../sass/imager.sass */
+/* line 185, ../sass/imager.sass */
 #imager-map #imager-map-buttons {
   float: right;
   z-index: 1110;
   background-color: #cccccc;
 }
-/* line 184, ../sass/imager.sass */
+/* line 189, ../sass/imager.sass */
 #imager-map #imager-map-buttons img {
   float: left;
 }
 
-/* line 187, ../sass/imager.sass */
+/* line 192, ../sass/imager.sass */
 #imager-messages.error {
-  color: black;
   background-color: red;
   background-image: none;
 }
 
-/* line 191, ../sass/imager.sass */
+/* line 195, ../sass/imager.sass */
 #imager-messages {
-  display: none;
+  padding: 10px;
   position: fixed;
   z-index: 1020;
   font-size: 80%;
 }
-/* line 198, ../sass/imager.sass */
+/* line 202, ../sass/imager.sass */
 #imager-messages .error {
   background-color: red;
 }
 
-/* line 202, ../sass/imager.sass */
+/* line 206, ../sass/imager.sass */
 #imager-filesave {
-  display: none;
   padding: 5px;
   position: fixed;
   z-index: 1050;
   padding: 10px;
   background-color: #aaaaaa;
 }
-/* line 209, ../sass/imager.sass */
+/* line 212, ../sass/imager.sass */
 #imager-filesave #imager-filesave-filename {
   width: 30em;
   font-size: 90%;
 }
-/* line 212, ../sass/imager.sass */
+/* line 215, ../sass/imager.sass */
 #imager-filesave #resolution {
   margin: 0 auto 10px;
   width: auto;
 }
 
-/* line 215, ../sass/imager.sass */
+/* line 218, ../sass/imager.sass */
 #imager-brightness,
 #imager-color {
-  display: none;
   position: fixed;
   z-index: 1050;
   background-color: #aaaaaa;
 }
-/* line 221, ../sass/imager.sass */
+/* line 223, ../sass/imager.sass */
 #imager-brightness .error,
 #imager-color .error {
   background-color: red;
 }
-/* line 223, ../sass/imager.sass */
+/* line 225, ../sass/imager.sass */
 #imager-brightness .slider,
 #imager-color .slider {
   -webkit-appearance: none;
   z-index: 1060;
 }
-/* line 226, ../sass/imager.sass */
+/* line 228, ../sass/imager.sass */
 #imager-brightness #slider-hue,
 #imager-color #slider-hue {
   background: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #00ffff, #0000ff, #800080);
 }
-/* line 229, ../sass/imager.sass */
+/* line 231, ../sass/imager.sass */
 #imager-brightness #slider-saturation,
 #imager-color #slider-saturation {
   background-image: linear-gradient(to right, #c8c8c8, rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(#ff0000, #ffff00, #008888);
 }
-/* line 231, ../sass/imager.sass */
+/* line 233, ../sass/imager.sass */
 #imager-brightness #slider-lightness,
 #imager-brightness #slider-brightness,
 #imager-color #slider-lightness,
 #imager-color #slider-brightness {
   background: linear-gradient(to right, #000000, #ffffff);
 }
-/* line 234, ../sass/imager.sass */
+/* line 236, ../sass/imager.sass */
 #imager-brightness #slider-contrast,
 #imager-color #slider-contrast {
   background-image: linear-gradient(to right, #888888, #666666, #222222, #000000), linear-gradient(to right, #888888, #aaaaaa, #dddddd, #ffffff);
@@ -351,33 +357,31 @@
   background-repeat: no-repeat;
 }
 
-/* line 240, ../sass/imager.sass */
+/* line 242, ../sass/imager.sass */
 #imager-email {
-  display: none;
   padding: 5px;
   position: fixed;
   z-index: 1050;
   padding: 10px;
   background-color: #aaaaaa;
 }
-/* line 242, ../sass/imager.sass */
+/* line 243, ../sass/imager.sass */
 #imager-email table {
   margin: 0 auto;
   width: auto;
 }
-/* line 248, ../sass/imager.sass */
+/* line 249, ../sass/imager.sass */
 #imager-email input {
   width: 97%;
 }
-/* line 252, ../sass/imager.sass */
+/* line 253, ../sass/imager.sass */
 #imager-email #resolution {
   margin: 0 auto 10px;
   width: auto;
 }
 
-/* line 256, ../sass/imager.sass */
+/* line 257, ../sass/imager.sass */
 #imager-busy {
-  display: none;
   position: fixed;
   top: 400px;
   left: 600px;
@@ -385,11 +389,7 @@
 }
 
 /* line 264, ../sass/imager.sass */
-.field-name-field-detail {
+.imager .views-row {
   float: left;
-}
-
-/* line 267, ../sass/imager.sass */
-div.krumo-preview {
-  color: black;
+  margin: 10px;
 }
