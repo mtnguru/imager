@@ -1624,8 +1624,7 @@
 
         // mouse enters thumbnail image
         // un-hide div#imager-overlay and display new image
-        var timer;
-        $(this).hoverIntent({
+/*      $(this).hoverIntent({   // hoverIntent requires at least jQuery 1.7
           over: function(evt) {
             if (viewMode > 0) return false;
             imagerSrc = getImagePath(this);
@@ -1635,7 +1634,6 @@
           },
           out: function(evt) {
             if (viewMode > 0) return false;
-    //          clearTimeout(timer);
             var el = evt.relatedTarget ? evt.relatedTarget : evt.toElement;
             var el1 = $(el).closest('#imager-overlay');
             var el2 = $(el).closest('#imager-info');
@@ -1659,7 +1657,7 @@
           },
           sensitivity: 2,
           interval: 50
-        });   // thumbnail.hoverIntent
+        });   // thumbnail.hoverIntent */
       });  // thumbnails.each()
     }   // function initEvents()
 
