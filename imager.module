@@ -16,6 +16,7 @@ function imager_init() {
  * Implement hook_menu().
  */
 function imager_menu() {
+  // Administer configuration settings for Imager module
   $items['admin/config/media/imager'] = array(
     'title' => 'Imager',
     'description' => 'Configure Imager module paths and settings.',

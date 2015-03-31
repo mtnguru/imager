@@ -518,7 +518,7 @@
     var applyBrightness = function() {
       $imagerBusy.show();
       $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
-                       height: ih});
+                           height: ih});
       ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
       ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
 
@@ -705,7 +705,7 @@
       var nih = ptSLrT.y - ptSUlT.y;
 
       $imagerCanvas.attr({width:  niw,           // Make canvas same size as the image
-                         height: nih});
+                          height: nih});
       ctx.clearRect(0,0,cw,ch);
       ctx.setTransform(1,0,0,1,0,0);
       ctx.drawImage(cimg,ptSUlT.x,ptSUlT.y,niw,nih,0,0,niw,nih);  // Copy cropped area from img into canvas
@@ -713,7 +713,7 @@
       cimg.src = $imagerCanvas[0].toDataURL();  // Copy canvas image back into img
       calcCanvasDims(niw,nih);                  // Calculate maximum size of canvas
       $imagerCanvas.attr({width:  cw,            // Make canvas proper size
-                         height: ch});
+                          height: ch});
       ctx.scale(cw/niw,ch/nih);                 // Scale image to fit canvas
   //  ctx.drawImage(cimg,0,0);                 // Draw image, not necessary, it's already drawn
       updateStatus();
@@ -1006,7 +1006,7 @@
 */
     function setInitialImage() {
       $imagerCanvas2.attr({width:  cw,     // Set image to be full size
-                          height: ch});
+                           height: ch});
       ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
       ctx2.drawImage($imagerCanvas[0],0,0);
     }
@@ -1303,10 +1303,11 @@
                       value: value,
                       format: format,
                       uri: imagerSrc,
-                    },function(response) {
-          var status = response['status'];
-          getInfo();
-        });
+                    }, function(response) {
+                         var status = response['status'];
+                         getInfo();
+                    }
+                   );
         // extract value from popup, update database and re-render?
         // or do I re-render a single field.
       });
@@ -1455,6 +1456,30 @@
     // div#file-buttons click event handlers
       function initFileSave(saveMode,saveTitle,filename,message) {
         fileSaveMode = saveMode;
+        $('#imager-filesave-email').hide();
+        $('#imager-filesave-clipboard').hide();
+        $('#imager-filesave-download').hide();
+        $('#imager-filesave-new').hide();
+        $('#imager-filesave-overwrite').hide();
+        $('#imager-filesave-filename-container').hide();
+        switch (saveMode) {
+          case 'database':
+            $('#imager-filesave-new').show();
+            $('#imager-filesave-overwrite').show();
+            $('#imager-filesave-filename-container').show();
+            break;
+          case 'email':
+            $('#imager-filesave-email').show();
+            $('#imager-filesave-filename-container').show();
+            break;
+          case 'clipboard':
+            $('#imager-filesave-clipboard').show();
+            break;
+          case 'download':
+            $('#imager-filesave-download').show();
+            $('#imager-filesave-filename-container').show();
+            break;
+        }
         setViewMode(1);
         $('#imager-filesave-title').text(saveTitle);
         $('#imager-filesave-filename').val(filename);
@@ -1468,64 +1493,37 @@
 
     // click on save to database
       $('#file-database').click(function () {
-        $('#imager-filesave-email').hide();
-        $('#imager-filesave-clipboard').hide();
-        $('#imager-filesave-download').hide();
-        $('#imager-filesave-new').show();
-        $('#imager-filesave-overwrite').show();
-        $('#imager-filesave-filename-container').show();
+//      $imagerSrc.toDataUrl
         initFileSave('database',"Save image to database",decodeURIComponent(imagerSrc).replace(/^.*\/files\//),'');
       });
 
     // click on download
       $('#file-download').click(function () {
-        $('#imager-filesave-email').hide();
-        $('#imager-filesave-clipboard').hide();
-        $('#imager-filesave-download').show();
-        $('#imager-filesave-new').hide();
-        $('#imager-filesave-overwrite').hide();
-        $('#imager-filesave-filename-container').show();
         initFileSave('download',"Download image to local file system",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
                      'The download feature is under development.<br>It does not work in all browsers and is intermittent.');
       });
 
       $('#file-email').click(function () {
-        $('#imager-filesave-email').show();
-        $('#imager-filesave-clipboard').hide();
-        $('#imager-filesave-download').hide();
-        $('#imager-filesave-new').hide();
-        $('#imager-filesave-overwrite').hide();
-        $('#imager-filesave-filename-container').show();
         initFileSave('email',"Email image",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
                      'Email Image to somewhere');
       });
 
       $('#file-clipboard').click(function () {
-        $('#imager-filesave-email').show();
-        $('#imager-filesave-clipboard').show();
-        $('#imager-filesave-download').hide();
-        $('#imager-filesave-new').hide();
-        $('#imager-filesave-overwrite').hide();
-        $('#imager-filesave-filename-container').hide();
         initFileSave('clipboard','Send image to clipboard','image.png',
                      'The clipboard feature is under development.<br>It does not work in all browsers.');
       });
 
       $('#imager-filesave-new').click(function () {
         saveFile(false);
-        $imagerBusy.hide();
-        $imagerFilesave.hide();
       });
       $('#imager-filesave-overwrite').click(function () {
         saveFile(true);
-        $imagerBusy.hide();
-        $imagerFilesave.hide();
       });
       $('#imager-filesave-download').click(function () {
-        saveFile(false);
-//      displayMessage('Extracting Image...');
-//      this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
-//      this.href = getImage($('input[name="resolution"]:checked').val(),true);
+//      saveFile(false);
+        displayMessage('Extracting Image...');
+        this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
+        this.href = getImage($('input[name="resolution"]:checked').val(),true);
         $imagerBusy.hide();
         $imagerFilesave.hide();
       });
@@ -1803,19 +1801,19 @@
       displayMessage('Saving Image...');
       if (fileSaveMode == 'database') {
         processAjax(settings.actions.saveFile.url,
-                    { overwrite: overwrite,
-                      action: 'save-file',
-                      saveMode: fileSaveMode,
-                      uri: imagerSrc,
-                      imgBase64: img 
+                    { 'overwrite': overwrite,
+                      'action': 'save-file',
+                      'saveMode': fileSaveMode,
+                      'uri': imagerSrc,
+                      'imgBase64': img 
                     });
 
       } else if (fileSaveMode == 'email') {
         processAjax(settings.actions.emailFile.url,
-                    { action: 'email',
-                      saveMode: fileSaveMode,
-                      uri: imagerSrc,
-                      imgBase64: img 
+                    { 'action': 'email',
+                      'saveMode': fileSaveMode,
+                      'uri': imagerSrc,
+                      'imgBase64': img 
                     },function (response) {
                       address = '';
                       path = response['data']['attachPath'];
@@ -1832,27 +1830,29 @@
                     });
       } else if (fileSaveMode == 'clipboard') {
         processAjax(settings.actions.clipboard.url,
-                    { overwrite: overwrite,
-                      action: 'clipboard',
-                      saveMode: fileSaveMode,
-                      uri: imagerSrc,
-                      imgBase64: img 
+                    { 'overwrite': overwrite,
+                      'action': 'clipboard',
+                      'saveMode': fileSaveMode,
+                      'uri': imagerSrc,
+                      'imgBase64': img 
                     });
       } else if (fileSaveMode == 'download') {
-        processAjax(settings.actions.download.url,
-                    { action: 'download',
-                      saveMode: fileSaveMode,
-                      uri: imagerSrc,
-                      imgBase64: img 
-                    });
+//      $('#file-download').attr({ 'href': img,
+//                                 'download': 'file.png',
+//                              });
+        link = document.getElementById('download');
+        link.href = img;
+        link.download = 'file.png';
       }
+      $imagerBusy.hide();
+      $imagerFilesave.hide();
     };
 
     function deleteFile() {
       displayMessage('Deleting Image...');
       processAjax(settings.actions.deleteFile.url,
-                  { action: 'delete-file',
-                    uri: imagerSrc,
+                  { 'action': 'delete-file',
+                    'uri': imagerSrc,
                   });
     }
 
