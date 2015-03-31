@@ -16,6 +16,16 @@ function imager_init() {
  * Implement hook_menu().
  */
 function imager_menu() {
+  // Administer configuration settings for Imager module
+  $items['admin/config/media/ajax/display_entity'] = array(
+    'title' => 'Imager',
+    'description' => 'Configure Imager module settins',
+    'page callback' => 'imager_admin_settings',
+    'file' => 'imager.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   // Retrieve a rendered file_entity
   $items['imager/ajax/display_entity'] = array(
     'title' => 'Display file_entity',
@@ -116,7 +126,7 @@ function imager_views_pre_view(&$view, &$display_id, &$args) {
   global $_imager_view_mode;
   if (preg_match('/imager/', $view->display['default']->display_options['css_class'])) {
     if (!preg_match('/browser/', $view->name)) {
-      drupal_add_library('system', 'ui.draggable');
+//    drupal_add_library('system', 'ui.draggable');
       $_imager_css_selector = '.imager-thumbnail img';
       $_imager_view_mode    = 'media_imager';
     }
@@ -158,14 +168,14 @@ function imager_theme() {
  *
  * @return type
  */
-function _imagerBuildButton($weight, $id, $src, $title, $classes = '') {
+function _imagerBuildButton($weight, $id, $src, $title, $wraplink = false) {
   $item = array(
     '#id' => $id,
     '#weight' => $weight,
     '#title' => t($title),  // I know, don't use t() on a variable
     '#src' => $src,
     '#theme' => 'imager_add_button',
-    '#classes' => $classes,
+    '#wraplink' => $wraplink,
   );
   return $item;
 }
@@ -179,7 +189,21 @@ function _imagerBuildButton($weight, $id, $src, $title, $classes = '') {
  */
 function theme_imager_add_button($variables) {
   $element = $variables['element'];
-  return '<img id="' . $element['#id'] . '" src="' . $GLOBALS["base_url"] . '/' . $GLOBALS["theme_path"] . '/icons/' . $element["#src"] . '" alt="" title="' . $element['#title'] . '" class="' . $element['#classes'] . '">';
+  if ($element['#wraplink']) {
+    $out = '<a href="#" id="' . $element['#id'] . '">' .
+             '<img ' .
+             'src="' . $GLOBALS["base_url"] . '/' . $GLOBALS["theme_path"] . '/icons/' . $element["#src"] . '" ' .
+//           'class="imager-filesave-button" ' .
+             'alt="" title="' . $element['#title'] . '" />' . 
+           '</a>';
+  }
+  else {
+    $out = '<img id="' . $element['#id'] . '" ' .
+           'src="' . $GLOBALS["base_url"] . '/' . $GLOBALS["theme_path"] . '/icons/' . $element["#src"] . '" ' .
+//         'class="imager-filesave-button" ' .
+           'alt="" title="' . $element['#title'] . '">'; 
+  }
+  return $out;
 }
 
 /**
@@ -494,12 +518,7 @@ function _imagerBuildFilesave() {
       '#prefix' => '<div id="imager-filesave-buttons" class="imager-buttons">',
       '#suffix' => '</div>',
       'clipboard' => _imagerBuildButton(2, 'imager-filesave-clipboard', 'clipboard.png', t('Send image to clipboard and exit')),
-      'file_download' => array(
-        '#weight' => 3,
-        '#prefix' => '<a id="filesave-download">',
-        '#suffix' => '</a>',
-        'image' => _imagerBuildButton(3, 'imager-filesave-download', 'download.png', t('Download image to local file system')),
-      ),
+      'download' => _imagerBuildButton(3, 'imager-filesave-download', 'download.png', t('Download image to local file system'), true),
       'email' => _imagerBuildButton(4, 'imager-filesave-email', 'mail.png', t('Email image using default email client')),
       'new' => _imagerBuildButton(4, 'imager-filesave-new', 'database_add.png', t('Create new database entry and exit')),
       'overwrite' => _imagerBuildButton(5, 'imager-filesave-overwrite', 'database_go.png', t('Overwrite existing database entry')),

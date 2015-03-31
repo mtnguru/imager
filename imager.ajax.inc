@@ -21,7 +21,7 @@ function imager_display_entity() {
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
-  dpm($file, 'imager_display_entity - $file');
+//dpm($file, 'imager_display_entity - $file');
   $view = file_view($file, check_plain($_POST['viewMode']));
 
   $icon_path = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'imager') . '/icons';
@@ -163,7 +163,7 @@ function imager_edit_form_field_load() {
  *
  * @param type $path
  */
-function _imager_save_image($path) {
+function _imager_write_image($path) {
   $filtered_data = explode(',', check_plain($_POST['imgBase64']));
   $fp = fopen($path, 'w');
   fwrite($fp, base64_decode($filtered_data[1]));
@@ -226,8 +226,8 @@ function imager_save_image() {
   $overwrite = check_plain($_POST['overwrite']);
   $uri = urldecode(check_plain($_POST['uri']));
 
-  $out['debug'] .= "imagerSaveFile() overwrite: " . $overwrite . "<br>\n";
-  $out['debug'] .= "imagerSaveFile() start uri: " . $uri . "<br>\n";
+  $out['debug'] .= "imager_save_image() overwrite: " . $overwrite . "<br>\n";
+  $out['debug'] .= "imager_save_image() start uri: " . $uri . "<br>\n";
 
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
@@ -235,7 +235,7 @@ function imager_save_image() {
 
   // save the image to a tmp file
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
-  _imager_save_image($tmp_path);
+  _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $ps['npath']);
 
   // doesn't actually overwrite,
@@ -284,10 +284,11 @@ function imager_email_file() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
+//  where do I write these - should I make a configuration form?
   $host = gethostname();  
   if ($host == "saphira") {
-    $ldir = "/home/ds/mail";
-    $ddir = "/home/ds/mail";
+    $ldir = "/home/eco/mail";
+    $ddir = "/home/eco/mail";
     $slash = "/";
   }
   elseif ($host == "dswebserver") {
@@ -301,7 +302,7 @@ function imager_email_file() {
   $ps = _imager_get_paths($uri);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
   $image_path = "$ldir$slash$ps[filename].$ps[suffix]";
-  _imager_save_image($tmp_path);
+  _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $image_path);
 
   $fid = _imager_get_fid($ps['puri']);
@@ -347,12 +348,14 @@ function imager_view_browser() {
   $out['debug'] .= "imagerViewBrowser() start uri: " . $uri . "<br>\n";
   $ps = _imager_get_paths($uri);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
-  $image_path = "$_SERVER[DOCUMENT_ROOT]/images/$ps[filename].$ps[suffix]";
-  _imager_save_image($tmp_path);
+  $image_path = $_SERVER['DOCUMENT_ROOT'] . $GLOBALS['base_path'] . 
+                'tmp.images/' .
+                $ps[filename] . $ps[suffix];
+  _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $image_path);
 
-  $path = $GLOBALS['base_root'] . '/images/' . $ps['filename'] . "." . $ps['suffix'];
-  $out['data']['image_path'] = $path;
+  $path = $GLOBALS['base_url'] . '/tmp.images/' . $ps['filename'] . "." . $ps['suffix'];
+  $out['data']['imagePath'] = $path;
   print json_encode($out);
 }
 
