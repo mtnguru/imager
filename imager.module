@@ -17,10 +17,11 @@ function imager_init() {
  */
 function imager_menu() {
   // Administer configuration settings for Imager module
-  $items['admin/config/media/ajax/display_entity'] = array(
+  $items['admin/config/media/imager'] = array(
     'title' => 'Imager',
-    'description' => 'Configure Imager module settins',
-    'page callback' => 'imager_admin_settings',
+    'description' => 'Configure Imager module paths and settings.',
+    'page callback' => 'drupal_get_form',
+    'page_arguments' => array('imager_admin_form'),
     'file' => 'imager.admin.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
