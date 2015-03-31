@@ -1,9 +1,6 @@
-name = "+ Imager"
+name = "Imager"
 description = Hovering over a thumbnail pops up a window showing full image where it can be zoomed, panned, rotated, cropped and saved
 core = 7.x
-package = "+ EcoSleuth"
-
-dependencies[] = entity
-dependencies[] = views
+package = "EcoSleuth"
 
 files[]  = imager.module

@@ -1,11 +1,9 @@
-
+-color
 /*
  * @file
  * imager.sass
  */
-// @import "normalize"
 
-$green:       #0f0
 $red:         #f00
 $lightergrey: #eee
 $lightgrey:   #ccc
@@ -13,10 +11,14 @@ $grey:        #aaa
 $greyer:      #888
 $darkgrey:    #666
 $darkergrey:  #444
+$black:       #000
+$white:       #fff
 
 #imager-wrapper
+  color: $black
+  background-color: $lightergrey
   table
-    background-color: $grey
+    background-color: $lightgrey
     border-collapse: separate
     border-spacing: 2px
     td
@@ -29,13 +31,13 @@ $darkergrey:  #444
 #imager-overlay.fullscreen
   width: 100%
 #imager-overlay
-  display: none
-  background: $greyer
   z-index: 1010
   position: fixed
   top: 0px
   left: 0px
   overflow: auto
+  padding: 3px
+  background-color: $darkgrey
   button
     background-color: $lightgrey
   #imager-canvas-wrapper
@@ -48,10 +50,16 @@ $darkergrey:  #444
     div
       text-align: center
     .buttons
-      color: #000
       background-color: $lightgrey
+      padding: 3px
+      margin: 0 2px 2px 0
+      text-align: center
+      font-size: 75%
       img
+        border-radius: 4px
         display: block
+        padding: 3px
+        margin: 0 auto
       .checked
         background-color: $lightergrey
       .disabled
@@ -63,31 +71,30 @@ $darkergrey:  #444
     #debug-buttons
       z-index: 1009
       position: absolute
-      bottom: 3px
+      bottom: 7px
 
 .imager-buttons
   position: absolute
   bottom: 5px
   right: 5px
   background-color: $lightgrey
+  img
+    padding: 4px
 
 .imager-content
   margin-bottom: 35px
 
 #imager-status
-  display: none
   position: fixed
   z-index: 1014
   background-color: $grey
-  color: cyan
-  font-size: 80%
   #imager-status-content
     text-align: center
   .imager-status-col
     float: left
     margin: 3px 3px 25px
   .imager-status-file
-    color: white 
+    color: $white
     
   table
     border-spacing: 0
@@ -95,24 +102,23 @@ $darkergrey:  #444
     th
       padding: 2px 4px
     td
-      padding: 0 4px
+      padding: 3px
 
 #imager-info
-  display: none
   position: fixed
   z-index: 1015
   padding: 5px
+  min-width: 200px
   max-width: 600px
-  background-color: $grey
+  background-color: $lightergrey
   .title
-    color: $darkergrey
     text-align: center
     word-wrap: break-word
   .filename
     text-align: center
   .error
     background-color: $red
-    color: white
+    color: $white
   .field-name-sfield-owner, 
   .field-name-sfield-filename, 
   .field-name-sfield-filesize, 
@@ -134,7 +140,6 @@ $darkergrey:  #444
       float: left
 
 #imager-edit
-  display: none
   max-width: 700px
   position: fixed
   padding: 10px
@@ -155,11 +160,11 @@ $darkergrey:  #444
       background-image: none
 
 #imager-confirm
-  display: none
   max-width: 700px
   position: fixed
-  background-color: $greyer
   z-index: 1020
+  background-color: $grey
+  padding: 0 10px
   .imager-content
     margin: 0
   #imager-confirm-buttons
@@ -169,7 +174,6 @@ $darkergrey:  #444
     float: none
 
 #imager-map
-  display: none
   max-width: 800px
   padding: 5px
   position: fixed
@@ -185,11 +189,10 @@ $darkergrey:  #444
       float: left
 
 #imager-messages.error
-  color: black
   background-color: $red
   background-image: none
 #imager-messages
-  display: none
+  padding: 10px
   position: fixed
   z-index: 1020
   font-size: 80%
@@ -200,7 +203,6 @@ $darkergrey:  #444
 
 
 #imager-filesave
-  display: none
   padding: 5px
   position: fixed
   z-index: 1050
@@ -214,7 +216,6 @@ $darkergrey:  #444
     width: auto
 #imager-brightness,
 #imager-color
-  display: none
   position: fixed
   z-index: 1050
   background-color: $grey
@@ -230,7 +231,7 @@ $darkergrey:  #444
     background-image: linear-gradient(to right, rgba(200,200,200,1),rgba(200,200,200,.4),rgba(200,200,200,0)),linear-gradient(red,yellow,#008888)
   #slider-lightness,
   #slider-brightness
-    background: linear-gradient(to right, black, white)
+    background: linear-gradient(to right, $black, $white)
   #slider-contrast
     background-image: linear-gradient(to right, #888, #666, #222, #000),linear-gradient(to right, #888, #aaa, #ddd, #fff)
     background-size: 100% 50%, 100% 50%
@@ -238,7 +239,6 @@ $darkergrey:  #444
     background-repeat: no-repeat
  
 #imager-email
-  display: none
   table
     margin: 0 auto
     width: auto
@@ -254,15 +254,16 @@ $darkergrey:  #444
     width: auto
 
 #imager-busy
-  display: none
   position: fixed
   top: 400px
   left: 600px
   z-index: 1110    
 
-
-.field-name-field-detail 
-  float: left
-
-div.krumo-preview
-  color: black
+.imager 
+  .views-row
+    line-height: 1.1
+    font-size: 90%
+    float: left
+    margin: 10px
+    width: 190px
+    height: 200px
