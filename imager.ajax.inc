@@ -22,7 +22,7 @@ function imager_display_entity() {
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
 //dpm($file, 'imager_display_entity - $file');
-  $view = file_view($file, check_plain($_POST['viewMode']));
+  $view = file_view($file, variable_get('imager_information_view_mode'));
 
   $icon_path = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'imager') . '/icons';
   $common = "class='imager-info-edit' src='$icon_path/edit.png'";
@@ -69,11 +69,11 @@ function imager_edit_form_load() {
   $uri = urldecode(check_plain($_POST['uri']));
   $cmp = _imager_extract_path_components($uri);
   $puri = "public://$cmp[dir]$cmp[filename].$cmp[suffix]";
-  $out['debug'] .= "uri: " . $uri . "<br>\n";
-  $out['debug'] .= "public uri: " . $puri . "<br>\n";
+//$out['debug'] .= "uri: " . $uri . "<br>\n";
+//$out['debug'] .= "public uri: " . $puri . "<br>\n";
 
   $fid = _imager_get_fid($puri);
-  $out['debug'] .= "fid: " . $fid . "<br>\n";
+//$out['debug'] .= "fid: " . $fid . "<br>\n";
   $file = file_load($fid);
   //$view_mode = check_plain($_POST['viewMode']);
   //$out['data'] = drupal_render(drupal_get_form('imager_file_entity_edit',$file));
@@ -155,7 +155,7 @@ function imager_edit_form_field_load() {
   $field = $form[$field_name];
   $out['data']['rendered'] = drupal_render($field);
   $out['data']['type'] .= _imager_get_field_type($field, 1);
-  $out['debug'] .= '#type: ' . $out['data']['type'];
+//$out['debug'] .= '#type: ' . $out['data']['type'];
   print json_encode($out);
 }
 
@@ -175,16 +175,25 @@ function _imager_write_image($path) {
  * @param type $spath
  * @param type $dpath
  */
-function _imager_convert_image($spath, $dpath) {
+function _imager_convert_image($spath, $dpath, $type = NULL) {
   // reduce image file size using jpeg quality of 50 and copy to $npath
-  $out['debug'] .= "convert: " . $spath . " to " . $dpath . "<br>\n";
-  $cmd = "/usr/bin/convert -quality 70 \"$spath\" \"$dpath\"";
+//$out['debug'] .= "convert: " . $spath . " to " . $dpath . "<br>\n";
+  switch ($type) {
+    case 'browser':
+      $geometry = variable_get('imager_browser_width', 1200) . 'x' .
+                  variable_get('imager_browser_height', 1200);  
+      $cmd = "/usr/bin/convert -quality 70 -scale $geometry \"$spath\" \"$dpath\"";
+      break;
+    default: 
+      $cmd = "/usr/bin/convert -quality 70 \"$spath\" \"$dpath\"";
+      break;
+  }
   system($cmd);
   if (!file_exists($dpath)) {
     $cmd = "cp $spath $dpath";
     system($cmd);
   }
-  $cmd = "rm $tmp_path";
+  $cmd = "rm $spath";
   system($cmd);
 }
 
@@ -226,8 +235,8 @@ function imager_save_image() {
   $overwrite = check_plain($_POST['overwrite']);
   $uri = urldecode(check_plain($_POST['uri']));
 
-  $out['debug'] .= "imager_save_image() overwrite: " . $overwrite . "<br>\n";
-  $out['debug'] .= "imager_save_image() start uri: " . $uri . "<br>\n";
+//$out['debug']  = "imager_save_image() overwrite: " . $overwrite . "<br>\n";
+//$out['debug'] .= "imager_save_image() start uri: " . $uri . "<br>\n";
 
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
@@ -238,36 +247,20 @@ function imager_save_image() {
   _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $ps['npath']);
 
-  // doesn't actually overwrite,
   if ($overwrite == "true") {
-    // creates a new file,
-    // sets status of old file to 'revised'
-    //  $opath = "check_plain($_POST[filePath])/files/$ps[dir]$ps[filename].$ps[suffix]";
-    $out['info'] = "File $npath revised<br>\n";
-
-    $otid = $file->field_status['und'][0]['tid'];
-    // Resave the original entity with the new file
-    $file->fid = $fid;
-    $file->uri = $ps['nuri'];
-    file_save($file);
-
-    // Create a new file_entity and save old file under it
-    unset($file->fid);
-    $file->uri = $ps['puri'];
-    $file->field_media_status['und'][0]['tid'] = reset(taxonomy_get_term_by_name('Revised', 'media_status'))->tid;
-    // Change status to revised, Save/Resave the file in Drupal
-    file_save($file);
-  }
-  else {
-    //$out['debug'] .= "nfilename: " . $nfilename . "<br>\n";
-    // This forces file_save to create a new file entity
-    unset($file->fid);
-    $out['debug'] .= "new uri: " . $ps['nuri'] . "<br>\n";
     $file->uri = $ps['nuri'];
     $file->filename = $ps['nfilename'] . '.' . $ps['suffix'];
-    $file->field_media_status['und'][0]['tid'] = reset(taxonomy_get_term_by_name('Active', 'media_status'))->tid;
-    $out['info'] = "Saved new file $ps[path]<br>\n";
-    file_save($file);
+    $file = file_save($file);
+    $out['file_old'] = reset(module_invoke_all('imager_modify', $file->fid));
+//  dpm($out,"overwrite");
+  }
+  else {
+    unset($file->fid);   // Forces file_save to create a new file entity
+    $file->uri = $ps['nuri'];
+    $file->filename = $ps['nfilename'] . '.' . $ps['suffix'];
+    $file = file_save($file);
+    $result = reset(module_invoke_all('imager_modify', $file->fid));
+    $out['file_new'] = $result;
   }
   print json_encode($out);
 }
@@ -284,50 +277,28 @@ function imager_email_file() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
-//  where do I write these - should I make a configuration form?
-  $host = gethostname();  
-  if ($host == "saphira") {
-    $ldir = "/home/eco/mail";
-    $ddir = "/home/eco/mail";
-    $slash = "/";
-  }
-  elseif ($host == "dswebserver") {
-    $ldir = "/home/ds/mail";
-    $ddir = "DigitalImages:\\mail";
-    $slash = "\\";
-  }
-
+  $slash = '/';
   $uri = urldecode(check_plain($_POST['uri']));
-  $out['debug'] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
+//$out['debug'] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
   $ps = _imager_get_paths($uri);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
-  $image_path = "$ldir$slash$ps[filename].$ps[suffix]";
+  $dir = variable_get('imager_email_local_path');
+  file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+  $image_path = $dir . '/' . $ps[filename] . '.' . $ps[suffix];
   _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $image_path);
 
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
 
-  // Create text body
-  $body = "Title: " . $file->title . "\n" . "Date taken: " . $file->field_create_date['und'][0]['value'] . "\n";
-  if (isset($file->field_facility['und'][0]['target_id'])) {
-    $nid = $file->field_facility['und'][0]['target_id'];
-    $facility = entity_load('node', array($nid));
-    $body .= "Facility: " . $facility[$nid]->title . "\n";
-  }
-  if (isset($file->field_image_purpose['und'][0]['tid'])) {
-    $tid = $file->field_image_purpose['und'][0]['tid'];
-    $body .= "Purpose: " . taxonomy_term_load($tid)->name . "\n";
-  }
-  if (isset($file->field_image_content['und'][0]['tid'])) {
-    $tid = $file->field_image_content['und'][0]['tid'];
-    $body .= "Content: " . taxonomy_term_load($tid)->name . "\n";
-  }
-  $tid = $file->field_image_content['und'][0]['tid'];
-  $body .= "\nThank you,\n   " . $GLOBALS['user'] . "\n";
-
-  $out['data']['attachPath'] = "$ddir$slash$ps[filename].$ps[suffix]";
-  $out['data']['body'] = $body;
+  $out['data']['attachPath'] = variable_get('imager_email_attach_linux') . $slash . 
+                               $ps[filename] . '.' . $ps[suffix];
+  $view = file_view($file, variable_get('imager_email_view_mode'));
+  unset($view['links']);
+  unset($view['#contextual_links']);
+  unset($view['#pre_render']);
+  unset($view['file']);
+  $out['data']['body'] = drupal_html_to_text(drupal_render($view));
   $out['data']['subject'] = "Dairy Specialists - photo - $ps[filename]";
   print json_encode($out);
 }
@@ -344,31 +315,58 @@ function imager_view_browser() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
-  $uri = urldecode(check_plain($_POST['uri']));
-  $out['debug'] .= "imagerViewBrowser() start uri: " . $uri . "<br>\n";
-  $ps = _imager_get_paths($uri);
-  $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
-  $image_path = $_SERVER['DOCUMENT_ROOT'] . $GLOBALS['base_path'] . 
-                'tmp.images/' .
-                $ps[filename] . $ps[suffix];
-  _imager_write_image($tmp_path);
-  _imager_convert_image($tmp_path, $image_path);
+  $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
+  $file = file_load(_imager_get_fid($ps['puri']));
 
-  $path = $GLOBALS['base_url'] . '/tmp.images/' . $ps['filename'] . "." . $ps['suffix'];
-  $out['data']['imagePath'] = $path;
+  $dir = DRUPAL_ROOT . '/tmp';
+  file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+
+  $tmp_path = '/tmp/' . $ps[filename] . '.' . $ps[suffix];
+  $html_path = $dir . '/file.html';
+  $image_path = $dir . '/image.jpg';
+  $html_uri  = $GLOBALS['base_url'] . '/tmp/file.html';
+  $image_uri = $GLOBALS['base_url'] . '/tmp/image.jpg';
+
+  _imager_write_image($tmp_path);
+  _imager_convert_image($tmp_path, $image_path, 'browser');
+
+  $view = file_view($file, variable_get('imager_browser_view_mode'));
+  unset($view['links']);
+  unset($view['#contextual_links']);
+  $content = drupal_render($view);
+  $content = preg_replace('/<h2.*h2>/', '', $content);  // Remove the title
+  $location = variable_get('imager_browser_location');
+  if (variable_get('imager_browser_location') == 'Above') {
+    $body = '<img src="' . $image_uri . '" />' . $content;
+  }
+  else {
+    $body = $content . '<img src="' . $image_uri . '" />';
+  }
+  $title = $file->file['field_file_imager_title_text'][LANGUAGE_NONE]['0']['safe_value'];
+  $page = '<html>' .
+            '<head>' .
+              '<title>' . $title . '</title>' .
+            '</head>' .
+            '<body>' . $body . '</body>' .
+          '</html>';
+  $fp = fopen($html_path, 'w');
+  fwrite($fp, $page);
+  fclose($fp);
+
+  $out['data']['uri'] = $html_uri;
   print json_encode($out);
 }
 
 /**
  * Delete an image file and the associated file_entity
  */
-function imager_delete_field() {
+function imager_delete_file() {
   $out['action'] = check_plain($_POST['action']);
 
   $uri = urldecode(check_plain($_POST['uri']));
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
-  $out['debug'] .= "deleteFile() fid: " . $fid . "<br>\n";
+//$out['debug'] .= "deleteFile() fid: " . $fid . "<br>\n";
 
   $file = file_load($fid);
   $force = TRUE;
@@ -376,6 +374,12 @@ function imager_delete_field() {
 
   $out['status'] = 'pass';
   print json_encode($out);
+  // Delete file entity - Hide .views-row
+  // Save new file entity - Render and insert after current image.
+  // Overwrite file entity - Render and insert after, color before in blue
+  // Edit image - Render and replace views-row.
+  // Edit fields through Imager viewer - Render and replace views-row
+//module_invoke_all('imager_modify', 'delete', $file);
 }
 
 /**
@@ -388,7 +392,7 @@ function imager_save_field_entity_field() {
   $field_type = check_plain($_POST['fieldType']);
 
   $uri = urldecode(check_plain($_POST['uri']));
-  $out['debug'] .= "imagerSaveFileEntityField() start uri: " . $uri . "<br>\n";
+//$out['debug'] .= "imagerSaveFileEntityField() start uri: " . $uri . "<br>\n";
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);

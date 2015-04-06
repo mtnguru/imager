@@ -27,7 +27,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
   );
-  // Retrieve a rendered file_entity
+  // AJAX - Retrieve a rendered file_entity
   $items['imager/ajax/display_entity'] = array(
     'title' => 'Display file_entity',
     'description' => 'Retrieve a rendered file_entity',
@@ -37,6 +37,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  // AJAX - Display map showing location of current image
   $items['imager/ajax/display_map'] = array(
     'title' => 'Display Map',
     'description' => 'Display a map of where this image was taken',
@@ -46,7 +47,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  // Overwrite or save a new image file and the file_entity
+  // AJAX - Overwrite or save a new image file and the file_entity
   $items['imager/ajax/save_image'] = array(
     'title' => 'Save edited image file',
     'description' => 'Save an edited image file back into Drupal',
@@ -56,6 +57,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  // AJAX - Attach current image to outgoing email message in users email client
   $items['imager/ajax/email_file'] = array(
     'title' => 'Email edited image file',
     'description' => 'Start users default email client with subject, body and image attached',
@@ -65,16 +67,17 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  // AJAX - Display current image and rendered file_entity in a new browser window
   $items['imager/ajax/view_browser'] = array(
     'title' => 'View Image natively in Browser',
-    'description' => 'Same image so it can be displayed natively in browser, then copied or printed',
+    'description' => 'Save image so it can be displayed natively in browser, then copied or printed',
     'page callback' => 'imager_view_browser',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  // Retrieve a rendered file_entity form
+  // AJAX - Retrieve a rendered file_entity form
   $items['imager/ajax/edit_form_load'] = array(
     'title' => 'Retrieve the edit form for a file_entity',
     'description' => 'Retrieve the edit form for a file_entity',
@@ -84,7 +87,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  // Retrieve a field from a rendered file_entity form
+  // AJAX - Retrieve a field from a rendered file_entity form
   $items['imager/ajax/edit_form_field_load'] = array(
     'title' => 'Retrieve a field from the edit form',
     'description' => 'Retrieve a field from the edit form',
@@ -94,7 +97,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  // Delete a file_entity and it's image file
+  // AJAX - Delete a file_entity and it's image file
   $items['imager/ajax/delete_file'] = array(
     'title' => 'Delete a file_entity from Drupal',
     'description' => 'Delete a file_entity from Drupal',
@@ -104,7 +107,7 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  // Save a file_entity field
+  // AJAX - Save a file_entity field
   $items['imager/ajax/save_file_entity_field'] = array(
     'title' => 'Save file_entity field',
     'description' => 'Save a file_entity field',
@@ -123,22 +126,20 @@ function imager_menu() {
  * Determine if this view needs imager module, if so load it
  */
 function imager_views_pre_view(&$view, &$display_id, &$args) {
-  if (preg_match('/imager/', $view->display['default']->display_options['css_class'])) {
+  if (preg_match('/' . variable_get('imager_views_css_class') . '/', 
+                 $view->display['default']->display_options['css_class'])) {
     if (!preg_match('/browser/', $view->name)) {
-      _imager_start('.imager-thumbnail img','media_imager');
+      _imager_start();
     }
   }
   return;
 }
 
 
-function _imager_start($css_selector,$view_mode) {
-  include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'imager') . '/imager.pages.inc';    
-  
-  global $_imager_css_selector;
-  global $_imager_view_mode;
-  $_imager_css_selector = $css_selector;
-  $_imager_view_mode = $view_mode;
+function _imager_start() {
+  global $_imager_enable;
+  $_imager_enable = TRUE;
+  variable_set('file_entity_allow_insecure_download', TRUE);
 }
 
 /**
@@ -171,10 +172,12 @@ function imager_theme() {
  * @todo Move most of this into imager.pages.inc
  */
 function imager_page_alter(&$page) {
+  // @todo using $imager_enable to determine if module is in use/loaded.
+  //       is there a more proper way?
+  global $_imager_enable;
   global $_imager_path;
-  global $_imager_css_selector;
-  global $_imager_view_mode;
-  if (isset($_imager_css_selector)) {
+  if (isset($_imager_enable)) {
+    module_load_include('inc', 'imager', 'imager.pages');
     $_imager_path = drupal_get_path('module', 'imager');
     $page['content']['imager_wrapper'] = array(
       '#prefix' => '<div id="imager-wrapper">',
@@ -196,9 +199,8 @@ function imager_page_alter(&$page) {
               'imager' => array(
                 'modulePath' => $_imager_path,
                 'filePath' => $_SERVER['DOCUMENT_ROOT'] . '/' . variable_get('file_public_path', ''),
-                'cssSelector' => $_imager_css_selector,
-                'viewMode' => $_imager_view_mode,
-                'viewMapMode' => $_imager_view_mode . '_map',
+                'cssContainer' => variable_get('imager_views_css_container'),
+                'cssImage' => variable_get('imager_views_css_image'),
               ),
             ),
           ),
@@ -219,7 +221,7 @@ function imager_page_alter(&$page) {
       'canvasorg' => _imagerBuildCanvas(),
       'busy' => _imagerBuildBusy(),
 //    'map' => _imagerBuildMap(),
-//    'form' => _imagerBuildForm(),
+      'form' => _imagerBuildForm(),
       'confirm' => _imagerBuildConfirm(),
     );
   }
@@ -398,14 +400,22 @@ function imager_file_entity_edit($form, &$form_state) {
  */
 function imager_entity_info_alter(&$entity_info) {
   //Not sure if it's still an issue, but a previous commenter noted that Media module only recognizes view modes with the prefix media_. Also, as you can see by the entity type 'file', this is for after the switch-to-file-entity patch.
-  $entity_info['file']['view modes']['media_imager'] = array(
-    'label' => t('Imager'),
+  $entity_info['file']['view modes']['media_imager_info'] = array(
+    'label' => t('Imager Info'),
     'custom settings' => TRUE,
   );
-  $entity_info['file']['view modes']['media_imager_map'] = array(
-    'label' => t('Imager Map'),
+  $entity_info['file']['view modes']['media_imager_email'] = array(
+    'label' => t('Imager Email'),
     'custom settings' => TRUE,
   );
+  $entity_info['file']['view modes']['media_imager_browser'] = array(
+    'label' => t('Imager Browser'),
+    'custom settings' => TRUE,
+  );
+//$entity_info['file']['view modes']['media_imager_map'] = array(
+//  'label' => t('Imager Map'),
+//  'custom settings' => TRUE,
+//);
 }
 
 /**
@@ -419,7 +429,8 @@ function imager_field_attach_view_alter(&$output, $context) {
  * Implement hook_file_view_alter
  */
 function imager_file_view_alter(&$build,$type) {
-  if ($build['#view_mode'] !== 'media_imager') {
+  // Exit if view_mode != configured view mode for information dialog
+  if ($build['#view_mode'] !== variable_get('imager_information_view_mode')) {
     return $build;
   }
   $file = $build['#file'];

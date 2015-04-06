@@ -10,23 +10,18 @@
     attach: function (context,settings) {
       $('#imager-wrapper').once(function() {
         imager = window.imager();
-        imager.init({'modulePath':  Drupal.settings.imager.modulePath,
-                     'cssSelector': Drupal.settings.imager.cssSelector,
-                     'basePath':    Drupal.settings.basePath,
-                     'filePath':    Drupal.settings.filePath,
+        imager.init({'modulePath':   Drupal.settings.imager.modulePath,
+                     'cssContainer': Drupal.settings.imager.cssContainer,
+                     'cssImage':     Drupal.settings.imager.cssImage,
+                     'basePath':     Drupal.settings.basePath,
+                     'filePath':     Drupal.settings.filePath,
                      'attachBehaviors': Drupal.attachBehaviors,
                      'actions': { 
                        'displayEntity': {
                          'url': Drupal.settings.basePath + '?q=imager/ajax/display_entity',
-                         'args': {
-                           'viewMode': Drupal.settings.imager.viewMode,
-                         },
                        },
                        'displayMap': {
                          'url': Drupal.settings.basePath + '?q=imager/ajax/display_map',
-                         'args': {
-                           'viewMapMode': Drupal.settings.imager.viewMapMode,
-                         },
                        },
                        'editFormFieldLoad': {
                          'url': Drupal.settings.basePath + '?q=imager/ajax/edit_form_field_load',
@@ -35,7 +30,7 @@
                          'url': Drupal.settings.basePath + '?q=imager/ajax/save_file_entity_field',
                        },
                        'saveFile': {
-                         'url': Drupal.settings.basePath + '?q=imager/ajax/save_file',
+                         'url': Drupal.settings.basePath + '?q=imager/ajax/save_image',
                        },
                        'viewBrowser': {
                          'url': Drupal.settings.basePath + '?q=imager/ajax/view_browser',
@@ -49,7 +44,7 @@
                      },
                     });
       });
- //   imager.attach();
+      imager.attach();
     },
   };
 })(jQuery);

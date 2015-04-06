@@ -1,18 +1,18 @@
--color
 /*
  * @file
  * imager.sass
  */
 
-$red:         #f00
-$lightergrey: #eee
-$lightgrey:   #ccc
-$grey:        #aaa
-$greyer:      #888
-$darkgrey:    #666
-$darkergrey:  #444
-$black:       #000
-$white:       #fff
+$red:          #f00
+$white:        #fff
+$lightestgrey: #f0f0f0
+$lightergrey:  #e0e0e0
+$lightgrey:    #cacaca
+$grey:         #aaa
+$greyer:       #888
+$darkgrey:     #666
+$darkergrey:   #444
+$black:        #000
 
 #imager-wrapper
   color: $black
@@ -50,7 +50,7 @@ $white:       #fff
     div
       text-align: center
     .buttons
-      background-color: $lightgrey
+      background-color: $lightergrey
       padding: 3px
       margin: 0 2px 2px 0
       text-align: center
@@ -77,7 +77,7 @@ $white:       #fff
   position: absolute
   bottom: 5px
   right: 5px
-  background-color: $lightgrey
+  background-color: $lightestgrey
   img
     padding: 4px
 
@@ -143,7 +143,7 @@ $white:       #fff
   max-width: 700px
   position: fixed
   padding: 10px
-  background-color: $greyer
+  background-color: $lightgrey
   z-index: 1020
   .form-item
     margin: 0
@@ -192,6 +192,7 @@ $white:       #fff
   background-color: $red
   background-image: none
 #imager-messages
+  background-color: $grey
   padding: 10px
   position: fixed
   z-index: 1020
@@ -259,6 +260,8 @@ $white:       #fff
   left: 600px
   z-index: 1110    
 
+// @TODO The remaining declarations don't belong here and are for
+// development convenience only.  Delete these 
 .imager 
   .views-row
     line-height: 1.1
@@ -267,3 +270,7 @@ $white:       #fff
     margin: 10px
     width: 190px
     height: 200px
+
+div#main
+  width: auto
+

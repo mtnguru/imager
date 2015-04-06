@@ -18,14 +18,29 @@
  *
  * @return type
  */
-function _imagerBuildButton($weight, $id, $src, $title, $classes = '') {
+
+
+/**
+ * Construct render array for a button
+ *
+ * @todo Use buttons instead of images - is this function necessary?
+ *
+ * @param type $weight
+ * @param type $id
+ * @param type $src
+ * @param type $title
+ * @param type $wraplink
+ *
+ * @return type
+ */
+function _imagerBuildButton($weight, $id, $image, $title, $wraplink = false) {
   $item = array(
     '#id' => $id,
     '#weight' => $weight,
     '#title' => t($title),  // I know, don't use t() on a variable
-    '#src' => $src,
+    '#image' => $image,
     '#theme' => 'imager_add_button',
-    '#classes' => $classes,
+    '#wraplink' => $wraplink,
   );
   return $item;
 }
@@ -38,10 +53,24 @@ function _imagerBuildButton($weight, $id, $src, $title, $classes = '') {
  * @return type
  */
 function theme_imager_add_button($variables) {
+  global $_imager_path;
   $element = $variables['element'];
-  return '<img id="' . $element['#id'] . '" src="' . $GLOBALS["base_url"] . '/' . $GLOBALS["theme_path"] . '/icons/' . $element["#src"] . '" alt="" title="' . $element['#title'] . '" class="' . $element['#classes'] . '">';
+  if ($element['#wraplink']) {
+    $out = '<a href="#" id="' . $element['#id'] . '">' .
+             '<img ' .
+             'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
+//           'class="imager-filesave-button" ' .
+             'alt="" title="' . $element['#title'] . '" />' . 
+           '</a>';
+  }
+  else {
+    $out = '<img id="' . $element['#id'] . '" ' .
+           'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
+//         'class="imager-filesave-button" ' .
+           'alt="" title="' . $element['#title'] . '">'; 
+  }
+  return $out;
 }
-
 
 /**
  * Build render array for Large Image popup
@@ -98,7 +127,7 @@ function _imagerBuildOverlay() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'view_browser' => _imagerBuildButton(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing')),
+        'view_browser' => _imagerBuildButton(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), true),
         'view_info' => _imagerBuildButton(2, 'view-info', 'information.png', t('View Image information')),
 //      'view_map' => _imagerBuildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
         //      'view_edit'       => _imagerBuildButton(4, 'view-edit', 'edit.png', t('Edit image title, categories, etc.')),
@@ -295,9 +324,7 @@ function _imagerBuildFilesave() {
       'clipboard' => _imagerBuildButton(2, 'imager-filesave-clipboard', 'clipboard.png', t('Send image to clipboard and exit')),
       'file_download' => array(
         '#weight' => 3,
-        '#prefix' => '<a id="filesave-download">',
-        '#suffix' => '</a>',
-        'image' => _imagerBuildButton(3, 'imager-filesave-download', 'download.png', t('Download image to local file system')),
+        'image' => _imagerBuildButton(3, 'imager-filesave-download', 'download.png', t('Download image to local file system'), true),
       ),
       'email' => _imagerBuildButton(4, 'imager-filesave-email', 'mail.png', t('Email image using default email client')),
       'new' => _imagerBuildButton(4, 'imager-filesave-new', 'database_add.png', t('Create new database entry and exit')),
@@ -482,7 +509,7 @@ function _imagerBuildBusy() {
   global $_imager_path;
   return array(
     '#type' => 'markup',
-    '#markup' => '<img alt="" id="imager-busy" src="' . $GLOBALS['base_url'] . '/' . $_imager_path . '/icons/busy.gif">',
+    '#markup' => '<img alt="" id="imager-busy" src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/busy.gif" />',
   );
 }
 
@@ -535,7 +562,7 @@ function _imagerBuildMap() {
 function _imagerBuildForm() {
   module_load_include('inc', 'file_entity', 'file_entity.pages');
   // load media file 1 - an image
-  $file = file_load(299);
+  $file = file_load(1);
   $form_id = "file_entity_edit";
   $title1 = drupal_get_title();
   $form = drupal_get_form($form_id, $file);

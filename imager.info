@@ -1,6 +1,7 @@
 name = "Imager"
 description = Hovering over a thumbnail pops up a window showing full image where it can be zoomed, panned, rotated, cropped and saved
 core = 7.x
-package = "EcoSleuth"
+package = "Media"
 
 files[]  = imager.module
+configure = admin/config/media/imager

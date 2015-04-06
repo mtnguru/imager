@@ -26,7 +26,7 @@
  * @param {type} $
  */
 (function ($) {
-  window.imager = function(){
+  window.imager = function imager(){
 
 //  localStorage.clear();
     var modulePath;         // Path to the imager module
@@ -55,8 +55,7 @@
     var cimg = document.createElement('IMG');
     var imgs = [];         // file paths and titles of all matched images on page
     var nimgs = 0;         // number of images
-    var imagerSrc = '';    // src path for current image
-    var imagerTitle = '';  // Image title from attr data-title
+    var currImage;         // current image being viewed
     var viewMode = 0;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
     var editMode = 0;      // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
     var elapsed = 0;       // # elapsed msec since last mouse up
@@ -84,7 +83,7 @@
     // Status 
     var rotation;  // 0, 90, 180, 270 
     var initScale = 1;
-    var scaleFactor = 1.04;
+    var scaleFactor = 1.02;
     var cscale;
     var dragging = false;
     var distance;
@@ -167,7 +166,7 @@
         viewMode = 1;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
       }
 
-      $thumbnails   = $(settings.cssSelector);
+      $thumbnails   = $(settings.cssContainer);
       if ($thumbnails.length == 0) return; // No thumbnails found, exit 
 
       $imagerCanvas     = $('#imager-canvas');
@@ -182,12 +181,19 @@
       });
 
       initEvents();
+//    initThumbEvents();
 
       trackTransforms(ctx);  // Create transform history
       enablePanZoom(); 
     }
 
+/**
+ * Attach behaviors to new thumbnails images
+ * 
+ * @todo Figure out what elements need behaviors updated on AJAX loads and add them here.
+ */
     function _attach() {
+      initThumbEvents();
     }
 
     function initDraggable($elem,name,initLeft,initTop) {
@@ -235,7 +241,8 @@
 //      ptCLrT = ctx.transformedPoint(cw,ch);
       if (localStorage.imagerShowStatus === "FALSE") return;
       $('#imager-status-content').html(
-        '<div class="imager-status-file">Image file: ' + decodeURIComponent(imagerSrc.split('/').reverse()[0]) + '</div>' +
+        '<div class="imager-status-file">Image file: ' + 
+          decodeURIComponent(currImage['src'].split('/').reverse()[0]) + '</div>' +
         '<div class="imager-status-col">' +
           '<table>' +
             '<tr><th>Name</th><th>Value</th></tr>' +
@@ -284,7 +291,7 @@
      * @param {type} evt
      * @returns {undefined}
      */
-    var changeImage = function(src,evt) {
+    var changeImage = function(thumb) {
       rotation = 0;  // 0, 90, 180, 270 
       brightness = 0;
       contrast = 1;
@@ -293,8 +300,8 @@
       saturation = 0;
 
       $imagerEdit.hide();
-      imagerSrc = src;
-      cimg.src = src;   // This begins loading the image - upon completion load event is fired
+      currImage = thumb;
+      cimg.src = currImage['src'];   // This begins loading the image - upon completion load event is fired
       $imagerBusy.show();
     }
 
@@ -798,8 +805,7 @@
       $imagerBusy.show();
       processAjax(settings.actions.displayEntity.url,
                   { action: 'display-entity',
-                    uri: imagerSrc,
-                    viewMode: settings.actions.displayEntity.args.viewMode,
+                    uri: currImage['src'],
                   },function(response) {
         var status = response['status'];
         var txt = "";
@@ -815,7 +821,7 @@
             displayMessage('Contacting Server ... loading form field');
             processAjax(settings.actions.editFormFieldLoad.url,  
                         { action: 'edit-form-field-load',
-                          uri: imagerSrc,
+                          uri: currImage['src'],
                           field: editField,
                         },function(response) {
               setViewMode(1);
@@ -847,8 +853,7 @@
       $imagerBusy.show();
       processAjax(settings.actions.displayMap.url,
                   { action: 'display-map',
-                    uri: imagerSrc,
-                    viewMapMode: settings.actions.displayMap.args.viewMapMode,
+                    uri: currImage['src'],
                   },function(response) {
         var status = response['status'];
         var txt = "";
@@ -1119,6 +1124,16 @@
     }
   }
 
+    function findImageFromThumbSrc(tsrc) {
+      for(i=0; i < nimgs; i++) {
+        if (tsrc == imgs[i]['tsrc']) {
+          currImage = imgs[i];
+          return currImage;
+        }
+      }
+      return undefined;
+    };
+
 /**
 * Given an image, find the next or previous image.
 * 
@@ -1127,19 +1142,18 @@
 * @param {type} offset
 *   Number of images.
 * 
-* @returns {Drupal.behaviors.imager.attach.imagerSrc|String|src}
+* @returns {Drupal.behaviors.imager.attach.currImage['src']|String|src}
 */
-    function findImage(src,offset) {
+    function findNextImage(current,offset) {
       for(i=0; i < nimgs; i++) {
-        if (src == imgs[i]['src']) {
+        if (current == imgs[i]) {
           if (offset == 1) {
             if (++i == nimgs) i = 0;
           } else {
             if (--i == -1) i = nimgs-1;
           }
-          imagerSrc   = imgs[i]['src'];
-          imagerTitle = imgs[i]['title'];
-          return imagerSrc;
+          currImage = imgs[i];
+          return currImage;
         }
       }
       return undefined;
@@ -1187,13 +1201,13 @@
       $('#image-left').click(function() {
         setViewMode(1);
         setEditMode(0);
-        changeImage(findImage(imagerSrc,-1));   
+        changeImage(findNextImage(currImage,-1));   
       });
       // click on #image-right - bring up next image to the right
       $('#image-right').click(function() {
         setViewMode(1);
         setEditMode(0);
-        changeImage(findImage(imagerSrc,1));
+        changeImage(findNextImage(currImage,1));
       });
       // click on #image-exit - Exit the large popup
       $('#image-exit').click(function() {
@@ -1302,7 +1316,7 @@
                       fieldType: editFieldType,
                       value: value,
                       format: format,
-                      uri: imagerSrc,
+                      uri: currImage['src'],
                     }, function(response) {
                          var status = response['status'];
                          getInfo();
@@ -1343,17 +1357,17 @@
 
       });
       $('#view-browser').click(function() {
-        displayMessage('Extracting Image...');
+//      displayMessage('Extracting Image...');
         $imagerBusy.show();
         var img = getImage($('image-cropped').val(),false);
-        displayMessage('Saving Image...');
+//      displayMessage('Saving Image...');
         processAjax(settings.actions.viewBrowser.url,
                     { action: 'view-browser',
-                      uri: imagerSrc,
+                      uri: currImage['src'],
                       imgBase64: img 
                     }, function (response) {
                       address = '';
-                      path = response['data']['imagePath'];
+                      path = response['data']['uri'];
                       window.open(path,'_blank');
                     });
       });
@@ -1437,13 +1451,13 @@
       $('#color-apply').click(function()       { applyColor();});
       $('#color-cancel').click(function()      { setEditMode(0);  redraw();});
       $('#color-reset').click(function()       { resetColor();}); 
-      // Rotate
+      // Rotatthumb
       $('#edit-ccw').click(function()          { rotate(-90); });
       $('#edit-cw').click(function()           { rotate(90); });
       // Crop
       $('#edit-crop').click(crop);
       $('#view-reset').click(function(evt)     { 
-         changeImage(imagerSrc,evt); 
+         changeImage(currImage); 
       });
 
       // brightness/contrast and HSL slider change events 
@@ -1493,18 +1507,17 @@
 
     // click on save to database
       $('#file-database').click(function () {
-//      $imagerSrc.toDataUrl
-        initFileSave('database',"Save image to database",decodeURIComponent(imagerSrc).replace(/^.*\/files\//),'');
+        initFileSave('database',"Save image to database",decodeURIComponent(currImage['src']).replace(/^.*\/files\//),'');
       });
 
     // click on download
       $('#file-download').click(function () {
-        initFileSave('download',"Download image to local file system",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
+        initFileSave('download',"Download image to local file system",decodeURIComponent(currImage['src'].split('/').reverse()[0]),
                      'The download feature is under development.<br>It does not work in all browsers and is intermittent.');
       });
 
       $('#file-email').click(function () {
-        initFileSave('email',"Email image",decodeURIComponent(imagerSrc.split('/').reverse()[0]),
+        initFileSave('email',"Email image",decodeURIComponent(currImage['src'].split('/').reverse()[0]),
                      'Email Image to somewhere');
       });
 
@@ -1520,12 +1533,7 @@
         saveFile(true);
       });
       $('#imager-filesave-download').click(function () {
-//      saveFile(false);
-        displayMessage('Extracting Image...');
-        this.download=decodeURIComponent(imagerSrc.split('/').reverse()[0]);
-        this.href = getImage($('input[name="resolution"]:checked').val(),true);
-        $imagerBusy.hide();
-        $imagerFilesave.hide();
+        saveFile(false);
       });
       $('#imager-filesave-clipboard').click(function () {
         $imagerCanvas.select();
@@ -1585,33 +1593,34 @@
           $imagerMessages.hide();
         }
       });
+    }   // function initEvents()
+
+
+    function initThumbEvents() {
+      $imgs = [];
+      nimgs = 0;
+
+      $thumbnails   = $(settings.cssContainer);
+      if ($thumbnails.length == 0) return; // No thumbnails found, exit 
       
-      
-    // Thumbnails $('a > img') event handlers
-      // for each thumbnail on the page 
       $thumbnails.each(function(index,value) {
-
         // Add image to imgs array
+        var $thumb = $(this).find(settings.cssImage);
         imgs[nimgs] = {};
-
-        imgs[nimgs]['src'] = getImagePath(this)
-
-//      var	str = "Visit Microsoft!";
-//      var res = str.replace(/microsoft/i, "W3Schools"); 
-//      imgs[nimgs]['src']   = ($(this).attr('src')).replace(;
-        
-        imgs[nimgs]['title'] = $(this).attr('data-title');
+        imgs[nimgs]['container'] = $(this);
+        imgs[nimgs]['thumb'] = $thumb;
+        imgs[nimgs]['tsrc'] = $thumb.attr('src');
+        imgs[nimgs]['src'] = getFullPath($thumb.attr('src'))
         nimgs++;
 
         // Unbind any current event handlers on thumbnails
-        $(this).parent().unbind('click');
+        $thumb.parent().unbind('click');
 
         // User clicks in thumbnail image
-        $(this).click(function(evt) {
+        $thumb.click(function(evt) {
+          currImage = findImageFromThumbSrc($thumb.attr('src'));
           if (viewMode == 1) {   // if the overlay is locked, select this image
-            imagerSrc = getImagePath(this);
-            imagerTitle = $(this).attr('data-title');
-            changeImage(imagerSrc,evt);
+            changeImage(currImage);
           } else {               // if the overlay is not locked, then lock it?
             setViewMode(1);
             updateStatus();
@@ -1622,13 +1631,12 @@
 
         // mouse enters thumbnail image
         // un-hide div#imager-overlay and display new image
-/*      $(this).hoverIntent({   // hoverIntent requires at least jQuery 1.7
+  /*      $(this).hoverIntent({   // hoverIntent requires at least jQuery 1.7
           over: function(evt) {
             if (viewMode > 0) return false;
-            imagerSrc = getImagePath(this);
-            imagerTitle = $(this).attr('data-title');
+            currImage['src'] = getFullPath(this);
             setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
-            changeImage(imagerSrc,evt);
+            changeImage(currImage['src']);
           },
           out: function(evt) {
             if (viewMode > 0) return false;
@@ -1657,7 +1665,7 @@
           interval: 50
         });   // thumbnail.hoverIntent */
       });  // thumbnails.each()
-    }   // function initEvents()
+    }
 
 /**
  * Given the path to a thumbnail determine the path of the full image
@@ -1670,31 +1678,30 @@
  * 
  * @returns path to full image
  */
-    function getImagePath(thumbnail) {
-      var path = decodeURIComponent($(thumbnail).attr('src'));
-      var npath;
+    function getFullPath(tsrc) {
+      var src;
       // If the image has "/styles/" in it's path
       // then create the large image path by modifying the thumbnail path
-      if (path.indexOf('/styles/')) {
-        var sindex = path.indexOf('styles');
+      if (tsrc.indexOf('/styles/')) {
+        var sindex = tsrc.indexOf('styles');
         var index = sindex;
         var slashes = 0;
         while (slashes < 3) {
            index++;
-           if (path.charAt(index) == '/') { 
+           if (tsrc.charAt(index) == '/') { 
              slashes++;
            }
         }
-        var tindex = path.indexOf('?itok');
+        var tindex = tsrc.indexOf('?itok');
         if (tindex) {
-          npath = path.substr(0,sindex) + path.substr(index + 1, tindex - index - 1);
+          src = tsrc.substr(0,sindex) + tsrc.substr(index + 1, tindex - index - 1);
         } else {
-          npath = path.substr(0,sindex) + path.substr(index + 1);
+          src = tsrc.substr(0,sindex) + tsrc.substr(index + 1);
         }
       } else if ($(thumbnail).parent().attr('href')) {
-        npath = $(thumbnail).parent().attr('href');
+        src = $(thumbnail).parent().attr('href');
       }
-      return npath;
+      return src;
     }
 
 /**
@@ -1708,9 +1715,9 @@
       var img;
       var pt;
       var mimeType = "";
-      if (imagerSrc.match(/\.png$/i)) {
+      if (currImage['src'].match(/\.png$/i)) {
         mimeType = "image/png";
-      } else if (imagerSrc.match(/\.jpe*g$/i)){
+      } else if (currImage['src'].match(/\.jpe*g$/i)){
         mimeType = "image/jpeg";
       }
       switch (imageResMode = $('input[name="resolution"]:checked').val()) {
@@ -1799,50 +1806,77 @@
       $imagerBusy.show();
       var img = getImage($('input[name="resolution"]:checked').val(),false);
       displayMessage('Saving Image...');
-      if (fileSaveMode == 'database') {
-        processAjax(settings.actions.saveFile.url,
-                    { 'overwrite': overwrite,
-                      'action': 'save-file',
-                      'saveMode': fileSaveMode,
-                      'uri': imagerSrc,
-                      'imgBase64': img 
-                    });
+      switch (fileSaveMode) {
+        case 'database':
+          processAjax(settings.actions.saveFile.url,
+                      { 'overwrite': overwrite,
+                        'action': 'save-file',
+                        'saveMode': fileSaveMode,
+                        'uri': currImage['src'],
+                        'imgBase64': img 
+                      }, function (response) {
+//                      Change the original thumbs array to hold the container also.
+                        if (response['file_new']) {
+                          currImage['container'].after(response['file_new']);
+                          var $row = currImage['container'].next().find(settings.cssContainer);
+                          $row.unwrap().unwrap();
+                        }
+                        if (response['file_old']) {
+                          currImage['container'].html(response['file_old']);
+                          // This is ugly, views wraps a couple extra divs around
+                          // the output.  The following code removes those divs
+                          var $row = currImage['container'].find(settings.cssContainer);
+                          var $p1 = $row.parent();
+                          while (currImage['container'][0] != $p1[0]) {
+                            $row.unwrap();
+                            $p1 = $row.parent();
+                          }
+                          $row.unwrap();
+                        }
+                        Drupal.attachBehaviors($row);
+                      }
+                     );
+          break;
 
-      } else if (fileSaveMode == 'email') {
-        processAjax(settings.actions.emailFile.url,
-                    { 'action': 'email',
-                      'saveMode': fileSaveMode,
-                      'uri': imagerSrc,
-                      'imgBase64': img 
-                    },function (response) {
-                      address = '';
-                      path = response['data']['attachPath'];
-                      body = response['data']['body'];
-                      subject = response['data']['subject'];
-                      var mailto_link = 'mailto:' + address + 
-                                        '?subject=' + encodeURIComponent(subject) + 
-                                        '&body=' + encodeURIComponent(body) +
-                                        '&attachment=' + path;
-
-                      window.location.href = mailto_link;
-//                    win = window.open(mailto_link, 'emailWindow');
-//                    if (win && win.open && !win.closed) win.close();
-                    });
-      } else if (fileSaveMode == 'clipboard') {
-        processAjax(settings.actions.clipboard.url,
-                    { 'overwrite': overwrite,
-                      'action': 'clipboard',
-                      'saveMode': fileSaveMode,
-                      'uri': imagerSrc,
-                      'imgBase64': img 
-                    });
-      } else if (fileSaveMode == 'download') {
-//      $('#file-download').attr({ 'href': img,
-//                                 'download': 'file.png',
-//                              });
-        link = document.getElementById('download');
-        link.href = img;
-        link.download = 'file.png';
+        case 'email':
+          processAjax(settings.actions.emailFile.url,
+                      { 'action': 'email',
+                        'saveMode': fileSaveMode,
+                        'uri': currImage['src'],
+                        'imgBase64': img 
+                      }, function (response) {
+                        address = '';
+                        path = response['data']['attachPath'];
+                        body = response['data']['body'];
+                        subject = response['data']['subject'];
+                        var mailto_link = 'mailto:' + address + 
+                                          '?subject=' + encodeURIComponent(subject) + 
+                                          '&body=' + body +
+                                          '&attachment=' + path;
+  
+                        window.location.href = mailto_link;
+//                      win = window.open(mailto_link, 'emailWindow');
+//                      if (win && win.open && !win.closed) win.close();
+                      });
+          break;
+        case 'clipboard':
+          processAjax(settings.actions.clipboard.url,
+                      { 'overwrite': overwrite,
+                        'action': 'clipboard',
+                        'saveMode': fileSaveMode,
+                        'uri': currImage['src'],
+                        'imgBase64': img 
+                      });
+          break;
+        case 'download':
+          $('#imager-filesave-download').attr({ 'href': img,
+                                     'download': $('#imager-filesave-filename').val(),
+                                  });
+//        $('#imager-filesave-download')[0].click();
+//        var link = document.getElementById('file-download');
+//        link.href = img;
+//        link.download = 'file.png';
+          break;
       }
       $imagerBusy.hide();
       $imagerFilesave.hide();
@@ -1852,7 +1886,7 @@
       displayMessage('Deleting Image...');
       processAjax(settings.actions.deleteFile.url,
                   { 'action': 'delete-file',
-                    'uri': imagerSrc,
+                    'uri': currImage['src'],
                   });
     }
 
