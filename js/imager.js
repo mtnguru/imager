@@ -1808,74 +1808,73 @@
       displayMessage('Saving Image...');
       switch (fileSaveMode) {
         case 'database':
-          processAjax(settings.actions.saveFile.url,
-                      { 'overwrite': overwrite,
-                        'action': 'save-file',
-                        'saveMode': fileSaveMode,
-                        'uri': currImage['src'],
-                        'imgBase64': img 
-                      }, function (response) {
-//                      Change the original thumbs array to hold the container also.
-                        if (response['file_new']) {
-                          currImage['container'].after(response['file_new']);
-                          var $row = currImage['container'].next().find(settings.cssContainer);
-                          $row.unwrap().unwrap();
-                        }
-                        if (response['file_old']) {
-                          currImage['container'].html(response['file_old']);
-                          // This is ugly, views wraps a couple extra divs around
-                          // the output.  The following code removes those divs
-                          var $row = currImage['container'].find(settings.cssContainer);
-                          var $p1 = $row.parent();
-                          while (currImage['container'][0] != $p1[0]) {
-                            $row.unwrap();
-                            $p1 = $row.parent();
-                          }
-                          $row.unwrap();
-                        }
-                        Drupal.attachBehaviors($row);
-                      }
-                     );
+          processAjax(
+            settings.actions.saveFile.url,
+            { 'overwrite': overwrite,
+              'action': 'save-file',
+              'saveMode': fileSaveMode,
+              'uri': currImage['src'],
+              'imgBase64': img 
+            }, function (response) {
+              if (response['file_new']) {
+                currImage['container'].after(response['file_new']);
+                // @TODO The two unwrap are hardcoded to remove two extra divs.  
+                // Can this be done in PHP when it is rendered.
+                // Maybe a Views tpl.php file.
+                var $row = currImage['container'].next().find(settings.cssContainer);
+                $row.unwrap().unwrap();
+              }
+              if (response['file_old']) {
+                currImage['container'].html(response['file_old']);
+                // @TODO - The following code is ugly, 
+                // Views wraps a couple extra divs around the output.
+                // The following code removes those divs so just 
+                // .views-row remains and everything below it remains.
+                var $row = currImage['container'].find(settings.cssContainer).child();
+                while (currImage['container'][0] != $row.parent()[0]) {
+                  $row.unwrap();
+                }
+              }
+              Drupal.attachBehaviors($row);
+            }
+          );
           break;
-
         case 'email':
           processAjax(settings.actions.emailFile.url,
-                      { 'action': 'email',
-                        'saveMode': fileSaveMode,
-                        'uri': currImage['src'],
-                        'imgBase64': img 
-                      }, function (response) {
-                        address = '';
-                        path = response['data']['attachPath'];
-                        body = response['data']['body'];
-                        subject = response['data']['subject'];
-                        var mailto_link = 'mailto:' + address + 
-                                          '?subject=' + encodeURIComponent(subject) + 
-                                          '&body=' + body +
-                                          '&attachment=' + path;
-  
-                        window.location.href = mailto_link;
-//                      win = window.open(mailto_link, 'emailWindow');
-//                      if (win && win.open && !win.closed) win.close();
-                      });
+            { 'action': 'email',
+              'saveMode': fileSaveMode,
+              'uri': currImage['src'],
+              'imgBase64': img 
+            }, function (response) {
+              address = '';
+              path = response['data']['attachPath'];
+              body = response['data']['body'];
+              subject = response['data']['subject'];
+              var mailto_link = 'mailto:' + address + 
+                                '?subject=' + encodeURIComponent(subject) + 
+                                '&body=' + body +
+                                '&attachment=' + path;
+
+              window.location.href = mailto_link;
+            }
+          );
           break;
         case 'clipboard':
-          processAjax(settings.actions.clipboard.url,
-                      { 'overwrite': overwrite,
-                        'action': 'clipboard',
-                        'saveMode': fileSaveMode,
-                        'uri': currImage['src'],
-                        'imgBase64': img 
-                      });
+          processAjax(
+            settings.actions.clipboard.url,
+            { 'overwrite': overwrite,
+              'action': 'clipboard',
+              'saveMode': fileSaveMode,
+              'uri': currImage['src'],
+              'imgBase64': img 
+            }
+          );
           break;
         case 'download':
-          $('#imager-filesave-download').attr({ 'href': img,
-                                     'download': $('#imager-filesave-filename').val(),
-                                  });
-//        $('#imager-filesave-download')[0].click();
-//        var link = document.getElementById('file-download');
-//        link.href = img;
-//        link.download = 'file.png';
+          $('#imager-filesave-download')
+            .attr({ 'href': img,
+                    'download': $('#imager-filesave-filename').val(),
+                 });
           break;
       }
       $imagerBusy.hide();
@@ -1884,10 +1883,12 @@
 
     function deleteFile() {
       displayMessage('Deleting Image...');
-      processAjax(settings.actions.deleteFile.url,
-                  { 'action': 'delete-file',
-                    'uri': currImage['src'],
-                  });
+      processAjax(
+        settings.actions.deleteFile.url,
+        { 'action': 'delete-file',
+          'uri': currImage['src'],
+        }
+      );
     }
 
 

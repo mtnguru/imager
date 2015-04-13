@@ -561,11 +561,9 @@ function _imagerBuildMap() {
  */
 function _imagerBuildForm() {
   module_load_include('inc', 'file_entity', 'file_entity.pages');
-  // load media file 1 - an image
-  $file = file_load(1);
   $form_id = "file_entity_edit";
   $title1 = drupal_get_title();
-  $form = drupal_get_form($form_id, $file);
+  $form = drupal_get_form($form_id, null);
   drupal_set_title($title1);
 
   $div = array(

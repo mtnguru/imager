@@ -18,6 +18,21 @@ function imager_admin_form() {
     $viewmodes[$file_view_mode] = $file_view_mode_info['label'];
   }
 
+  // General
+  $form['general'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'General',
+  );
+  $form['general']['imager_fid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('CSS Class'),
+    '#default_value' => variable_get('imager_fid', 1),
+    '#description' => 
+      t('<p>@TODO - FID of any file stored on the system.  Rather than store this as a configurable variable it should instead be a database call.  Or better yet find a way to initialize the file_entity_edit form without needing a pre-existing file.</p>'
+       ),
+    '#size' => 4,
+    '#required' => TRUE,
+  );
   // Views configuration
   $form['views'] = array(
     '#type' => 'fieldset',
