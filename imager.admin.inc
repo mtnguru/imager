@@ -25,7 +25,7 @@ function imager_admin_form() {
   );
   $form['general']['imager_fid'] = array(
     '#type' => 'textfield',
-    '#title' => t('CSS Class'),
+    '#title' => t('File ID for one file on the system'),
     '#default_value' => variable_get('imager_fid', 1),
     '#description' => 
       t('<p>@TODO - FID of any file stored on the system.  Rather than store this as a configurable variable it should instead be a database call.  Or better yet find a way to initialize the file_entity_edit form without needing a pre-existing file.</p>'

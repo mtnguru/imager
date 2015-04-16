@@ -139,7 +139,10 @@ function imager_views_pre_view(&$view, &$display_id, &$args) {
 function _imager_start() {
   global $_imager_enable;
   $_imager_enable = TRUE;
-  variable_set('file_entity_allow_insecure_download', TRUE);
+
+//@TODO - find out why the itok token doesn't work right and get rid of 
+//        the following line - only needs to be executed once.
+//variable_set('file_entity_allow_insecure_download', TRUE);
 }
 
 /**
@@ -175,55 +178,9 @@ function imager_page_alter(&$page) {
   // @todo using $imager_enable to determine if module is in use/loaded.
   //       is there a more proper way?
   global $_imager_enable;
-  global $_imager_path;
   if (isset($_imager_enable)) {
     module_load_include('inc', 'imager', 'imager.pages');
-    $_imager_path = drupal_get_path('module', 'imager');
-    $page['content']['imager_wrapper'] = array(
-      '#prefix' => '<div id="imager-wrapper">',
-      '#suffix' => '</div>',
-      '#weight' => -100,
-      '#attached' => array(
-        'library' => array(
-          array('system', 'ui.draggable'),
-        ),
-        'js' => array(
-          $_imager_path . '/js/hoverintent.js',
-          $_imager_path . '/js/jquery.imgareaselect.min.js',
-          $_imager_path . '/js/screenfull.js',
-          $_imager_path . '/js/imager.js',
-          $_imager_path . '/js/imager.drupal.js',
-          array(
-            'type' => 'setting',
-            'data' => array(
-              'imager' => array(
-                'modulePath' => $_imager_path,
-                'filePath' => $_SERVER['DOCUMENT_ROOT'] . '/' . variable_get('file_public_path', ''),
-                'cssContainer' => variable_get('imager_views_css_container'),
-                'cssImage' => variable_get('imager_views_css_image'),
-              ),
-            ),
-          ),
-        ),
-        'css' => array(
-          $_imager_path . '/css/imgareaselect-animated.css',
-          $_imager_path . '/css/imager.css',
-        ),
-      ),
-      'overlay' => _imagerBuildOverlay(),
-      'brightness' => _imagerBuildBrightness(),
-      'color' => _imagerBuildColor(),
-      'filesave' => _imagerBuildFilesave(),
-      'status' => _imagerBuildStatus(),
-      'info' => _imagerBuildInfo(),
-      'edit' => _imagerBuildEdit(),
-      'messages' => _imagerBuildMessages(),
-      'canvasorg' => _imagerBuildCanvas(),
-      'busy' => _imagerBuildBusy(),
-//    'map' => _imagerBuildMap(),
-      'form' => _imagerBuildForm(),
-      'confirm' => _imagerBuildConfirm(),
-    );
+    _imagerBuildWrapper($page);
   }
 }
 
@@ -348,6 +305,7 @@ function imager_file_entity_edit($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Associated with'),
     '#maxlength' => 60,
+    
     '#autocomplete_path' => 'user/autocomplete',
     // '#default_value' => !empty($file->uid) ? user_load($file->uid)->name : '',
     '#weight' => -1,

@@ -35,12 +35,13 @@
    
     // Elements
     var $imagerWrapper;    // Wrapper around all imager html divs
-    var $imagerOverlay;    // Div containing the popup image and buttons
+    var $imagerViewer;     // Div containing the popup image and buttons
     var $imagerCanvas;     // canvas with current displayed image
     var $imagerCanvas2;    // canvas with original full image - never shown
     var $imagerInfo;       // popup for displaying text information
     var $imagerMap;        // popup for displaying map showing locations of images
     var $imagerConfirm;    // popup for confirming actions - delete image
+    var $imagerConfig;     // popup for configuration dialog
     var $imagerEdit;       // popup for displaying text information
     var $imagerBrightness; // brightness slider popup
     var $imagerColor;      // hsl color slider popup
@@ -115,8 +116,8 @@
       ctx2 = $imagerCanvas2[0].getContext('2d');           
 
       $imagerWrapper    = $('#imager-wrapper');
-      $imagerOverlay    = $('#imager-overlay');
-      $imagerOverlay.hide();
+      $imagerViewer    = $('#imager-viewer');
+      $imagerViewer.hide();
 
       $imagerInfo       = $('#imager-info');
       $imagerInfo.hide();
@@ -154,6 +155,8 @@
       $imagerFilesave   = $('#imager-filesave');
       $imagerFilesave.hide();
       initDraggable($imagerFilesave,'filesave_location',200,400);
+
+      initConfigDialog();
 
       $imagerBusy = $('#imager-busy');
       $imagerBusy.hide();
@@ -236,6 +239,30 @@
       });
     }
 
+    function initConfigDialog() {
+      if (!$imagerConfig) {
+        $imagerConfig   = $('#imager-config');
+        $imagerConfig.dialog({
+            autoOpen: true,
+            title: 'Imager Configuration',
+            draggable: 'false',
+            width: '50%',
+            maxWidth: '20px',
+            height: 'auto',
+            resize: 'auto',
+            buttons: {
+              OK: function() {$(this).dialog("close");},
+              fart: function() {$(this).dialog("close");}
+            },
+            position: {
+              my: "center center",
+              at: "center center"
+            }
+          });
+        $imagerConfig.dialog({draggable: false}).parent().draggable();
+      }
+    }
+
     function updateStatus() {
 //      ptCUlT = ctx.transformedPoint(0,0);
 //      ptCLrT = ctx.transformedPoint(cw,ch);
@@ -284,7 +311,7 @@
     };
 
 
-    // Change the current image in #image-overlay
+    // Change the current image in #image-viewer
     /**
      * 
      * @param {type} src
@@ -342,7 +369,7 @@
       initializeImage();
   //  var nimg = Pixastic.process(cimg,"desaturate");
       redraw();                                        // Draw the image
-      showPopups();               // Hide the image overlay 
+      showPopups();               // Hide the image viewer 
       if (localStorage.imagerShowInfo === "TRUE") getInfo();                                       //
     }, false);
    
@@ -1079,7 +1106,7 @@
 * Display any popups that are enabled. 
 */
   function showPopups() {
-    $imagerOverlay.show();
+    $imagerViewer.show();
     if (localStorage.imagerShowInfo   === "TRUE") {
       $('#view-info').addClass('checked');
       $imagerInfo.show();
@@ -1102,7 +1129,7 @@
 * Hide all popups and the main viewer window. 
 */
   function hidePopups() {
-    $imagerOverlay.hide();
+    $imagerViewer.hide();
     $imagerInfo.hide();
     $imagerEdit.hide();
     $imagerMap.hide();
@@ -1165,25 +1192,25 @@
  * @todo This function is 500 lines long and needs restructuring.
  */
     function initEvents() {
-      // div#imager-overlay event handlers
-      // click on #imager-overlay - hide it, set mode back to view=0
-      $imagerOverlay.click(function () {
+      // div#imager-viewer event handlers
+      // click on #imager-viewer - hide it, set mode back to view=0
+      $imagerViewer.click(function () {
         if (viewMode > 0) return;
         $(this).hide();
         hidePopups();
         updateStatus();
       });
 
-      // mouse enters the #imager-overlay div - do nothing
-    //$imagerOverlay.mouseenter(function() {
-    //  console.debug('#imager-overlay mouseenter');
+      // mouse enters the #imager-viewer div - do nothing
+    //$imagerViewer.mouseenter(function() {
+    //  console.debug('#imager-viewer mouseenter');
     //})
 
-      // mouse leaves the #imager-overlay div - hide it
-      $imagerOverlay.mouseleave(function(evt) {
+      // mouse leaves the #imager-viewer div - hide it
+      $imagerViewer.mouseleave(function(evt) {
         if (viewMode > 0) return false; 
         var el = evt.relatedTarget ? evt.relatedTarget : evt.toElement;
-        var el1 = $(el).closest('#imager-info');        // if they went to the info overlay don't leave
+        var el1 = $(el).closest('#imager-info');        // if they went to the info viewer don't leave
         if (el === $imagerInfo[0] || el1.length) return;
 
         hidePopups();
@@ -1339,6 +1366,14 @@
           $(this).removeClass('checked');
           setViewMode(1);
         }
+      });
+
+      $('#mode-configure').click(function() {
+        $imagerConfig.dialog("open");
+          position: {
+            my: "center center";
+            at: "center center";
+          }
       });
 
       // click on #mode-crop - set mode to edit=2
@@ -1619,9 +1654,9 @@
         // User clicks in thumbnail image
         $thumb.click(function(evt) {
           currImage = findImageFromThumbSrc($thumb.attr('src'));
-          if (viewMode == 1) {   // if the overlay is locked, select this image
+          if (viewMode == 1) {   // if the viewer is locked, select this image
             changeImage(currImage);
-          } else {               // if the overlay is not locked, then lock it?
+          } else {               // if the viewer is not locked, then lock it?
             setViewMode(1);
             updateStatus();
           }
@@ -1630,7 +1665,10 @@
         });
 
         // mouse enters thumbnail image
-        // un-hide div#imager-overlay and display new image
+        // un-hide div#imager-viewer and display new image
+        
+        var version = $().jquery;
+        var crap = version;
   /*      $(this).hoverIntent({   // hoverIntent requires at least jQuery 1.7
           over: function(evt) {
             if (viewMode > 0) return false;
@@ -1641,13 +1679,13 @@
           out: function(evt) {
             if (viewMode > 0) return false;
             var el = evt.relatedTarget ? evt.relatedTarget : evt.toElement;
-            var el1 = $(el).closest('#imager-overlay');
+            var el1 = $(el).closest('#imager-viewer');
             var el2 = $(el).closest('#imager-info');
             var el3 = $(el).closest('#imager-status');
             var el4 = $(el).closest('#imager-map');
             var el5 = $(el).closest('#imager-messages');
             var el6 = $(el).closest('#imager-confirm');
-            if (el === $imagerOverlay[0] || 
+            if (el === $imagerViewer[0] || 
                 el1.length || 
                 el2.length || 
                 el3.length || 

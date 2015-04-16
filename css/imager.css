@@ -25,12 +25,12 @@
 }
 
 /* line 31, ../sass/imager.sass */
-#imager-overlay.fullscreen {
+#imager-viewer.fullscreen {
   width: 100%;
 }
 
 /* line 33, ../sass/imager.sass */
-#imager-overlay {
+#imager-viewer {
   z-index: 1010;
   position: fixed;
   top: 0px;
@@ -40,27 +40,27 @@
   background-color: #666666;
 }
 /* line 41, ../sass/imager.sass */
-#imager-overlay button {
+#imager-viewer button {
   background-color: #cacaca;
 }
 /* line 43, ../sass/imager.sass */
-#imager-overlay #imager-canvas-wrapper {
+#imager-viewer #imager-canvas-wrapper {
   float: left;
 }
 /* line 45, ../sass/imager.sass */
-#imager-overlay #imager-canvas-wrapper #imager-canvas-org {
+#imager-viewer #imager-canvas-wrapper #imager-canvas-org {
   display: hidden;
 }
 /* line 48, ../sass/imager.sass */
-#imager-overlay #button-wrapper {
+#imager-viewer #button-wrapper {
   float: left;
 }
 /* line 50, ../sass/imager.sass */
-#imager-overlay #button-wrapper div {
+#imager-viewer #button-wrapper div {
   text-align: center;
 }
 /* line 52, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons {
+#imager-viewer #button-wrapper .buttons {
   background-color: #e0e0e0;
   padding: 3px;
   margin: 0 2px 2px 0;
@@ -68,30 +68,30 @@
   font-size: 75%;
 }
 /* line 58, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons img {
+#imager-viewer #button-wrapper .buttons img {
   border-radius: 4px;
   display: block;
   padding: 3px;
   margin: 0 auto;
 }
 /* line 63, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons .checked {
+#imager-viewer #button-wrapper .buttons .checked {
   background-color: #e0e0e0;
 }
 /* line 65, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons .disabled {
+#imager-viewer #button-wrapper .buttons .disabled {
   background-color: #aaaaaa;
 }
 /* line 67, ../sass/imager.sass */
-#imager-overlay #button-wrapper .buttons .specific {
+#imager-viewer #button-wrapper .buttons .specific {
   background-color: #666666;
 }
 /* line 69, ../sass/imager.sass */
-#imager-overlay #button-wrapper #file-buttons {
+#imager-viewer #button-wrapper #file-buttons {
   margin-bottom: 65px;
 }
 /* line 71, ../sass/imager.sass */
-#imager-overlay #button-wrapper #debug-buttons {
+#imager-viewer #button-wrapper #debug-buttons {
   z-index: 1009;
   position: absolute;
   bottom: 7px;
@@ -402,4 +402,9 @@
 /* line 274, ../sass/imager.sass */
 div#main {
   width: auto;
+}
+
+/* line 279, ../sass/imager.sass */
+.ui-dialog .ui-dialog-titlebar {
+  padding: 0 0 0 0.5em;
 }

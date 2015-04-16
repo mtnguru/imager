@@ -21,6 +21,67 @@
 
 
 /**
+ * Insert into $page the render arrays for all imager dialogs, popups, forms.
+ * 
+ * @global type $_imager_path
+ *   Path to imager module.
+ * 
+ * @param type $page
+ *   Render array for page.
+ */
+function _imagerBuildWrapper(&$page) {
+  global $_imager_path;
+  $_imager_path = drupal_get_path('module', 'imager');
+  $page['content']['imager_wrapper'] = array(
+    '#prefix' => '<div id="imager-wrapper">',
+    '#suffix' => '</div>',
+    '#weight' => -100,
+    '#attached' => array(
+      'library' => array(
+        array('system', 'ui.draggable'),
+      ),
+      'js' => array(
+        $_imager_path . '/js/hoverintent.js',
+        $_imager_path . '/js/jquery.imgareaselect.min.js',
+        $_imager_path . '/js/screenfull.js',
+        $_imager_path . '/js/imager.js',
+        $_imager_path . '/js/imager.drupal.js',
+        array(
+          'type' => 'setting',
+          'data' => array(
+            'imager' => array(
+              'modulePath' => $_imager_path,
+              'filePath' => $_SERVER['DOCUMENT_ROOT'] . '/' . variable_get('file_public_path', ''),
+              'cssContainer' => variable_get('imager_views_css_container'),
+              'cssImage' => variable_get('imager_views_css_image'),
+            ),
+          ),
+        ),
+      ),
+      'css' => array(
+        $_imager_path . '/css/imgareaselect-animated.css',
+        $_imager_path . '/css/imager.css',
+      ),
+    ),
+    'viewer'     => _imagerBuildViewer(),
+    'brightness' => _imagerBuildBrightness(),
+    'color'      => _imagerBuildColor(),
+    'filesave'   => _imagerBuildFilesave(),
+    'status'     => _imagerBuildStatus(),
+    'info'       => _imagerBuildInfo(),
+    'edit'       => _imagerBuildEdit(),
+    'messages'   => _imagerBuildMessages(),
+    'canvasorg'  => _imagerBuildCanvas(),
+    'busy'       => _imagerBuildBusy(),
+//  'map'        => _imagerBuildMap(),
+    'form'       => _imagerBuildForm(),
+    'confirm'    => _imagerBuildConfirm(),
+    'config'     => _imagerBuildConfig(),
+  );
+}
+
+
+/**
  * Construct render array for a button
  *
  * @todo Use buttons instead of images - is this function necessary?
@@ -77,9 +138,9 @@ function theme_imager_add_button($variables) {
  *
  * @return type render_array
  */
-function _imagerBuildOverlay() {
+function _imagerBuildViewer() {
   return array(
-    '#prefix' => '<div id="imager-overlay">',
+    '#prefix' => '<div id="imager-viewer">',
     '#suffix' => '</div>',
     'button_wrapper' => array(
       '#prefix' => '<div id="button-wrapper">',
@@ -98,10 +159,9 @@ function _imagerBuildOverlay() {
         ),
         'image_left' => _imagerBuildButton(1, 'image-left', 'left_arrow.png', t('View image to the left')),
         'image_right' => _imagerBuildButton(2, 'image-right', 'right_arrow.png', t('View image to the right')),
-        'mode_fullscreen' => _imagerBuildButton(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
         'image_exit' => _imagerBuildButton(4, 'image-exit', 'redx.png', t('Exit image popup')),
       ),
-/*    'mode_buttons' => array(
+      'mode_buttons' => array(
         '#prefix' => '<div id="mode-buttons" class="buttons">',
         '#suffix' => '</div>',
         '#weight' => 2,
@@ -112,10 +172,11 @@ function _imagerBuildOverlay() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-//      'mode_view' => _imagerBuildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
-//      'mode_lock' => _imagerBuildButton(2, 'mode-lock', 'lock.png', t('Lock image to screen'),
-//      'mode_configure' => _imagerBuildButton(4, 'mode-configure', 'configure.png', t('Under Construction - Configure settings')),
-      ), */
+        'mode_view' => _imagerBuildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
+//      'mode_lock' => _imagerBuildButton(2, 'mode-lock', 'lock.png', t('Lock image to screen')),
+        'mode_fullscreen' => _imagerBuildButton(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
+        'mode_configure' => _imagerBuildButton(4, 'mode-configure', 'configure.png', t('Configure settings')),
+      ),   
       'view_buttons' => array(
         '#prefix' => '<div id="view-buttons" class="buttons">',
         '#suffix' => '</div>',
@@ -545,8 +606,10 @@ function _imagerBuildMap() {
 /**
  * Load the file_entity_edit form - default form for image file type
  *
- * Loading the full form as the page loads ensures all javascript libraries are
- * also loaded.  Complex file_entity_edit forms use a lot of additional files:
+ * Loading the full form as the page loads ensures all javascript code for
+ * form fields are also loaded.
+ * 
+ * Complex file_entity_edit forms use a lot of additional javascript:
  * - date popup
  * - autocomplete - entity reference
  * - ckeditor
@@ -555,15 +618,22 @@ function _imagerBuildMap() {
  *
  * @todo This form isn't used and is removed by imager.js.  A better approach
  * is to only load the necessary JavaScript and CSS files and not
- * render the form.
+ * render the form.  
+ *  Questions:
+ *   - Can JavaScript files be loaded through AJAX?
+ *   - If so those modules that use #attached should work OK.
+ *   - Modules using drupal_load_js won't work. 
  *
  * @return type render_array
  */
 function _imagerBuildForm() {
   module_load_include('inc', 'file_entity', 'file_entity.pages');
+  // @TODO Instead of specifying file ID 1, 
+  // query database to load one random image.
+  $file = file_load(1);
   $form_id = "file_entity_edit";
   $title1 = drupal_get_title();
-  $form = drupal_get_form($form_id, null);
+  $form = drupal_get_form($form_id, $file);
   drupal_set_title($title1);
 
   $div = array(
@@ -572,15 +642,6 @@ function _imagerBuildForm() {
     'editform' => $form,
   );
   return $div;
-
-  // or we can render it ourselves
-  //drupal_render($form);
-  //$div = array(
-  //  '#prefix' => '<div id="imager-form">',
-  //  '#suffix' => '</div>',
-  //  '#type'   => 'markup',
-  //  '#markup' => "shazam",
-  //);
 }
 
 /**
@@ -610,6 +671,44 @@ function _imagerBuildConfirm() {
         '#suffix' => '</div>',
         'apply' => _imagerBuildButton(1, 'imager-confirm-apply', 'checkmark.png', t('Apply action')),
         'exit' => _imagerBuildButton(2, 'imager-confirm-exit', 'redx.png', t('Do nothing and exit dialog')),
+      ),
+    ),
+  );
+}
+
+
+function _imagerBuildConfig() {
+  global $_imager_path;
+  return array(
+    '#prefix' => '<div id="imager-config">',
+    '#suffix' => '</div>',
+    'content' => array(
+      '#prefix' => '<div id="imager-config-content" class="imager-content">',
+      '#suffix' => '</div>',
+      '#weight' => 1,
+      '#type' => 'markup',
+      'imager_quickview_enable' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable Quickview mode'),
+        '#description' => t('In Quickview mode you hover over an image to pop up the image viewer.  Leaving the viewer with the mouse will close the viewer.  This mode requires JQuery 1.7 or greater.'),
+        '#default_value' => variable_get('imager_quickview_enable', FALSE),
+      ),
+      'imager_bounds_enable' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable Bounds limiting'),
+        '#description' => t('When zooming it is possible to zoom the image smaller than the view area.  It is also to pan the image off screen.  Enabling this mode prevents this from happening and will keep the image on screen at all times.'),
+        '#default_value' => variable_get('imager_bounds_enable', FALSE),
+      ),
+    ),
+    'buttons-wrapper' => array(
+      '#prefix' => '<div id="imager-config-buttons-wrapper">',
+      '#suffix' => '</div>',
+      '#weight' => 2,
+      'buttons' => array(
+        '#prefix' => '<div id="imager-config-buttons" class="imager-buttons">',
+        '#suffix' => '</div>',
+        'apply' => _imagerBuildButton(1, 'imager-config-apply', 'checkmark.png', t('Apply action')),
+        'exit' => _imagerBuildButton(2, 'imager-config-exit', 'redx.png', t('Do nothing and exit dialog')),
       ),
     ),
   );
