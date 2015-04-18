@@ -67,7 +67,7 @@ function _imagerBuildWrapper(&$page) {
     'brightness' => _imagerBuildBrightness(),
     'color'      => _imagerBuildColor(),
     'filesave'   => _imagerBuildFilesave(),
-    'status'     => _imagerBuildStatus(),
+//  'status'     => _imagerBuildStatus(),
     'info'       => _imagerBuildInfo(),
     'edit'       => _imagerBuildEdit(),
     'messages'   => _imagerBuildMessages(),
@@ -76,7 +76,7 @@ function _imagerBuildWrapper(&$page) {
 //  'map'        => _imagerBuildMap(),
     'form'       => _imagerBuildForm(),
     'confirm'    => _imagerBuildConfirm(),
-    'config'     => _imagerBuildConfig(),
+//  'config'     => _imagerBuildConfig(),
   );
 }
 
@@ -230,19 +230,19 @@ function _imagerBuildViewer() {
         'file_email' => _imagerBuildButton(4, 'file-email', 'mail.png', t('E-mail image')),
         //      'file_clipboard'   => _imagerBuildButton(5, 'file-clipboard', 'clipboard.png', t('Send image to clipboard')),
       ),
-      'debug_buttons' => array(
-        '#prefix' => '<div id="debug-buttons" class="buttons">',
-        '#suffix' => '</div>',
-        '#weight' => -5,
-        'title' => array(
-          '#type' => 'markup',
-          '#markup' => t('Debug'),
-          '#prefix' => '<div>',
-          '#suffix' => '</div>',
-        ),
-        'debug_status' => _imagerBuildButton(1, 'debug-status', 'bug.png', t('Toggle status output')),
-        'debug_messages' => _imagerBuildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
-      ),
+//    'debug_buttons' => array(
+//      '#prefix' => '<div id="debug-buttons" class="buttons">',
+//      '#suffix' => '</div>',
+//      '#weight' => -5,
+//      'title' => array(
+//        '#type' => 'markup',
+//        '#markup' => t('Debug'),
+//        '#prefix' => '<div>',
+//        '#suffix' => '</div>',
+//      ),
+//      'debug_status' => _imagerBuildButton(1, 'debug-status', 'bug.png', t('Toggle status output')),
+//      'debug_messages' => _imagerBuildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
+//    ),
     ),
     'imager_canvas_wrapper' => array(
       '#prefix' => '<div id="imager-canvas-wrapper">',
@@ -463,12 +463,6 @@ function _imagerBuildStatus() {
       '#type' => 'markup',
       '#markup' => 'Placeholder for status popup',
     ),
-    'buttons' => array(
-      '#prefix' => '<div id="imager-status-buttons" class="imager-buttons">',
-      '#suffix' => '</div>',
-      '#weight' => 2,
-      'exit' => _imagerBuildButton(1, 'imager-status-exit', 'redx.png', t('Exit Status dialog')),
-    ),
   );
 }
 
@@ -686,29 +680,35 @@ function _imagerBuildConfig() {
       '#prefix' => '<div id="imager-config-content" class="imager-content">',
       '#suffix' => '</div>',
       '#weight' => 1,
-      '#type' => 'markup',
-      'imager_quickview_enable' => array(
-        '#type' => 'checkbox',
-        '#title' => t('Enable Quickview mode'),
-        '#description' => t('In Quickview mode you hover over an image to pop up the image viewer.  Leaving the viewer with the mouse will close the viewer.  This mode requires JQuery 1.7 or greater.'),
-        '#default_value' => variable_get('imager_quickview_enable', FALSE),
+      'description' => array(
+        '#type' => 'markup',
+        '#markup' => '<p><em>All values are stored specific to the browser you are using.</em></p>',
       ),
-      'imager_bounds_enable' => array(
-        '#type' => 'checkbox',
-        '#title' => t('Enable Bounds limiting'),
-        '#description' => t('When zooming it is possible to zoom the image smaller than the view area.  It is also to pan the image off screen.  Enabling this mode prevents this from happening and will keep the image on screen at all times.'),
-        '#default_value' => variable_get('imager_bounds_enable', FALSE),
+      'viewer' => array(
+        '#type' => 'fieldset',
+        '#title' => 'Image Viewer',
+        'imager_bounds_enable' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Enable Bounds limiting'),
+          '#description' => t('Prevents image from zooming smaller than the viewing area.  Also prevents image from being panned (dragged) offscreen.'),
+          '#attributes' => array('id' => 'imager-bounds-enable'),
+        ),
       ),
-    ),
-    'buttons-wrapper' => array(
-      '#prefix' => '<div id="imager-config-buttons-wrapper">',
-      '#suffix' => '</div>',
-      '#weight' => 2,
-      'buttons' => array(
-        '#prefix' => '<div id="imager-config-buttons" class="imager-buttons">',
-        '#suffix' => '</div>',
-        'apply' => _imagerBuildButton(1, 'imager-config-apply', 'checkmark.png', t('Apply action')),
-        'exit' => _imagerBuildButton(2, 'imager-config-exit', 'redx.png', t('Do nothing and exit dialog')),
+      'debug' => array(
+        '#type' => 'fieldset',
+        '#title' => 'Debug',
+        'imager_debug_status' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Display Status'),
+          '#description' => t('Display current state of variables.'),
+          '#attributes' => array('id' => 'imager-debug-status'),
+        ),
+        'imager_debug_messages' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Display Messages'),
+          '#description' => t('Display messages involving AJAX communications and debug messages.'),
+          '#attributes' => array('id' => 'imager-debug-messages'),
+        ),
       ),
     ),
   );

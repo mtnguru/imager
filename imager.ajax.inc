@@ -385,7 +385,7 @@ function imager_delete_file() {
 /**
  * Save an edited file_entity field
  */
-function imager_save_field_entity_field() {
+function imager_save_file_entity_field() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
   $field_name = preg_replace('/\-/', '_', check_plain($_POST['field']));
@@ -447,6 +447,26 @@ function imager_save_field_entity_field() {
   }
   // change the appropriate field
   file_save($file);
+  print json_encode($out);
+}
+
+/**
+ * Retrieve the rendered content of a dialog
+ */
+function imager_render_dialog() {
+  module_load_include('inc', 'imager', 'imager.pages');
+  $out['action'] = check_plain($_POST['action']);
+  $out['status'] = 'pass';
+  $dialog_name = check_plain($_POST['dialogName']);
+  $func_name = '_imagerBuild' . $dialog_name;
+  if (function_exists($func_name)) {
+    $render = $func_name();
+    $out['data'] = drupal_render($render);
+  }
+  else {
+    $out['status'] = 'error';
+    $out['error'] = 'Function does not exist: - ' + $func_name;
+  }
   print json_encode($out);
 }
 

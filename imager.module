@@ -19,7 +19,7 @@ function imager_menu() {
   // Administer configuration settings for Imager module
   $items['admin/config/media/imager'] = array(
     'title' => 'Imager',
-    'description' => 'Configure Imager module paths and settings.',
+    'description' => t('Configure Imager module paths and settings.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('imager_admin_form'),
     'file' => 'imager.admin.inc',
@@ -30,7 +30,7 @@ function imager_menu() {
   // AJAX - Retrieve a rendered file_entity
   $items['imager/ajax/display_entity'] = array(
     'title' => 'Display file_entity',
-    'description' => 'Retrieve a rendered file_entity',
+    'description' => t('Retrieve a rendered file_entity'),
     'page callback' => 'imager_display_entity',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -40,7 +40,7 @@ function imager_menu() {
   // AJAX - Display map showing location of current image
   $items['imager/ajax/display_map'] = array(
     'title' => 'Display Map',
-    'description' => 'Display a map of where this image was taken',
+    'description' => t('Display a map of where this image was taken'),
     'page callback' => 'imager_display_map',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -50,7 +50,7 @@ function imager_menu() {
   // AJAX - Overwrite or save a new image file and the file_entity
   $items['imager/ajax/save_image'] = array(
     'title' => 'Save edited image file',
-    'description' => 'Save an edited image file back into Drupal',
+    'description' => t('Save an edited image file back into Drupal'),
     'page callback' => 'imager_save_image',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -60,7 +60,7 @@ function imager_menu() {
   // AJAX - Attach current image to outgoing email message in users email client
   $items['imager/ajax/email_file'] = array(
     'title' => 'Email edited image file',
-    'description' => 'Start users default email client with subject, body and image attached',
+    'description' => t('Start users default email client with subject, body and image attached.'),
     'page callback' => 'imager_email_file',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -70,7 +70,7 @@ function imager_menu() {
   // AJAX - Display current image and rendered file_entity in a new browser window
   $items['imager/ajax/view_browser'] = array(
     'title' => 'View Image natively in Browser',
-    'description' => 'Save image so it can be displayed natively in browser, then copied or printed',
+    'description' => t('Save image so it can be displayed natively in browser, then copied or printed.'),
     'page callback' => 'imager_view_browser',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -80,7 +80,7 @@ function imager_menu() {
   // AJAX - Retrieve a rendered file_entity form
   $items['imager/ajax/edit_form_load'] = array(
     'title' => 'Retrieve the edit form for a file_entity',
-    'description' => 'Retrieve the edit form for a file_entity',
+    'description' => t('Retrieve the edit form for a file_entity'),
     'page callback' => 'imager_edit_form_load',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -90,7 +90,7 @@ function imager_menu() {
   // AJAX - Retrieve a field from a rendered file_entity form
   $items['imager/ajax/edit_form_field_load'] = array(
     'title' => 'Retrieve a field from the edit form',
-    'description' => 'Retrieve a field from the edit form',
+    'description' => t('Retrieve a field from the edit form.'),
     'page callback' => 'imager_edit_form_field_load',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -100,7 +100,7 @@ function imager_menu() {
   // AJAX - Delete a file_entity and it's image file
   $items['imager/ajax/delete_file'] = array(
     'title' => 'Delete a file_entity from Drupal',
-    'description' => 'Delete a file_entity from Drupal',
+    'description' => t('Delete a file_entity from Drupal'),
     'page callback' => 'imager_delete_file',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
@@ -110,8 +110,18 @@ function imager_menu() {
   // AJAX - Save a file_entity field
   $items['imager/ajax/save_file_entity_field'] = array(
     'title' => 'Save file_entity field',
-    'description' => 'Save a file_entity field',
+    'description' => t('Save a file_entity field'),
     'page callback' => 'imager_save_file_entity_field',
+    'file' => 'imager.ajax.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  // AJAX - Load Dialog
+  $items['imager/ajax/render_dialog'] = array(
+    'title' => 'Load dialog',
+    'description' => t('Render the contents for a dialog and return it.'),
+    'page callback' => 'imager_render_dialog',
     'file' => 'imager.ajax.inc',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),

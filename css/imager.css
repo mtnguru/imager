@@ -110,44 +110,39 @@
 }
 
 /* line 84, ../sass/imager.sass */
-.imager-content {
-  margin-bottom: 35px;
-}
-
-/* line 87, ../sass/imager.sass */
 #imager-status {
   position: fixed;
   z-index: 1014;
   background-color: #aaaaaa;
 }
-/* line 91, ../sass/imager.sass */
+/* line 88, ../sass/imager.sass */
 #imager-status #imager-status-content {
   text-align: center;
 }
-/* line 93, ../sass/imager.sass */
+/* line 90, ../sass/imager.sass */
 #imager-status .imager-status-col {
   float: left;
   margin: 3px 3px 25px;
 }
-/* line 96, ../sass/imager.sass */
+/* line 93, ../sass/imager.sass */
 #imager-status .imager-status-file {
   color: white;
 }
-/* line 99, ../sass/imager.sass */
+/* line 96, ../sass/imager.sass */
 #imager-status table {
   border-spacing: 0;
   margin-bottom: 6px;
 }
-/* line 102, ../sass/imager.sass */
+/* line 99, ../sass/imager.sass */
 #imager-status table th {
   padding: 2px 4px;
 }
-/* line 104, ../sass/imager.sass */
+/* line 101, ../sass/imager.sass */
 #imager-status table td {
   padding: 3px;
 }
 
-/* line 107, ../sass/imager.sass */
+/* line 104, ../sass/imager.sass */
 #imager-info {
   position: fixed;
   z-index: 1015;
@@ -156,21 +151,21 @@
   max-width: 600px;
   background-color: #e0e0e0;
 }
-/* line 114, ../sass/imager.sass */
+/* line 111, ../sass/imager.sass */
 #imager-info .title {
   text-align: center;
   word-wrap: break-word;
 }
-/* line 117, ../sass/imager.sass */
+/* line 114, ../sass/imager.sass */
 #imager-info .filename {
   text-align: center;
 }
-/* line 119, ../sass/imager.sass */
+/* line 116, ../sass/imager.sass */
 #imager-info .error {
-  background-color: red;
+  background-color: #cc0000;
   color: white;
 }
-/* line 122, ../sass/imager.sass */
+/* line 119, ../sass/imager.sass */
 #imager-info .field-name-sfield-owner,
 #imager-info .field-name-sfield-filename,
 #imager-info .field-name-sfield-filesize,
@@ -178,30 +173,30 @@
   float: none;
   clear: both;
 }
-/* line 128, ../sass/imager.sass */
+/* line 125, ../sass/imager.sass */
 #imager-info #imager-info-buttons {
   float: right;
   z-index: 1110;
 }
-/* line 131, ../sass/imager.sass */
+/* line 128, ../sass/imager.sass */
 #imager-info #imager-info-buttons img {
   float: left;
 }
-/* line 133, ../sass/imager.sass */
+/* line 130, ../sass/imager.sass */
 #imager-info #imager-info-geometry {
   clear: both;
 }
-/* line 136, ../sass/imager.sass */
+/* line 133, ../sass/imager.sass */
 #imager-info #imager-info-content img.imager-info-edit {
   float: left;
   clear: both;
 }
-/* line 139, ../sass/imager.sass */
+/* line 136, ../sass/imager.sass */
 #imager-info #imager-info-content section {
   float: left;
 }
 
-/* line 142, ../sass/imager.sass */
+/* line 139, ../sass/imager.sass */
 #imager-edit {
   max-width: 700px;
   position: fixed;
@@ -209,31 +204,31 @@
   background-color: #cacaca;
   z-index: 1020;
 }
-/* line 148, ../sass/imager.sass */
+/* line 145, ../sass/imager.sass */
 #imager-edit .form-item {
   margin: 0;
 }
-/* line 150, ../sass/imager.sass */
+/* line 147, ../sass/imager.sass */
 #imager-edit .description {
   font-style: italic;
   margin-top: 10px;
   max-width: 500px;
 }
-/* line 154, ../sass/imager.sass */
+/* line 151, ../sass/imager.sass */
 #imager-edit .form-text {
   width: 500px;
 }
-/* line 156, ../sass/imager.sass */
+/* line 153, ../sass/imager.sass */
 #imager-edit table.cke_editor {
   background-color: #cccccc;
   border-radius: 0;
 }
-/* line 159, ../sass/imager.sass */
+/* line 156, ../sass/imager.sass */
 #imager-edit table.cke_editor body {
   background-image: none;
 }
 
-/* line 162, ../sass/imager.sass */
+/* line 159, ../sass/imager.sass */
 #imager-confirm {
   max-width: 700px;
   position: fixed;
@@ -241,11 +236,11 @@
   background-color: #aaaaaa;
   padding: 0 10px;
 }
-/* line 168, ../sass/imager.sass */
+/* line 165, ../sass/imager.sass */
 #imager-confirm .imager-content {
   margin: 0;
 }
-/* line 170, ../sass/imager.sass */
+/* line 167, ../sass/imager.sass */
 #imager-confirm #imager-confirm-buttons {
   position: static;
   margin: 0 auto;
@@ -253,7 +248,7 @@
   float: none;
 }
 
-/* line 176, ../sass/imager.sass */
+/* line 173, ../sass/imager.sass */
 #imager-map {
   max-width: 800px;
   padding: 5px;
@@ -261,28 +256,28 @@
   background-color: #888888;
   z-index: 1013;
 }
-/* line 182, ../sass/imager.sass */
+/* line 179, ../sass/imager.sass */
 #imager-map .description {
   max-width: 300px;
 }
-/* line 184, ../sass/imager.sass */
+/* line 181, ../sass/imager.sass */
 #imager-map #imager-map-buttons {
   float: right;
   z-index: 1110;
   background-color: #cacaca;
 }
-/* line 188, ../sass/imager.sass */
+/* line 185, ../sass/imager.sass */
 #imager-map #imager-map-buttons img {
   float: left;
 }
 
-/* line 191, ../sass/imager.sass */
+/* line 188, ../sass/imager.sass */
 #imager-messages.error {
-  background-color: red;
+  background-color: #cc0000;
   background-image: none;
 }
 
-/* line 194, ../sass/imager.sass */
+/* line 191, ../sass/imager.sass */
 #imager-messages {
   background-color: #aaaaaa;
   padding: 10px;
@@ -290,9 +285,12 @@
   z-index: 1020;
   font-size: 80%;
 }
-/* line 202, ../sass/imager.sass */
+/* line 199, ../sass/imager.sass */
 #imager-messages .error {
-  background-color: red;
+  padding: 0.5em;
+  background-color: #cc0000;
+  color: white;
+  font-size: 130%;
 }
 
 /* line 206, ../sass/imager.sass */
@@ -324,7 +322,7 @@
 /* line 223, ../sass/imager.sass */
 #imager-brightness .error,
 #imager-color .error {
-  background-color: red;
+  background-color: #cc0000;
 }
 /* line 225, ../sass/imager.sass */
 #imager-brightness .slider,
@@ -404,7 +402,36 @@ div#main {
   width: auto;
 }
 
-/* line 279, ../sass/imager.sass */
-.ui-dialog .ui-dialog-titlebar {
-  padding: 0 0 0 0.5em;
+/* line 278, ../sass/imager.sass */
+.imager-dialog {
+  position: fixed;
+}
+/* line 280, ../sass/imager.sass */
+.imager-dialog .ui-dialog-titlebar {
+  padding: 0.3em 0 0.3em 0.5em;
+}
+/* line 282, ../sass/imager.sass */
+.imager-dialog .ui-dialog-title {
+  margin: 0 1em 0 0;
+}
+/* line 284, ../sass/imager.sass */
+.imager-dialog .ui-dialog-buttonpane {
+  padding: 0 1em 0 0.4em;
+}
+/* line 286, ../sass/imager.sass */
+.imager-dialog .ui-button-text {
+  padding: 0.2em 0.5em;
+}
+/* line 289, ../sass/imager.sass */
+.imager-dialog .form-item input {
+  font-size: 110%;
+}
+/* line 291, ../sass/imager.sass */
+.imager-dialog .form-item .option {
+  font-size: 110%;
+  padding-left: 0.5em;
+}
+/* line 294, ../sass/imager.sass */
+.imager-dialog .form-item .description {
+  color: #666666;
 }

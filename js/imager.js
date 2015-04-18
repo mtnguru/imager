@@ -23,19 +23,31 @@
 
 /**
  * Wrap file in JQuery();
- * @param {type} $
+ * 
+ * @param $
  */
 (function ($) {
+  /**
+   * Reserve imager namespace
+   * 
+   * @returns {_L28.imager.Anonym$32}
+   *   init()    Initialization imager
+   *   attach()  Attach to thumbnails on source page
+   */
   window.imager = function imager(){
 
 //  localStorage.clear();
-    var modulePath;         // Path to the imager module
-    var settings = {};
-    var $thumbnails;
+    var settings = {};     // Settings passed in from Drupal.settings
+    var $thumbnails;       // List of thumbnails on source page
    
+//  configDialog = {
+//
+//    'save': save
+//    dialog
+//  };
     // Elements
     var $imagerWrapper;    // Wrapper around all imager html divs
-    var $imagerViewer;     // Div containing the popup image and buttons
+    var $imagerViewer;     // Dialog - Viewer/Editor
     var $imagerCanvas;     // canvas with current displayed image
     var $imagerCanvas2;    // canvas with original full image - never shown
     var $imagerInfo;       // popup for displaying text information
@@ -108,8 +120,7 @@
     var ptNowT  = {}; // Current point, varies with use    - transformed
 
     function _init(opts) {
-      settings = opts;   // Why do I make a local copy?  
-      modulePath = settings.modulePath;
+      settings = opts;   // Why do I make a local copy?  There must have been a reason.
 
       $imagerCanvas2    = $('#imager-canvas-org');
       $imagerCanvas2.hide();   // This is never displayed, it is used to save images temporarily
@@ -143,11 +154,6 @@
       $imagerColor.hide();
       initDraggable($imagerColor,'color_location',50,-5);
 
-      $imagerStatus     = $('#imager-status');
-      $imagerStatus.hide();
-      updateStatus();
-      initDraggable($imagerStatus,'status_location',-5,-5);
-
       $imagerMessages   = $('#imager-messages');
       $imagerMessages.hide();
       initDraggable($imagerMessages,'messages_location',200,5)
@@ -155,8 +161,6 @@
       $imagerFilesave   = $('#imager-filesave');
       $imagerFilesave.hide();
       initDraggable($imagerFilesave,'filesave_location',200,400);
-
-      initConfigDialog();
 
       $imagerBusy = $('#imager-busy');
       $imagerBusy.hide();
@@ -239,37 +243,13 @@
       });
     }
 
-    function initConfigDialog() {
-      if (!$imagerConfig) {
-        $imagerConfig   = $('#imager-config');
-        $imagerConfig.dialog({
-            autoOpen: true,
-            title: 'Imager Configuration',
-            draggable: 'false',
-            width: '50%',
-            maxWidth: '20px',
-            height: 'auto',
-            resize: 'auto',
-            buttons: {
-              OK: function() {$(this).dialog("close");},
-              fart: function() {$(this).dialog("close");}
-            },
-            position: {
-              my: "center center",
-              at: "center center"
-            }
-          });
-        $imagerConfig.dialog({draggable: false}).parent().draggable();
-      }
-    }
-
     function updateStatus() {
 //      ptCUlT = ctx.transformedPoint(0,0);
 //      ptCLrT = ctx.transformedPoint(cw,ch);
-      if (localStorage.imagerShowStatus === "FALSE") return;
+      if (localStorage.imagerDebugStatus === "FALSE") return;
+      var filename = (currImage) ? decodeURIComponent(currImage['src'].split('/').reverse()[0]) : 'none';
       $('#imager-status-content').html(
-        '<div class="imager-status-file">Image file: ' + 
-          decodeURIComponent(currImage['src'].split('/').reverse()[0]) + '</div>' +
+        '<div class="imager-status-file">Image file: ' + filename + '</div>' +
         '<div class="imager-status-col">' +
           '<table>' +
             '<tr><th>Name</th><th>Value</th></tr>' +
@@ -763,6 +743,7 @@
     var outOfBounds = function() {
       var npt = {'x': 0, 
                  'y': 0};
+      if (localStorage.imagerBoundsEnable === 'FALSE') return npt;
       var pw;
       var ph;
       switch (rotation) {
@@ -1111,11 +1092,11 @@
       $('#view-info').addClass('checked');
       $imagerInfo.show();
     }
-    if (localStorage.imagerShowStatus === "TRUE") {
+    if (localStorage.imagerDebugStatus === "TRUE") {
       $('#debug-status').addClass('checked');
-      $imagerStatus.show();
+      configClose();
     }
-    if (localStorage.imagerShowDebug  === "TRUE") {
+    if (localStorage.imagerDebugMessages  === "TRUE") {
       $('#debug-messages').addClass('checked');
       $imagerMessages.show();
     }
@@ -1133,7 +1114,7 @@
     $imagerInfo.hide();
     $imagerEdit.hide();
     $imagerMap.hide();
-    $imagerStatus.hide();
+    if ($imagerStatus) $imagerStatus.dialog("close");
     $imagerMessages.hide();
     $imagerConfirm.hide();
     setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
@@ -1144,7 +1125,7 @@
   function displayMessage(msg) {
     $imagerMessages.show();
     $('#imager-messages-content').html(msg);
-    if (localStorage['imagerShowDebug'] === "FALSE") {
+    if (localStorage['imagerDebugMessages'] === "FALSE") {
        messageTimeout = setTimeout(function() {
          $imagerMessages.hide();
        },5000);
@@ -1247,14 +1228,14 @@
       });
       // click on #image-ques - ajax call to bring in image description
       $('#imager-status-exit').click(function(evt) {
-        $imagerStatus.hide();
+        if ($imagerStatus) $imagerStatus.dialog('close');
         $('#debug-status').removeClass('checked');
-        localStorage['imagerShowStatus'] = "FALSE";
+        localStorage['imagerDebugStatus'] = "FALSE";
       });
       $('#imager-messages-exit').click(function(evt) {
         $imagerMessages.hide();
         $('#debug-messages').removeClass('checked');
-        localStorage['imagerShowDebug'] = "FALSE";
+        localStorage['imagerDebugMessages'] = "FALSE";
       });
       $('#imager-info-exit').click(function(evt) {
         $imagerInfo.hide();
@@ -1368,13 +1349,129 @@
         }
       });
 
-      $('#mode-configure').click(function() {
-        $imagerConfig.dialog("open");
-          position: {
-            my: "center center";
-            at: "center center";
+      var toggleDialog = function(dialogName) {
+        var $elem = $('.' + dialogName);
+        if ($elem) {
+          if ($elem.dialog("isOpen") === true) {
+            $elem.dialog("close");
           }
+          else {
+            $elem.dialog("open");
+            $elem.imagerInit();
+          }
+          $elem.imagerOpen();
+        }
+        else {
+          processAjax(settings.actions.renderDialog.url,
+                      { action: 'render-dialog',
+                        dialogName: 'Config',
+                      },
+                      configDialog);
+        }
+      }
+
+      var closeDialog = function($elem) {
+        if ($elem) {
+          $elem.dialog('close');
+        }
+      }
+
+      $('#mode-configure').click(function() {
+        if ($imagerConfig) {
+          if ($imagerConfig.dialog("isOpen") === true) {
+            $imagerConfig.dialog("close");
+          }
+          else {
+            $imagerConfig.dialog("open");
+            configInit();
+          }
+        }
+        else { // Load the config dialog
+          processAjax(settings.actions.renderDialog.url,
+                      { action: 'render-dialog',
+                        dialogName: 'Config',
+                      },
+                      configDialog);
+        }
       });
+
+      function configDialog(response) {
+        var status = response['status'];
+        $imagerWrapper.append(response['data']);
+        $imagerConfig = $('#imager-config');
+        configInit();
+        $imagerConfig.dialog({
+          autoOpen: true,
+          title: 'Imager Configuration',
+          zIndex: 1015,
+          width: '50%',
+          dialogClass: 'imager-dialog',
+          id: 'imager-config-dialog',
+          height: 'auto',
+//          resize: 'auto',
+          buttons: {
+            Save: configSave,
+            Cancel: function() {
+              $(this).dialog("close");
+            }
+          },
+          position: {
+            my: "center center",
+            at: "center center"
+          }
+        });
+        $imagerConfig.dialog({draggable: false}).parent().draggable();
+      }
+
+      function configInit() {
+        if (localStorage.imagerBoundsEnable === "TRUE") {
+          $('#imager-bounds-enable').attr('checked','checked');
+        }
+        if (localStorage.imagerDebugStatus === "TRUE") {
+          $('#imager-debug-status').attr('checked','checked');
+        }
+        if (localStorage.imagerDebugMessages === "TRUE") {
+          $('#imager-debug-messages').attr('checked','checked');
+        }
+      }
+
+      function configClose() {
+//      if ($imagerConfig) $imagerConfig.dialog('close');
+      }
+
+      function configOpen() {
+        if ($imagerConfig) {
+          $imagerConfig.dialog('open');
+        }
+        else {
+          configDialog();
+        }
+      }
+
+      function configSave() {
+        if ($('#imager-debug-status').attr('checked')) {
+          localStorage.imagerDebugStatus = "TRUE";
+          if ($imagerStatus) $imagerStatus.dialog('open');
+          updateStatus();
+        } else {
+          localStorage.imagerDebugStatus = "FALSE";
+//        if ($imagerStatus) $imagerStatus.dialog('close');
+        }
+        if ($('#imager-debug-messages').attr('checked')) {
+          localStorage.imagerDebugMessages = "TRUE";
+          $imagerMessages.show();
+        } else {
+          localStorage.imagerDebugMessages = "FALSE";
+          $imagerMessages.hide();
+        }
+        if ($('#imager-bounds-enable').attr('checked')) {
+          localStorage.imagerBoundsEnable = "TRUE";
+        } else {
+          localStorage.imagerBoundsEnable = "FALSE";
+        }
+        $imagerConfig.dialog("close");
+      }
+      
 
       // click on #mode-crop - set mode to edit=2
       $('#mode-crop').click(function() {
@@ -1600,34 +1697,6 @@
       $('#imager-confirm-exit').click(function () {
         $imagerConfirm.hide();
       });
-
-
-      //div#debug-buttons event handlers
-      // toggle debug
-      $('#debug-status').click(function(evt) {
-        if (localStorage.imagerShowStatus === "FALSE") {
-          localStorage.imagerShowStatus = "TRUE";
-          $(this).addClass('checked');
-          $imagerStatus.show();
-        } else {
-          localStorage.imagerShowStatus = "FALSE";
-          $(this).removeClass('checked');
-          $imagerStatus.hide();
-        }
-//      $('#imager-messages-content').append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>');
-        updateStatus();
-      });
-      $('#debug-messages').click(function(evt) {
-        localStorage.imagerShowDebug = (localStorage.imagerShowDebug === "TRUE") ? "FALSE" : "TRUE";
-        if (localStorage.imagerShowDebug === "TRUE") {
-          $(this).addClass('checked');
-          $imagerMessages.show();
-          $('#imager-messages-content').empty();
-        } else {
-          $(this).removeClass('checked');
-          $imagerMessages.hide();
-        }
-      });
     }   // function initEvents()
 
 
@@ -1848,11 +1917,11 @@
         case 'database':
           processAjax(
             settings.actions.saveFile.url,
-            { 'overwrite': overwrite,
-              'action': 'save-file',
-              'saveMode': fileSaveMode,
-              'uri': currImage['src'],
-              'imgBase64': img 
+            { overwrite: overwrite,
+              action: 'save-file',
+              saveMode: fileSaveMode,
+              uri: currImage['src'],
+              imgBase64: img 
             }, function (response) {
               if (response['file_new']) {
                 currImage['container'].after(response['file_new']);
@@ -1879,10 +1948,10 @@
           break;
         case 'email':
           processAjax(settings.actions.emailFile.url,
-            { 'action': 'email',
-              'saveMode': fileSaveMode,
-              'uri': currImage['src'],
-              'imgBase64': img 
+            { action: 'email',
+              saveMode: fileSaveMode,
+              uri: currImage['src'],
+              imgBase64: img 
             }, function (response) {
               address = '';
               path = response['data']['attachPath'];
@@ -1900,11 +1969,11 @@
         case 'clipboard':
           processAjax(
             settings.actions.clipboard.url,
-            { 'overwrite': overwrite,
-              'action': 'clipboard',
-              'saveMode': fileSaveMode,
-              'uri': currImage['src'],
-              'imgBase64': img 
+            { overwrite: overwrite,
+              action: 'clipboard',
+              saveMode: fileSaveMode,
+              uri: currImage['src'],
+              imgBase64: img 
             }
           );
           break;
@@ -1923,8 +1992,8 @@
       displayMessage('Deleting Image...');
       processAjax(
         settings.actions.deleteFile.url,
-        { 'action': 'delete-file',
-          'uri': currImage['src'],
+        { action: 'delete-file',
+          uri: currImage['src'],
         }
       );
     }
@@ -2007,7 +2076,7 @@
 */
     function processAjax(url,postData,processFunc) {
       postData['filePath']   = settings.filePath;
-//      if (localStorage['imagerShowDebug'] === "TRUE") {
+//      if (localStorage['imagerDebugMessages'] === "TRUE") {
 //        $imagerMessages.append("<h2>Process action: " + postData.action + "</h2>" +
 //          "<div>" + JSON.stringify(postData).substr(1,256) + "</div>\n");
 //      }
@@ -2015,6 +2084,7 @@
         type: "POST",
         url:   url, 
         data: postData, 
+        async: false,
         success: function (response_json) {
           clearTimeout(messageTimeout);
           $imagerBusy.hide();
@@ -2026,8 +2096,8 @@
             out += "<div class='info'>"  + response['info'] + "</div>";
             display = true;
           }
-          if (status === 'catch' || 
-              (response['debug'] && localStorage['imagerShowDebug'] === "TRUE"))  {
+          if (response['status'] === 'catch' || 
+              (response['debug'] && localStorage['imagerDebugMessages'] === "TRUE"))  {
             out += "<div class='debug'>" + response['debug'] + "</div>";
             display = true;
           }
@@ -2037,7 +2107,7 @@
             $('#imager-messages-content').html(out);
           }
           if (processFunc) processFunc(response);   // Execute users function
-          if (localStorage['imagerShowDebug'] === "FALSE") {
+          if (localStorage['imagerDebugMessages'] === "FALSE") {
             setTimeout(function() {
               $imagerMessages.hide();
             },3000);
@@ -2050,12 +2120,12 @@
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText + 
                                              '<br>Action: ' + postData.action + '</p>');
           if (processFunc) processFunc(response,evt);   // Execute users error function
-          if (localStorage['imagerShowDebug'] === "FALSE") {
+          if (localStorage['imagerDebugMessages'] === "FALSE") {
             setTimeout(function() {
               $imagerMessages.hide();
             },10000);
           }
-        }
+        },
       });
     }; // processAjax()
 

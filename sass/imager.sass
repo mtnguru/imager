@@ -3,7 +3,7 @@
  * imager.sass
  */
 
-$red:          #f00
+$red:          #c00
 $white:        #fff
 $lightestgrey: #f0f0f0
 $lightergrey:  #e0e0e0
@@ -80,9 +80,6 @@ $black:        #000
   background-color: $lightestgrey
   img
     padding: 4px
-
-.imager-content
-  margin-bottom: 35px
 
 #imager-status
   position: fixed
@@ -200,7 +197,10 @@ $black:        #000
   .info
   h2
   .error
+    padding: .5em
     background-color: $red
+    color: white
+    font-size: 130%
 
 
 #imager-filesave
@@ -275,10 +275,21 @@ div#main
   width: auto
 
 
-.ui-dialog
+.imager-dialog
+  position: fixed
   .ui-dialog-titlebar
-    padding: 0 0 0 .5em 
-//.ui-dialog-titlebar-close
-//  display: none
+    padding: .3em 0 .3em .5em 
   .ui-dialog-title
     margin: 0 1em 0 0
+  .ui-dialog-buttonpane
+    padding: 0 1em 0 .4em
+  .ui-button-text
+    padding: .2em .5em
+  .form-item
+    input
+      font-size: 110%
+    .option
+      font-size: 110%
+      padding-left: .5em
+    .description
+      color: #666

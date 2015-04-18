@@ -4,6 +4,11 @@
  * JavaScript library to view and edit images from thumbnails
  */
 
+/**
+ * Wrap file in JQuery();
+ * 
+ * @param $
+ */
 (function ($) {
   var imager;
   Drupal.behaviors.imager = {
@@ -40,6 +45,9 @@
                        },
                        'deleteFile': {
                          'url': Drupal.settings.basePath + '?q=imager/ajax/delete_file',
+                       },
+                       'renderDialog': {
+                         'url': Drupal.settings.basePath + '?q=imager/ajax/render_dialog',
                        },
                      },
                     });
