@@ -40,11 +40,6 @@
     var settings = {};     // Settings passed in from Drupal.settings
     var $thumbnails;       // List of thumbnails on source page
    
-//  configDialog = {
-//
-//    'save': save
-//    dialog
-//  };
     // Elements
     var $imagerWrapper;    // Wrapper around all imager html divs
     var $imagerViewer;     // Dialog - Viewer/Editor
@@ -53,11 +48,7 @@
     var $imagerInfo;       // popup for displaying text information
     var $imagerMap;        // popup for displaying map showing locations of images
     var $imagerConfirm;    // popup for confirming actions - delete image
-    var $imagerConfig;     // popup for configuration dialog
     var $imagerEdit;       // popup for displaying text information
-    var $imagerBrightness; // brightness slider popup
-    var $imagerColor;      // hsl color slider popup
-    var $imagerStatus;     // Status or debug popup
     var $imagerMessages;   // Debug response debug popup
     var $imagerFilesave;   // Debug response debug popup
     var $imagerBusy;       // Image busy gif popup
@@ -68,7 +59,7 @@
     var cimg = document.createElement('IMG');
     var imgs = [];         // file paths and titles of all matched images on page
     var nimgs = 0;         // number of images
-    var currImage;         // current image being viewed
+    var current_image;         // current image being viewed
     var viewMode = 0;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
     var editMode = 0;      // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
     var elapsed = 0;       // # elapsed msec since last mouse up
@@ -118,6 +109,606 @@
     var ptCLrT  = {}; // Lower Right corner of canvas      - transformed
     var ptNowC  = {}; // Current point, varies with use    - canvas
     var ptNowT  = {}; // Current point, varies with use    - transformed
+    // Start Config dialog development
+
+/**
+ * Base class from which all other dialog classes inherit from.
+ *  
+ * @param {type} spec
+ * 
+ * @returns {imager_L29.imager.dialogBaseC.that}
+ */
+    var dialogBaseC = function dialogBaseC(spec) {
+      var that = {};
+
+      that.spec = spec;
+      that.spec.name = that.spec.name || 'unknown';
+      that.spec.dialogClass = that.spec.dialogClass || '';
+      that.spec.$elem || undefined;
+
+      // return if dialog is loaded
+      that.dialogHave = function dialogHave() {
+        return (that.spec.$elem) ? true : false;
+      }
+
+      // load the dialog using AJAX
+      that.dialogLoad = function dialogLoad() {
+        ajaxProcess(that,
+                    settings.actions.renderDialog.url,
+                    { action: 'render-dialog',
+                      dialogName: that.spec.name
+                    },
+                    that.dialogInsert);
+      };
+
+      // load the dialog using AJAX
+      that.dialogInsert = function dialogInsert(response) {
+        var status = response['status'];
+        $imagerWrapper.append(response['data']);
+        that.spec.$elem = $('#' + that.spec.cssId);
+        var $elem = that.spec.$elem;
+        that.dialogInit();
+        $elem.dialog(that.spec);
+        $elem.dialog({draggable: false}).parent().draggable();
+      };
+
+
+      // Check to see if dialog is epedialogConfie
+      that.dialogIsOpen = function dialogIsOpen() {
+        return (that.spec.$elem && that.spec.$elem.dialog('isOpen')) ? true : false;
+      }
+
+      // Close the dialog if it's open
+      that.dialogClose = function dialogClose() {
+        if (that.spec.$elem) {
+          that.spec.$elem.dialog('close');
+        }
+      };
+      // Open the dialog if it exists, otherwise create it.
+      that.dialogOpen = function dialogOpen() {
+        if (spec.$elem) {
+          that.spec.$elem.dialog('open');
+        }
+        else {
+          that.dialogLoad();  
+        }
+      };
+      // Toggle the dialog if it exists, otherwise create it.
+      that.dialogToggle = function dialogToggle() {
+        if (that.dialogHave()) {
+          if (that.dialogIsOpen()) {
+            that.dialogClose();
+          }
+          else {
+            that.dialogOpen();
+          }
+        }
+        else { 
+          that.dialogLoad();
+        }
+      };
+
+      return that;
+    };
+
+
+/**
+ * Declare Configuration Dialog class - dialogConfigC - inherits from dialogBaseC 
+ * 
+ * @param {object} spec
+ *   Specifications for opening dialog, can also have ad-hoc properties
+ *   not used by jQuery dialog but needed for other purposes.
+ * 
+ * @returns {that}
+ */
+    function dialogConfigC (spec) {
+      var dspec = $.extend({
+                     name: 'Configuration',
+                     autoOpen: true,
+                     title: 'Imager Configuration',
+                     zIndex: 1015,
+                     width: 'auto',
+                     dialogClass: 'imager-dialog',
+                     cssId: 'imager-config-content',
+                     height: 'auto',
+  //                 resize: 'auto',
+                     position:  { my: "center center",
+                                  at: "center center"
+                                }
+                   }, spec);
+      // Initialize the dialog.
+      var that = dialogBaseC(dspec);
+
+      /**
+       * Initialize checkboxes from localStorage
+       */
+      that.dialogInit = function dialogInit() {
+        if (localStorage.imagerBoundsEnable === "TRUE") {
+          $('#imager-bounds-enable').attr('checked','checked');
+        }
+        if (localStorage.imagerDebugStatus === "TRUE") {
+          $('#imager-debug-status').attr('checked','checked');
+        }
+        if (localStorage.imagerDebugMessages === "TRUE") {
+          $('#imager-debug-messages').attr('checked','checked');
+        }
+      };
+
+      /**
+       * Save information from the configuration dialog to localStorage
+       */
+      that.dialogSave = function dialogSave() {
+        if ($('#imager-debug-status').attr('checked')) {
+          localStorage.imagerDebugStatus = "TRUE";
+          dialogStatus.dialogOpen();
+        } else {
+          localStorage.imagerDebugStatus = "FALSE";
+          dialogStatus.dialogClose();
+        }
+        if ($('#imager-debug-messages').attr('checked')) {
+          localStorage.imagerDebugMessages = "TRUE";
+          $imagerMessages.show();
+        } else {
+          localStorage.imagerDebugMessages = "FALSE";
+          $imagerMessages.hide();
+        }
+        if ($('#imager-bounds-enable').attr('checked')) {
+          localStorage.imagerBoundsEnable = "TRUE";
+        } else {
+          localStorage.imagerBoundsEnable = "FALSE";
+        }
+        that.dialogClose();
+      };
+
+      /**
+       * User clicks on configure button in main viewer window
+       */
+      $('#mode-configure').click(function() { that.dialogToggle(); });
+
+      /**
+       * Dialog buttons are defined last to ensure methods are defined.
+       */
+      that.spec['buttons'] = { Save: that.dialogSave,
+                               Cancel: that.dialogClose
+                             };
+      return that;
+    };
+    var dialogConfig = dialogConfigC();
+
+/**
+ * Declare Brightness/Contrast Dialog class - dialogBrightnessC - inherits from dialogBaseC 
+ * 
+ * @param {object} spec
+ *   Specifications for opening dialog, can also have ad-hoc properties
+ *   not used by jQuery dialog but needed for other purposes.
+ * 
+ * @returns {that}
+ */
+    function dialogBrightnessC (spec) {
+      var dspec = $.extend({
+                     name: 'Brightness',
+                     autoOpen: true,
+                     title: 'Brightness/Contrast',
+                     zIndex: 1015,
+                     width: 'auto',
+                     dialogClass: 'imager-dialog imager-noclose',
+                     cssId: 'imager-brightness-content',
+                     height: 'auto',
+                     resizable: false,
+                     position:  { my: "center center",
+                                  at: "center center"
+                                }
+                   }, spec);
+      // Initialize the dialog.
+      var that = dialogBaseC(dspec);
+
+      /**
+       * Initialize checkboxes from localStorage
+       */
+      that.dialogInit = function dialogInit() {
+        $('#slider-brightness').change(function() { that.adjustBrightness($imagerCanvas2,$imagerCanvas);});
+        $('#slider-contrast').change(function()   { that.adjustBrightness($imagerCanvas2,$imagerCanvas);});
+        $('#slider-brightness').val(brightness);
+        $('#slider-contrast').val(contrast);
+      };
+
+      /*
+       * adjustBrightness($cvssrc,$cvsdst)
+       */
+      that.adjustBrightness = function adjustBrightness($cvssrc,$cvsdst) {
+        brightness = parseInt($('#slider-brightness').val());
+        contrast   = parseInt($('#slider-contrast').val())/100;
+        dialogStatus.dialogUpdate();
+
+        var multiplier = 1 + Math.min(150,Math.max(-150,brightness)) / 150;
+        contrast = Math.max(0,contrast+1);
+
+        var ctxsrc = $cvssrc[0].getContext('2d');
+        var ctxdst = $cvsdst[0].getContext('2d');
+
+        var w = $cvssrc.attr('width');
+        var h = $cvssrc.attr('height');
+   
+        var dataDesc = ctxsrc.getImageData(0,0,w,h); // left, top, width, height
+        var data = dataDesc.data;
+
+        var p = w*h;
+        var pix = p*4, pix1, pix2;
+
+        var mul, add;
+        if (contrast !== 1) {
+          mul = multiplier * contrast;
+          add = - contrast * 128 + 128;
+        } else {  // this if-then is not necessary anymore, is it?
+          mul = multiplier;
+          add = 0;
+        }
+        var r, g, b;
+        while (p--) {
+          if ((r = data[pix-=4] * mul + add) > 255 )
+            data[pix] = 255;
+          else if (r < 0)
+            data[pix] = 0;
+          else
+            data[pix] = r;
+
+          if ((g = data[pix1=pix+1] * mul + add) > 255 ) 
+            data[pix1] = 255;
+          else if (g < 0)
+            data[pix1] = 0;
+          else
+            data[pix1] = g;
+
+          if ((b = data[pix2=pix+2] * mul + add) > 255 ) 
+            data[pix2] = 255;
+          else if (b < 0)
+            data[pix2] = 0;
+          else
+            data[pix2] = b;
+        }
+    //  ctx.putImageData(dataDesc,0,0,0,0,iw,ih);  // left, top
+        ctxdst.putImageData(dataDesc,0,0);  // left, top
+      };
+
+      that.dialogReset = function dialogReset() {
+        brightness = 0;
+        contrast = 0;
+        that.dialogInit();
+        that.adjustBrightness($imagerCanvas2,$imagerCanvas);
+        dialogStatus.dialogUpdate();
+      };
+
+      that.dialogApply = function dialogApply() {
+        $imagerBusy.show();
+        $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
+                             height: ih});
+        ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
+        ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
+
+        that.adjustBrightness($imagerCanvas2,$imagerCanvas2);
+        cimg.src = $imagerCanvas2[0].toDataURL(); 
+        redraw();
+        setEditMode(0);
+        $imagerBusy.hide();
+      };
+
+      /**
+       * User clicks on brightness button in main viewer window
+       */
+      $('#edit-brightness').click(function()    { setEditMode((editMode === 1) ? 0 : 1); redraw();});
+
+      /**
+       * Dialog buttons are defined last to ensure methods are defined.
+       */
+      that.spec['buttons'] = { Apply: that.dialogApply,
+                               Reset: that.dialogReset,
+                               Cancel: that.dialogClose
+                             };
+      return that;
+    };
+    var dialogBrightness = dialogBrightnessC();
+
+/**
+ * Declare Color - dialogColor - inherits from dialogBaseC 
+ * 
+ * @param {object} spec
+ *   Specifications for opening dialog, can also have ad-hoc properties
+ *   not used by jQuery dialog but needed for other purposes.
+ * 
+ * @returns {that}
+ */
+    function dialogColorC (spec) {
+      var dspec = $.extend({
+                     name: 'Color',
+                     autoOpen: true,
+                     title: 'Hue/Saturation/Lightness',
+                     zIndex: 1015,
+                     width: 'auto',
+                     dialogClass: 'imager-dialog imager-noclose',
+                     cssId: 'imager-color-content',
+                     height: 'auto',
+                     resizable: false,
+                     position:  { my: "center center",
+                                  at: "center center"
+                                }
+                   }, spec);
+      // Initialize the dialog.
+      var that = dialogBaseC(dspec);
+
+      /**
+       * Initialize checkboxes from localStorage
+       */
+      that.dialogInit = function dialogInit() {
+        // brightness/contrast and HSL slider change events 
+        $('#slider-hue').change(function()        { that.adjustColor($imagerCanvas2,$imagerCanvas);});
+        $('#slider-saturation').change(function() { that.adjustColor($imagerCanvas2,$imagerCanvas);});
+        $('#slider-lightness').change(function()  { that.adjustColor($imagerCanvas2,$imagerCanvas);});
+        $('#slider-hue').val(0);
+        $('#slider-saturation').val(0);
+        $('#slider-lightness').val(0);
+      };
+
+      that.adjustColor = function adjustColor($cvssrc,$cvsdst) {
+        hue        = parseInt($('#slider-hue').val() * 100)/100;
+        saturation = parseInt($('#slider-saturation').val() * 100)/9000;
+        lightness = parseInt($('#slider-lightness').val() * 100)/10000;
+        dialogStatus.dialogUpdate();
+
+        var w = $cvssrc.attr('width');
+        var h = $cvssrc.attr('height');
+
+        var ctxsrc = $cvssrc[0].getContext('2d');
+        var ctxdst = $cvsdst[0].getContext('2d');
+
+        var dataDesc = ctxsrc.getImageData(0,0,w,h); // left, top, width, height
+        var data = dataDesc.data;
+
+        // this seems to give the same result as Photoshop
+        if (saturation < 0) {
+          var satMul = 1+saturation;
+        } else {
+          var satMul = 1+saturation*2;
+        }
+
+        hue = (hue%360) / 360;
+        var hue6 = hue * 6;
+
+        var rgbDiv = 1 / 255;
+
+        var light255 = lightness * 255;
+        var lightp1 = 1 + lightness;
+        var lightm1 = 1 - lightness;
+
+        var p = w * h;
+        var pix = p*4, pix1 = pix + 1, pix2 = pix + 2, pix3 = pix + 3;
+
+        while (p--) {
+
+          var r = data[pix-=4];
+          var g = data[pix1=pix+1];
+          var b = data[pix2=pix+2];
+
+          if (hue !== 0 || saturation !== 0) {
+            // ok, here comes rgb to hsl + adjust + hsl to rgb, all in one jumbled mess. 
+            // It's not so pretty, but it's been optimized to get somewhat decent performance.
+            // The transforms were originally adapted from the ones found in Graphics Gems, but have been heavily modified.
+            var vs = r;
+            if (g > vs) vs = g;
+            if (b > vs) vs = b;
+            var ms = r;
+            if (g < ms) ms = g;
+            if (b < ms) ms = b;
+            var vm = (vs-ms);
+            var l = (ms+vs)/510;
+            if (l > 0) {
+              if (vm > 0) {
+                if (l <= 0.5) {
+                  var s = vm / (vs+ms) * satMul;
+                  if (s > 1) s = 1;
+                  var v = (l * (1+s));
+                } else {
+                  var s = vm / (510-vs-ms) * satMul;
+                  if (s > 1) s = 1;
+                  var v = (l+s - l*s);
+                }
+                if (r === vs) {
+                  if (g === ms)
+                    var h = 5 + ((vs-b)/vm) + hue6;
+                  else
+                    var h = 1 - ((vs-g)/vm) + hue6;
+                } else if (g === vs) {
+                  if (b === ms)
+                    var h = 1 + ((vs-r)/vm) + hue6;
+                  else
+                    var h = 3 - ((vs-b)/vm) + hue6;
+                } else {
+                  if (r === ms)
+                    var h = 3 + ((vs-g)/vm) + hue6;
+                  else
+                    var h = 5 - ((vs-r)/vm) + hue6;
+                }
+                if (h < 0) h+=6;
+                if (h >= 6) h-=6;
+                var m = (l+l-v);
+                var sextant = h>>0;
+                if (sextant === 0) {
+                  r = v*255; g = (m+((v-m)*(h-sextant)))*255; b = m*255;
+                } else if (sextant === 1) {
+                  r = (v-((v-m)*(h-sextant)))*255; g = v*255; b = m*255;
+                } else if (sextant === 2) {
+                  r = m*255; g = v*255; b = (m+((v-m)*(h-sextant)))*255;
+                } else if (sextant === 3) {
+                  r = m*255; g = (v-((v-m)*(h-sextant)))*255; b = v*255;
+                } else if (sextant === 4) {
+                  r = (m+((v-m)*(h-sextant)))*255; g = m*255; b = v*255;
+                } else if (sextant === 5) {
+                  r = v*255; g = m*255; b = (v-((v-m)*(h-sextant)))*255;
+                }
+              }
+            }
+          }
+
+          if (lightness < 0) {
+            r *= lightp1;
+            g *= lightp1;
+            b *= lightp1;
+          } else if (lightness > 0) {
+            r = r * lightm1 + light255;
+            g = g * lightm1 + light255;
+            b = b * lightm1 + light255;
+          }
+
+          if (r < 0) 
+            data[pix] = 0;
+          else if (r > 255)
+            data[pix] = 255;
+          else
+            data[pix] = r;
+
+          if (g < 0) 
+            data[pix1] = 0;
+          else if (g > 255)
+            data[pix1] = 255;
+          else
+            data[pix1] = g;
+
+          if (b < 0) 
+            data[pix2] = 0;
+          else if (b > 255)
+            data[pix2] = 255;
+          else
+            data[pix2] = b;
+
+        }
+        ctxdst.putImageData(dataDesc,0,0);  // left, top
+      };
+
+      that.dialogReset = function dialogReset() {
+        hue = 0;
+        saturation = 0;
+        lightness = 0;
+        that.dialogInit();
+        that.adjustColor($imagerCanvas2,$imagerCanvas);
+        dialogStatus.dialogUpdate();
+      }
+
+
+      that.dialogApply = function dialogApply() {
+        $imagerBusy.show();
+        $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
+                             height: ih});
+        ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
+        ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
+
+        that.adjustColor($imagerCanvas2,$imagerCanvas2);
+        cimg.src = $imagerCanvas2[0].toDataURL(); 
+        redraw();
+        setEditMode(0);
+        $imagerBusy.hide();
+      };
+
+      /**
+       * User clicks on color button in main viewer window
+       */
+      $('#edit-color').click(function()    { setEditMode((editMode === 2) ? 0 : 2); redraw();});
+
+      /**
+       * Dialog buttons are defined last to ensure methods are defined.
+       */
+      that.spec['buttons'] = { Apply: that.dialogApply,
+                               Reset: that.dialogReset,
+                               Cancel: that.dialogClose
+                             };
+      return that;
+    };
+    var dialogColor = dialogColorC();
+
+/**
+ * Declare Status dialog - dialogStatusC - inherits from dialogBaseC 
+ * 
+ * @param {object} spec
+ *   Specifications for opening dialog, can also have ad-hoc properties
+ *   not used by jQuery dialog but needed for other purposes.
+ * 
+ * @returns {that}
+ */
+    function dialogStatusC (spec) {
+      var dspec = $.extend({
+                     name: 'Status',
+                     autoOpen: true,
+                     title: 'Imager Module Status',
+                     zIndex: 1015,
+                     width: 'auto',
+                     dialogClass: 'imager-dialog',
+                     cssId: 'imager-status-content',
+                     height: 'auto',
+                     resizable: false,
+                     position:  { my: "center center",
+                                  at: "center center"
+                                }
+                   }, spec);
+      // Initialize the dialog.
+      var that = dialogBaseC(dspec);
+
+      that.dialogUpdate = function dialogUpdate() {
+        if (localStorage.imagerDebugStatus === "FALSE") return;
+        var filename = (current_image) ? decodeURIComponent(current_image['src'].split('/').reverse()[0]) : 'none';
+        $('#imager-status-content').html(
+          '<div class="imager-status-file">Image file: ' + filename + '</div>' +
+          '<div class="imager-status-col">' +
+            '<table>' +
+              '<tr><th>Name</th><th>Value</th></tr>' +
+              '<tr><td>View Mode</td><td>'   + viewMode + '</td></tr>' +
+              '<tr><td>Edit Mode</td><td>'   + editMode + '</td></tr>' +
+              '<tr><td>Full Screen</td><td>' + fullScreen + '</td></tr>' +
+              '<tr><td>Distance</td><td>'    + parseInt(distance) + '</td></tr>' +
+              '<tr><td>Elapsed</td><td>'     + elapsed/1000 + '</td></tr>' +
+              '<tr><td>Zoom</td><td>'        + parseInt(cscale*10000)/10000 + '</td></tr>' +
+              '<tr><td>Rotation</td><td>'    + rotation + '</td></tr>' +
+              '<tr><td>Brightness</td><td>'  + brightness + '</td></tr>' +
+              '<tr><td>Contrast</td><td>'    + contrast + '</td></tr>' +
+              '<tr><td>Hue</td><td>'         + parseInt(hue*100)/100 + '</td></tr>' +
+              '<tr><td>Saturation</td><td>'  + parseInt(saturation*100)/100 + '</td></tr>' +
+              '<tr><td>Lightness</td><td>'   + parseInt(lightness*100)/100 + '</td></tr>' +
+            '</table>' +
+          '</div>' +
+          '<div class="imager-status-col">' +
+            '<table>' +
+              '<tr><th>Name</th><th>Width</th><th>Height</th></tr>' +
+              '<tr><td>Maximum Canvas</td><td>'   + parseInt(mw) + '</td><td>' + parseInt(mh) + '</td></tr>' +
+              '<tr><td>Actual Canvas</td><td>'    + parseInt(cw) + '</td><td>' + parseInt(ch) + '</td></tr>' +
+              '<tr><td>Displayed Image</td><td>'  + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
+              '<tr><td>Full Image</td><td>'+ iw + '</td><td>' + ih + '</td></tr>' +
+            '</table>' +
+  //      '</div>' +
+  //      '<div class="imager-status-col">' +
+            '<table>' +
+              '<tr><th>Name</th><th>X</th><th>Y</th></tr>' +
+              '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>'  + parseInt(ptNowC.y) + '</td></tr>' +
+              '<tr><td>Mouse Now Tx</td><td>'  + parseInt(ptNowT.x) + '</td><td>'  + parseInt(ptNowT.y) + '</td></tr>' +
+              '<tr><td>Mouse Down</td><td>'    + parseInt(ptDownC.x) + '</td><td>' + parseInt(ptDownC.y) + '</td></tr>' +
+              '<tr><td>Mouse Down Tx</td><td>' + parseInt(ptDownT.x) + '</td><td>' + parseInt(ptDownT.y) + '</td></tr>' +
+              '<tr><td>Upper Left Canvas Tx</td><td>'    + parseInt(ptCUlT.x)   + '</td><td>' + parseInt(ptCUlT.y)   + '</td></tr>' +
+              '<tr><td>Lower Right Canvas Tx</td><td>'   + parseInt(ptCLrT.x)   + '</td><td>' + parseInt(ptCLrT.y)   + '</td></tr>' +
+            '</table>' +
+          '</div>'
+        );
+      };
+      /**
+       * Initialize checkboxes from localStorage
+       */
+      that.dialogInit = function dialogInit() {
+        that.dialogUpdate();
+      };
+
+      /**
+       * User clicks on color button in main viewer window
+       */
+      $('#edit-color').click(function()    { setEditMode((editMode === 2) ? 0 : 2); redraw();});
+      return that;
+    };
+    var dialogStatus = dialogStatusC();
+
 
     function _init(opts) {
       settings = opts;   // Why do I make a local copy?  There must have been a reason.
@@ -146,17 +737,9 @@
       $imagerEdit.hide();
       initDraggable($imagerEdit,'edit_location',0,0);
 
-      $imagerBrightness = $('#imager-brightness');
-      $imagerBrightness.hide();
-      initDraggable($imagerBrightness,'brightness_location',50,-5);
-
-      $imagerColor      = $('#imager-color');
-      $imagerColor.hide();
-      initDraggable($imagerColor,'color_location',50,-5);
-
       $imagerMessages   = $('#imager-messages');
       $imagerMessages.hide();
-      initDraggable($imagerMessages,'messages_location',200,5)
+      initDraggable($imagerMessages,'messages_location',200,5);
 
       $imagerFilesave   = $('#imager-filesave');
       $imagerFilesave.hide();
@@ -174,7 +757,7 @@
       }
 
       $thumbnails   = $(settings.cssContainer);
-      if ($thumbnails.length == 0) return; // No thumbnails found, exit 
+      if ($thumbnails.length === 0) return; // No thumbnails found, exit 
 
       $imagerCanvas     = $('#imager-canvas');
       ctx  = $imagerCanvas[0].getContext('2d');
@@ -184,7 +767,7 @@
         handles: true,
         autoHide: false,
         hide: true,
-        show: true,
+        show: true
       });
 
       initEvents();
@@ -194,11 +777,11 @@
       enablePanZoom(); 
     }
 
-/**
- * Attach behaviors to new thumbnails images
- * 
- * @todo Figure out what elements need behaviors updated on AJAX loads and add them here.
- */
+  /**
+   * Attach behaviors to new thumbnails images
+   * 
+   * @todo Figure out what elements need behaviors updated on AJAX loads and add them here.
+   */
     function _attach() {
       initThumbEvents();
     }
@@ -243,62 +826,15 @@
       });
     }
 
-    function updateStatus() {
-//      ptCUlT = ctx.transformedPoint(0,0);
-//      ptCLrT = ctx.transformedPoint(cw,ch);
-      if (localStorage.imagerDebugStatus === "FALSE") return;
-      var filename = (currImage) ? decodeURIComponent(currImage['src'].split('/').reverse()[0]) : 'none';
-      $('#imager-status-content').html(
-        '<div class="imager-status-file">Image file: ' + filename + '</div>' +
-        '<div class="imager-status-col">' +
-          '<table>' +
-            '<tr><th>Name</th><th>Value</th></tr>' +
-            '<tr><td>View Mode</td><td>'   + viewMode + '</td></tr>' +
-            '<tr><td>Edit Mode</td><td>'   + editMode + '</td></tr>' +
-            '<tr><td>Full Screen</td><td>' + fullScreen + '</td></tr>' +
-            '<tr><td>Distance</td><td>'    + parseInt(distance) + '</td></tr>' +
-            '<tr><td>Elapsed</td><td>'     + elapsed/1000 + '</td></tr>' +
-            '<tr><td>Zoom</td><td>'        + parseInt(cscale*10000)/10000 + '</td></tr>' +
-            '<tr><td>Rotation</td><td>'    + rotation + '</td></tr>' +
-            '<tr><td>Brightness</td><td>'  + brightness + '</td></tr>' +
-            '<tr><td>Contrast</td><td>'    + contrast + '</td></tr>' +
-            '<tr><td>Hue</td><td>'         + parseInt(hue*100)/100 + '</td></tr>' +
-            '<tr><td>Saturation</td><td>'  + parseInt(saturation*100)/100 + '</td></tr>' +
-            '<tr><td>Lightness</td><td>'   + parseInt(lightness*100)/100 + '</td></tr>' +
-          '</table>' +
-        '</div>' +
-        '<div class="imager-status-col">' +
-          '<table>' +
-            '<tr><th>Name</th><th>Width</th><th>Height</th></tr>' +
-            '<tr><td>Maximum Canvas</td><td>'   + parseInt(mw) + '</td><td>' + parseInt(mh) + '</td></tr>' +
-            '<tr><td>Actual Canvas</td><td>'    + parseInt(cw) + '</td><td>' + parseInt(ch) + '</td></tr>' +
-            '<tr><td>Displayed Image</td><td>'  + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
-            '<tr><td>Full Image</td><td>'+ iw + '</td><td>' + ih + '</td></tr>' +
-          '</table>' +
-//      '</div>' +
-//      '<div class="imager-status-col">' +
-          '<table>' +
-            '<tr><th>Name</th><th>X</th><th>Y</th></tr>' +
-            '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>'  + parseInt(ptNowC.y) + '</td></tr>' +
-            '<tr><td>Mouse Now Tx</td><td>'  + parseInt(ptNowT.x) + '</td><td>'  + parseInt(ptNowT.y) + '</td></tr>' +
-            '<tr><td>Mouse Down</td><td>'    + parseInt(ptDownC.x) + '</td><td>' + parseInt(ptDownC.y) + '</td></tr>' +
-            '<tr><td>Mouse Down Tx</td><td>' + parseInt(ptDownT.x) + '</td><td>' + parseInt(ptDownT.y) + '</td></tr>' +
-            '<tr><td>Upper Left Canvas Tx</td><td>'    + parseInt(ptCUlT.x)   + '</td><td>' + parseInt(ptCUlT.y)   + '</td></tr>' +
-            '<tr><td>Lower Right Canvas Tx</td><td>'   + parseInt(ptCLrT.x)   + '</td><td>' + parseInt(ptCLrT.y)   + '</td></tr>' +
-          '</table>' +
-        '</div>'
-      );
-    };
 
-
-    // Change the current image in #image-viewer
     /**
+     * Change the current image in #image-viewer
      * 
-     * @param {type} src
-     * @param {type} evt
+     * @param string image_path
+     *   Path to the current image
      * @returns {undefined}
      */
-    var changeImage = function(thumb) {
+    var changeImage = function(image_path) {
       rotation = 0;  // 0, 90, 180, 270 
       brightness = 0;
       contrast = 1;
@@ -307,10 +843,10 @@
       saturation = 0;
 
       $imagerEdit.hide();
-      currImage = thumb;
-      cimg.src = currImage['src'];   // This begins loading the image - upon completion load event is fired
+      current_image = image_path;
+      cimg.src = current_image['src'];   // This begins loading the image - upon completion load event is fired
       $imagerBusy.show();
-    }
+    };
 
     var initializeImage = function() {
       iw = cimg.width;
@@ -341,7 +877,7 @@
       ctx.clearRect(0,0,cw,ch);        // Clear the canvas
       rotation = 0;
       scale(cscale,false);                          // Set initial scaling to fit
-    }
+    };
 
     // When image is loaded - load event is fired
     cimg.addEventListener('load', function () {
@@ -356,7 +892,7 @@
     var redraw = function(){
       ptCUlT = ctx.transformedPoint(0,0);
       ptCLrT = ctx.transformedPoint($imagerCanvas[0].width,$imagerCanvas[0].height);
-      if ((rotation == 0) || (rotation == 180)) {
+      if ((rotation === 0) || (rotation === 180)) {
         cscale = cw / Math.abs(ptCLrT.x - ptCUlT.x);
       } else {
         cscale = cw / Math.abs(ptCLrT.y - ptCUlT.y);
@@ -373,8 +909,8 @@
   //       ctx.restore();
 
       ctx.drawImage(cimg,0,0);
-      updateStatus();
-    }
+      dialogStatus.dialogUpdate();
+    };
 
     var calcCanvasDims = function(sw,sh) {
       if ((ch = sh*mw/sw) < mh) {   // width determines max size
@@ -385,7 +921,7 @@
       }
       cw = parseInt(cw);
       ch = parseInt(ch);
-    }
+    };
 
     var rotate = function(deg) {
       mw = $(window).width()  - 200; // Maximum canvas width
@@ -393,12 +929,12 @@
       ctx.clearHistory();
       iw = cimg.width;
       ih = cimg.height;
-      if (deg == 90) {
-        rotation = (rotation == 270) ? 0 : rotation += 90;
-      }  else if (deg == -90) {
-        rotation = (rotation == 0) ? 270 : rotation -= 90;
+      if (deg === 90) {
+        rotation = (rotation === 270) ? 0 : rotation += 90;
+      }  else if (deg === -90) {
+        rotation = (rotation === 0) ? 270 : rotation -= 90;
       }
-      if (rotation == 0 || rotation == 180) {
+      if (rotation === 0 || rotation === 180) {
         calcCanvasDims(iw,ih);
         $imagerCanvas.attr({width: cw,
                            height: ch});
@@ -407,7 +943,7 @@
         ptNowC.y=ch/2;
         ctx.setTransform(1,0,0,1,0,0);
         ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
-        if (rotation == 180) {
+        if (rotation === 180) {
           ctx.translate(cw,ch);
           ctx.rotate(angleInRadians(rotation));
         } else {
@@ -423,7 +959,7 @@
         ptNowC.y=ch/2;
         ctx.setTransform(1,0,0,1,0,0);
         ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
-        if (rotation == 90) {
+        if (rotation === 90) {
           ctx.translate(cw,0);
         } else {
           ctx.translate(0,ch);
@@ -446,7 +982,7 @@
     };
 
     var scale = function(factor,checkScale) {
-      if (checkScale && factor < 1) {
+      if (checkScale && factor < 1 && localStorage.imagerBoundsEnable === 'TRUE') {
         if (cscale * factor < initScale) {
           factor = initScale / cscale;
         }
@@ -456,255 +992,19 @@
       ctx.scale(factor,factor);
       ctx.translate(-ptNowT.x,-ptNowT.y);
       var npt;
-      if (npt = outOfBounds()) {
+      npt = outOfBounds();
+      if (npt != undefined) {
 //      ctx.restore();
         ctx.translate(npt.x,npt.y);
       }
     };
 
-  /*
-   * adjustBrightness($cvssrc,$cvsdst)
-   */
-    var adjustBrightness = function($cvssrc,$cvsdst) {
-      brightness = parseInt($('#slider-brightness').val());
-      contrast   = parseInt($('#slider-contrast').val())/100;
-      updateStatus();
-
-      var brightMul = 1 + Math.min(150,Math.max(-150,brightness)) / 150;
-      contrast = Math.max(0,contrast+1);
-
-      var ctxsrc = $cvssrc[0].getContext('2d');
-      var ctxdst = $cvsdst[0].getContext('2d');
-
-      var w = $cvssrc.attr('width');
-      var h = $cvssrc.attr('height');
-
-      var dataDesc = ctxsrc.getImageData(0,0,w,h); // left, top, width, height
-      var data = dataDesc.data;
-
-      var p = w*h;
-      var pix = p*4, pix1, pix2;
-
-      var mul, add;
-      if (contrast != 1) {
-        mul = brightMul * contrast;
-        add = - contrast * 128 + 128;
-      } else {  // this if-then is not necessary anymore, is it?
-        mul = brightMul;
-        add = 0;
-      }
-      var r, g, b;
-      while (p--) {
-        if ((r = data[pix-=4] * mul + add) > 255 )
-          data[pix] = 255;
-        else if (r < 0)
-          data[pix] = 0;
-        else
-          data[pix] = r;
-
-        if ((g = data[pix1=pix+1] * mul + add) > 255 ) 
-          data[pix1] = 255;
-        else if (g < 0)
-          data[pix1] = 0;
-        else
-          data[pix1] = g;
-
-        if ((b = data[pix2=pix+2] * mul + add) > 255 ) 
-          data[pix2] = 255;
-        else if (b < 0)
-          data[pix2] = 0;
-        else
-          data[pix2] = b;
-      }
-  //  ctx.putImageData(dataDesc,0,0,0,0,iw,ih);  // left, top
-      ctxdst.putImageData(dataDesc,0,0);  // left, top
-    };
-
-    var resetBrightness = function() {
-      brightness = 0;
-      contrast = 0;
-      updateStatus();
-      $('#slider-brightness').val(brightness);
-      $('#slider-contrast').val(contrast);
-      adjustBrightness($imagerCanvas2,$imagerCanvas);
-    }
-
-    var applyBrightness = function() {
-      $imagerBusy.show();
-      $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
-                           height: ih});
-      ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
-      ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
-
-      adjustBrightness($imagerCanvas2,$imagerCanvas2);
-      cimg.src = $imagerCanvas2[0].toDataURL(); 
-      redraw();
-      setEditMode(0);
-      $imagerBusy.hide();
-    }
-
-    var adjustColor = function($cvssrc,$cvsdst) {
-      hue        = parseInt($('#slider-hue').val() * 100)/100;
-      saturation = parseInt($('#slider-saturation').val() * 100)/9000;
-      lightness = parseInt($('#slider-lightness').val() * 100)/10000;
-      updateStatus();
-
-      var w = $cvssrc.attr('width');
-      var h = $cvssrc.attr('height');
-
-      var ctxsrc = $cvssrc[0].getContext('2d');
-      var ctxdst = $cvsdst[0].getContext('2d');
-
-      var dataDesc = ctxsrc.getImageData(0,0,w,h); // left, top, width, height
-      var data = dataDesc.data;
-
-      // this seems to give the same result as Photoshop
-      if (saturation < 0) {
-        var satMul = 1+saturation;
-      } else {
-        var satMul = 1+saturation*2;
-      }
-
-      hue = (hue%360) / 360;
-      var hue6 = hue * 6;
-
-      var rgbDiv = 1 / 255;
-
-      var light255 = lightness * 255;
-      var lightp1 = 1 + lightness;
-      var lightm1 = 1 - lightness;
-
-      var p = w * h;
-      var pix = p*4, pix1 = pix + 1, pix2 = pix + 2, pix3 = pix + 3;
-
-      while (p--) {
-
-        var r = data[pix-=4];
-        var g = data[pix1=pix+1];
-        var b = data[pix2=pix+2];
-
-        if (hue != 0 || saturation != 0) {
-          // ok, here comes rgb to hsl + adjust + hsl to rgb, all in one jumbled mess. 
-          // It's not so pretty, but it's been optimized to get somewhat decent performance.
-          // The transforms were originally adapted from the ones found in Graphics Gems, but have been heavily modified.
-          var vs = r;
-          if (g > vs) vs = g;
-          if (b > vs) vs = b;
-          var ms = r;
-          if (g < ms) ms = g;
-          if (b < ms) ms = b;
-          var vm = (vs-ms);
-          var l = (ms+vs)/510;
-          if (l > 0) {
-            if (vm > 0) {
-              if (l <= 0.5) {
-                var s = vm / (vs+ms) * satMul;
-                if (s > 1) s = 1;
-                var v = (l * (1+s));
-              } else {
-                var s = vm / (510-vs-ms) * satMul;
-                if (s > 1) s = 1;
-                var v = (l+s - l*s);
-              }
-              if (r == vs) {
-                if (g == ms)
-                  var h = 5 + ((vs-b)/vm) + hue6;
-                else
-                  var h = 1 - ((vs-g)/vm) + hue6;
-              } else if (g == vs) {
-                if (b == ms)
-                  var h = 1 + ((vs-r)/vm) + hue6;
-                else
-                  var h = 3 - ((vs-b)/vm) + hue6;
-              } else {
-                if (r == ms)
-                  var h = 3 + ((vs-g)/vm) + hue6;
-                else
-                  var h = 5 - ((vs-r)/vm) + hue6;
-              }
-              if (h < 0) h+=6;
-              if (h >= 6) h-=6;
-              var m = (l+l-v);
-              var sextant = h>>0;
-              if (sextant == 0) {
-                r = v*255; g = (m+((v-m)*(h-sextant)))*255; b = m*255;
-              } else if (sextant == 1) {
-                r = (v-((v-m)*(h-sextant)))*255; g = v*255; b = m*255;
-              } else if (sextant == 2) {
-                r = m*255; g = v*255; b = (m+((v-m)*(h-sextant)))*255;
-              } else if (sextant == 3) {
-                r = m*255; g = (v-((v-m)*(h-sextant)))*255; b = v*255;
-              } else if (sextant == 4) {
-                r = (m+((v-m)*(h-sextant)))*255; g = m*255; b = v*255;
-              } else if (sextant == 5) {
-                r = v*255; g = m*255; b = (v-((v-m)*(h-sextant)))*255;
-              }
-            }
-          }
-        }
-
-        if (lightness < 0) {
-          r *= lightp1;
-          g *= lightp1;
-          b *= lightp1;
-        } else if (lightness > 0) {
-          r = r * lightm1 + light255;
-          g = g * lightm1 + light255;
-          b = b * lightm1 + light255;
-        }
-
-        if (r < 0) 
-          data[pix] = 0
-        else if (r > 255)
-          data[pix] = 255
-        else
-          data[pix] = r;
-
-        if (g < 0) 
-          data[pix1] = 0
-        else if (g > 255)
-          data[pix1] = 255
-        else
-          data[pix1] = g;
-
-        if (b < 0) 
-          data[pix2] = 0
-        else if (b > 255)
-          data[pix2] = 255
-        else
-          data[pix2] = b;
-
-      }
-      ctxdst.putImageData(dataDesc,0,0);  // left, top
-    }
-
-    function resetColor() {
-      $('#slider-hue').val(0);
-      $('#slider-saturation').val(0);
-      $('#slider-lightness').val(0);
-      adjustColor($imagerCanvas2,$imagerCanvas);
-    }
-
-    function applyColor() {
-      $imagerBusy.show();
-      $imagerCanvas2.attr({width:  iw,     // Set image to be full size
-                          height: ih});
-      ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
-      ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
-
-      adjustColor($imagerCanvas2,$imagerCanvas2);
-      cimg.src = $imagerCanvas2[0].toDataURL(); 
-      redraw();
-      setEditMode(0);
-      $imagerBusy.hide();
-    }
-
-  /*
+    /*
    * crop()
    */
     function crop() {
       $imagerBusy.show();
-      if (viewMode != 2) return;
+      if (viewMode !== 2) return;
       setViewMode(1);
       var selection = ias.getSelection();
       sw = selection.width;
@@ -730,7 +1030,7 @@
                           height: ch});
       ctx.scale(cw/niw,ch/nih);                 // Scale image to fit canvas
   //  ctx.drawImage(cimg,0,0);                 // Draw image, not necessary, it's already drawn
-      updateStatus();
+      dialogStatus.dialogUpdate();
       $imagerBusy.hide();
     }
 
@@ -743,7 +1043,7 @@
     var outOfBounds = function() {
       var npt = {'x': 0, 
                  'y': 0};
-      if (localStorage.imagerBoundsEnable === 'FALSE') return npt;
+      if (localStorage.imagerBoundsEnable === 'FALSE') return undefined;
       var pw;
       var ph;
       switch (rotation) {
@@ -782,13 +1082,13 @@
 //    if (cw < pw) {   // @todo
         if (x2 < 0) {
           msg += '<p>outOfBounds - right:' + x2 + '</p>';
-          npt.x = -x2
+          npt.x = -x2;
         }
 //    }
 //    if (ch < ph) {
         if (y2 < 0) {
           msg += '<p>outOfBounds - bottom:' + y2 + '</p>';
-          npt.y = -y2
+          npt.y = -y2;
         }
 //    }
       if (x1 < 0) {
@@ -811,9 +1111,10 @@
  */
     function getInfo() {
       $imagerBusy.show();
-      processAjax(settings.actions.displayEntity.url,
+      ajaxProcess(this,
+                  settings.actions.displayEntity.url,
                   { action: 'display-entity',
-                    uri: currImage['src'],
+                    uri: current_image['src']
                   },function(response) {
         var status = response['status'];
         var txt = "";
@@ -827,10 +1128,11 @@
             // Display edit popup - render current field from default edit form  
             $imagerBusy.show();
             displayMessage('Contacting Server ... loading form field');
-            processAjax(settings.actions.editFormFieldLoad.url,  
+            ajaxProcess(this,
+                        settings.actions.editFormFieldLoad.url,  
                         { action: 'edit-form-field-load',
-                          uri: currImage['src'],
-                          field: editField,
+                          uri: current_image['src'],
+                          field: editField
                         },function(response) {
               setViewMode(1);
               var status = response['status'];
@@ -859,9 +1161,10 @@
 */
     function getMap() {
       $imagerBusy.show();
-      processAjax(settings.actions.displayMap.url,
+      ajaxProcess(this,
+                  settings.actions.displayMap.url,
                   { action: 'display-map',
-                    uri: currImage['src'],
+                    uri: current_image['src']
                   },function(response) {
         var status = response['status'];
         var txt = "";
@@ -889,7 +1192,7 @@
       ptDownT = ctx.transformedPoint(ptDownC.x,ptDownC.y);
       dragging = true;
       distance = 0;
-      updateStatus();
+      dialogStatus.dialogUpdate();
     };
 
 /**
@@ -910,13 +1213,14 @@
         ctx.save();
         ctx.translate(ptNowT.x-ptDownT.x,ptNowT.y-ptDownT.y);
         var npt;   // recommended x and y motions that won't go out of bounds
-        if (npt = outOfBounds()) {
+        npt = outOfBounds();
+        if (npt != undefined) {
           ctx.restore();
           ctx.translate(ptNowT.x-ptDownT.x+npt.x,ptNowT.y-ptDownT.y+npt.y);
         }
         redraw();
       }
-      updateStatus();
+      dialogStatus.dialogUpdate();
     }
 
 /**
@@ -945,7 +1249,7 @@
           }
         }
       }
-      updateStatus();
+      dialogStatus.dialogUpdate();
     }
 
 /**
@@ -1034,19 +1338,17 @@
       switch (editMode) {
         case 0:   // no editing
           $('#edit-brightness').removeClass('checked');
-          $imagerBrightness.hide();
+          dialogBrightness.dialogClose();
           $('#edit-color').removeClass('checked');
-          $imagerColor.hide();
+          dialogColor.dialogClose();
           break;
         case 1:   // #edit-brightness
           setInitialImage();
           setViewMode(1);
-          $('#slider-brightness').val(0);
-          $('#slider-contrast').val(0);
-          $('#edit-brightness').addClass('checked');
-          $imagerBrightness.show();
           $('#edit-color').removeClass('checked');
-          $imagerColor.hide();
+          dialogColor.dialogClose();
+          $('#edit-brightness').addClass('checked');
+          dialogBrightness.dialogOpen();
           break;
         case 2:   // #edit-color
           $('#slider-hue').val(0);
@@ -1055,9 +1357,9 @@
           setInitialImage();
           setViewMode(1);
           $('#edit-brightness').removeClass('checked');
-          $imagerBrightness.hide();
+          dialogBrightness.dialogClose();
           $('#edit-color').addClass('checked');
-          $imagerColor.show();
+          dialogColor.dialogOpen();
           break;
       }
     }
@@ -1094,7 +1396,7 @@
     }
     if (localStorage.imagerDebugStatus === "TRUE") {
       $('#debug-status').addClass('checked');
-      configClose();
+      dialogStatus.dialogOpen();
     }
     if (localStorage.imagerDebugMessages  === "TRUE") {
       $('#debug-messages').addClass('checked');
@@ -1114,7 +1416,7 @@
     $imagerInfo.hide();
     $imagerEdit.hide();
     $imagerMap.hide();
-    if ($imagerStatus) $imagerStatus.dialog("close");
+    dialogStatus.dialogClose();
     $imagerMessages.hide();
     $imagerConfirm.hide();
     setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
@@ -1134,9 +1436,9 @@
 
     function findImageFromThumbSrc(tsrc) {
       for(i=0; i < nimgs; i++) {
-        if (tsrc == imgs[i]['tsrc']) {
-          currImage = imgs[i];
-          return currImage;
+        if (tsrc === imgs[i]['tsrc']) {
+          current_image = imgs[i];
+          return current_image;
         }
       }
       return undefined;
@@ -1145,23 +1447,23 @@
 /**
 * Given an image, find the next or previous image.
 * 
-* @param {type} src
-*   Source image.
+* @param {type} current
+*   Current image to offset from
 * @param {type} offset
 *   Number of images.
 * 
-* @returns {Drupal.behaviors.imager.attach.currImage['src']|String|src}
+* @returns {Drupal.behaviors.imager.attach.current_image['src']|String|src}
 */
     function findNextImage(current,offset) {
       for(i=0; i < nimgs; i++) {
-        if (current == imgs[i]) {
-          if (offset == 1) {
-            if (++i == nimgs) i = 0;
+        if (current === imgs[i]) {
+          if (offset === 1) {
+            if (++i === nimgs) i = 0;
           } else {
-            if (--i == -1) i = nimgs-1;
+            if (--i === -1) i = nimgs-1;
           }
-          currImage = imgs[i];
-          return currImage;
+          current_image = imgs[i];
+          return current_image;
         }
       }
       return undefined;
@@ -1179,7 +1481,7 @@
         if (viewMode > 0) return;
         $(this).hide();
         hidePopups();
-        updateStatus();
+        dialogStatus.dialogUpdate();
       });
 
       // mouse enters the #imager-viewer div - do nothing
@@ -1195,7 +1497,7 @@
         if (el === $imagerInfo[0] || el1.length) return;
 
         hidePopups();
-        updateStatus();
+        dialogStatus.dialogUpdate();
       });
 
       
@@ -1209,13 +1511,13 @@
       $('#image-left').click(function() {
         setViewMode(1);
         setEditMode(0);
-        changeImage(findNextImage(currImage,-1));   
+        changeImage(findNextImage(current_image,-1));   
       });
       // click on #image-right - bring up next image to the right
       $('#image-right').click(function() {
         setViewMode(1);
         setEditMode(0);
-        changeImage(findNextImage(currImage,1));
+        changeImage(findNextImage(current_image,1));
       });
       // click on #image-exit - Exit the large popup
       $('#image-exit').click(function() {
@@ -1225,12 +1527,6 @@
         } else {
           hidePopups();
         }
-      });
-      // click on #image-ques - ajax call to bring in image description
-      $('#imager-status-exit').click(function(evt) {
-        if ($imagerStatus) $imagerStatus.dialog('close');
-        $('#debug-status').removeClass('checked');
-        localStorage['imagerDebugStatus'] = "FALSE";
       });
       $('#imager-messages-exit').click(function(evt) {
         $imagerMessages.hide();
@@ -1269,15 +1565,15 @@
             var $elems = $('#imager-edit-content select');
             var editor = $elems[0].value;
             format = editor;
-            if (editor == "panopoly_wysiwyg_text") {
+            if (editor === "panopoly_wysiwyg_text") {
               id = Drupal.wysiwyg.activeId;
               value = tinyMCE.get(id).getContent();
-            } else if (editor == 'full_html') {
+            } else if (editor === 'full_html') {
               var $elems = $('#imager-edit-content textarea.form-textarea');
               $elems.each(function (index,elem) {
                 value = $(elem).val();   // Last one wins - this is what we want
               });
-            } else if (editor == 'plain_text') {
+            } else if (editor === 'plain_text') {
               var $elems = $('#imager-edit-content textarea.form-textarea');
               $elems.each(function (index,elem) {
                 value = $(elem).val();   // Last one wins - this is what we want
@@ -1318,13 +1614,14 @@
         }
         $imagerBusy.show();
         displayMessage('Saving ...');
-        processAjax(settings.actions.saveFileEntityField.url,
+        ajaxProcess(this,
+                    settings.actions.saveFileEntityField.url,
                     { action: 'save-file-entity-field',
                       field: editField,
                       fieldType: editFieldType,
                       value: value,
                       format: format,
-                      uri: currImage['src'],
+                      uri: current_image['src']
                     }, function(response) {
                          var status = response['status'];
                          getInfo();
@@ -1349,139 +1646,17 @@
         }
       });
 
-      var toggleDialog = function(dialogName) {
-        var $elem = $('.' + dialogName);
-        if ($elem) {
-          if ($elem.dialog("isOpen") === true) {
-            $elem.dialog("close");
-          }
-          else {
-            $elem.dialog("open");
-            $elem.imagerInit();
-          }
-          $elem.imagerOpen();
-        }
-        else {
-          processAjax(settings.actions.renderDialog.url,
-                      { action: 'render-dialog',
-                        dialogName: 'Config',
-                      },
-                      configDialog);
-        }
-      }
 
-      var closeDialog = function($elem) {
-        if ($elem) {
-          $elem.dialog('close');
-        }
-      }
-
-      $('#mode-configure').click(function() {
-        if ($imagerConfig) {
-          if ($imagerConfig.dialog("isOpen") === true) {
-            $imagerConfig.dialog("close");
-          }
-          else {
-            $imagerConfig.dialog("open");
-            configInit();
-          }
-        }
-        else { // Load the config dialog
-          processAjax(settings.actions.renderDialog.url,
-                      { action: 'render-dialog',
-                        dialogName: 'Config',
-                      },
-                      configDialog);
-        }
-      });
-
-      function configDialog(response) {
-        var status = response['status'];
-        $imagerWrapper.append(response['data']);
-        $imagerConfig = $('#imager-config');
-        configInit();
-        $imagerConfig.dialog({
-          autoOpen: true,
-          title: 'Imager Configuration',
-          zIndex: 1015,
-          width: '50%',
-          dialogClass: 'imager-dialog',
-          id: 'imager-config-dialog',
-          height: 'auto',
-//          resize: 'auto',
-          buttons: {
-            Save: configSave,
-            Cancel: function() {
-              $(this).dialog("close");
-            }
-          },
-          position: {
-            my: "center center",
-            at: "center center"
-          }
-        });
-        $imagerConfig.dialog({draggable: false}).parent().draggable();
-      }
-
-      function configInit() {
-        if (localStorage.imagerBoundsEnable === "TRUE") {
-          $('#imager-bounds-enable').attr('checked','checked');
-        }
-        if (localStorage.imagerDebugStatus === "TRUE") {
-          $('#imager-debug-status').attr('checked','checked');
-        }
-        if (localStorage.imagerDebugMessages === "TRUE") {
-          $('#imager-debug-messages').attr('checked','checked');
-        }
-      }
-
-      function configClose() {
-//      if ($imagerConfig) $imagerConfig.dialog('close');
-      }
-
-      function configOpen() {
-        if ($imagerConfig) {
-          $imagerConfig.dialog('open');
-        }
-        else {
-          configDialog();
-        }
-      }
-
-      function configSave() {
-        if ($('#imager-debug-status').attr('checked')) {
-          localStorage.imagerDebugStatus = "TRUE";
-          if ($imagerStatus) $imagerStatus.dialog('open');
-          updateStatus();
-        } else {
-          localStorage.imagerDebugStatus = "FALSE";
-//        if ($imagerStatus) $imagerStatus.dialog('close');
-        }
-        if ($('#imager-debug-messages').attr('checked')) {
-          localStorage.imagerDebugMessages = "TRUE";
-          $imagerMessages.show();
-        } else {
-          localStorage.imagerDebugMessages = "FALSE";
-          $imagerMessages.hide();
-        }
-        if ($('#imager-bounds-enable').attr('checked')) {
-          localStorage.imagerBoundsEnable = "TRUE";
-        } else {
-          localStorage.imagerBoundsEnable = "FALSE";
-        }
-        $imagerConfig.dialog("close");
-      }
-      
 
       // click on #mode-crop - set mode to edit=2
       $('#mode-crop').click(function() {
-        if (viewMode == 2) {
+        if (viewMode === 2) {
           setViewMode(1);
         } else {
           setViewMode(2);
           setEditMode(0);
         }
-        updateStatus();
+        dialogStatus.dialogUpdate();
       });
 
     // div#view-buttons event handlers
@@ -1493,9 +1668,10 @@
         $imagerBusy.show();
         var img = getImage($('image-cropped').val(),false);
 //      displayMessage('Saving Image...');
-        processAjax(settings.actions.viewBrowser.url,
+        ajaxProcess(this,
+                    settings.actions.viewBrowser.url,
                     { action: 'view-browser',
-                      uri: currImage['src'],
+                      uri: current_image['src'],
                       imgBase64: img 
                     }, function (response) {
                       address = '';
@@ -1504,22 +1680,22 @@
                     });
       });
       $('#view-zoom-fit').click(function() {
-        ptNowC.x = ptDownC.x
+        ptNowC.x = ptDownC.x;
         ptNowC.y = ptDownC.y;
         zoom(0);
       });
       $('#view-zoom-1').click(function() {
-        ptNowC.x = ptDownC.x
+        ptNowC.x = ptDownC.x;
         ptNowC.y = ptDownC.y;
         zoom(0);
       });
       $('#view-zoom-in').click(function() {
-        ptNowC.x = ptDownC.x
+        ptNowC.x = ptDownC.x;
         ptNowC.y = ptDownC.y;
         zoom(1);
       });
       $('#view-zoom-out').click(function() {
-        ptNowC.x = ptDownC.x
+        ptNowC.x = ptDownC.x;
         ptNowC.y = ptDownC.y;
         zoom(-1);
       });
@@ -1573,31 +1749,14 @@
         localStorage['imagerShowMap'] = "FALSE";
       });
     // div#edit-buttons click event handlers
-      // Edit Brightness/Contrast
-      $('#edit-brightness').click(function()   { setEditMode((editMode == 1) ? 0 : 1); redraw();});
-      $('#brightness-apply').click(function()  { applyBrightness();});
-      $('#brightness-cancel').click(function() { setEditMode(0);  redraw();});
-      $('#brightness-reset').click(function()  { resetBrightness();}); 
-      // Edit Color
-      $('#edit-color').click(function()        { setEditMode((editMode == 2) ? 0 : 2); redraw();});
-      $('#color-apply').click(function()       { applyColor();});
-      $('#color-cancel').click(function()      { setEditMode(0);  redraw();});
-      $('#color-reset').click(function()       { resetColor();}); 
       // Rotatthumb
       $('#edit-ccw').click(function()          { rotate(-90); });
       $('#edit-cw').click(function()           { rotate(90); });
       // Crop
       $('#edit-crop').click(crop);
       $('#view-reset').click(function(evt)     { 
-         changeImage(currImage); 
+         changeImage(current_image); 
       });
-
-      // brightness/contrast and HSL slider change events 
-      $('#slider-contrast').change(function()   { adjustBrightness($imagerCanvas2,$imagerCanvas);});
-      $('#slider-brightness').change(function() { adjustBrightness($imagerCanvas2,$imagerCanvas);});
-      $('#slider-hue').change(function()        { adjustColor($imagerCanvas2,$imagerCanvas);});
-      $('#slider-saturation').change(function() { adjustColor($imagerCanvas2,$imagerCanvas);});
-      $('#slider-lightness').change(function()  { adjustColor($imagerCanvas2,$imagerCanvas);});
 
     // div#file-buttons click event handlers
       function initFileSave(saveMode,saveTitle,filename,message) {
@@ -1639,17 +1798,17 @@
 
     // click on save to database
       $('#file-database').click(function () {
-        initFileSave('database',"Save image to database",decodeURIComponent(currImage['src']).replace(/^.*\/files\//),'');
+        initFileSave('database',"Save image to database",decodeURIComponent(current_image['src']).replace(/^.*\/files\//),'');
       });
 
     // click on download
       $('#file-download').click(function () {
-        initFileSave('download',"Download image to local file system",decodeURIComponent(currImage['src'].split('/').reverse()[0]),
+        initFileSave('download',"Download image to local file system",decodeURIComponent(current_image['src'].split('/').reverse()[0]),
                      'The download feature is under development.<br>It does not work in all browsers and is intermittent.');
       });
 
       $('#file-email').click(function () {
-        initFileSave('email',"Email image",decodeURIComponent(currImage['src'].split('/').reverse()[0]),
+        initFileSave('email',"Email image",decodeURIComponent(current_image['src'].split('/').reverse()[0]),
                      'Email Image to somewhere');
       });
 
@@ -1722,12 +1881,12 @@
 
         // User clicks in thumbnail image
         $thumb.click(function(evt) {
-          currImage = findImageFromThumbSrc($thumb.attr('src'));
+          current_image = findImageFromThumbSrc($thumb.attr('src'));
           if (viewMode == 1) {   // if the viewer is locked, select this image
-            changeImage(currImage);
+            changeImage(current_image);
           } else {               // if the viewer is not locked, then lock it?
             setViewMode(1);
-            updateStatus();
+            dialogStatus.dialogUpdate();
           }
           evt.stopPropagation();
           return false;
@@ -1741,9 +1900,9 @@
   /*      $(this).hoverIntent({   // hoverIntent requires at least jQuery 1.7
           over: function(evt) {
             if (viewMode > 0) return false;
-            currImage['src'] = getFullPath(this);
+            current_image['src'] = getFullPath(this);
             setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
-            changeImage(currImage['src']);
+            changeImage(current_image['src']);
           },
           out: function(evt) {
             if (viewMode > 0) return false;
@@ -1764,7 +1923,7 @@
     //        console.debug("image mouseleave image has focus");
             } else {
               hidePopups();
-              updateStatus();
+              dialogStatus.dialogUpdate();
     //        console.debug("image mouseleave image doesn't have focus ");
             }
           },
@@ -1822,9 +1981,9 @@
       var img;
       var pt;
       var mimeType = "";
-      if (currImage['src'].match(/\.png$/i)) {
+      if (current_image['src'].match(/\.png$/i)) {
         mimeType = "image/png";
-      } else if (currImage['src'].match(/\.jpe*g$/i)){
+      } else if (current_image['src'].match(/\.jpe*g$/i)){
         mimeType = "image/jpeg";
       }
       switch (imageResMode = $('input[name="resolution"]:checked').val()) {
@@ -1915,30 +2074,30 @@
       displayMessage('Saving Image...');
       switch (fileSaveMode) {
         case 'database':
-          processAjax(
+          ajaxProcess(this,
             settings.actions.saveFile.url,
             { overwrite: overwrite,
               action: 'save-file',
               saveMode: fileSaveMode,
-              uri: currImage['src'],
+              uri: current_image['src'],
               imgBase64: img 
             }, function (response) {
               if (response['file_new']) {
-                currImage['container'].after(response['file_new']);
+                current_image['container'].after(response['file_new']);
                 // @TODO The two unwrap are hardcoded to remove two extra divs.  
                 // Can this be done in PHP when it is rendered.
                 // Maybe a Views tpl.php file.
-                var $row = currImage['container'].next().find(settings.cssContainer);
+                var $row = current_image['container'].next().find(settings.cssContainer);
                 $row.unwrap().unwrap();
               }
               if (response['file_old']) {
-                currImage['container'].html(response['file_old']);
+                current_image['container'].html(response['file_old']);
                 // @TODO - The following code is ugly, 
                 // Views wraps a couple extra divs around the output.
                 // The following code removes those divs so just 
                 // .views-row remains and everything below it remains.
-                var $row = currImage['container'].find(settings.cssContainer).child();
-                while (currImage['container'][0] != $row.parent()[0]) {
+                var $row = current_image['container'].find(settings.cssContainer).child();
+                while (current_image['container'][0] != $row.parent()[0]) {
                   $row.unwrap();
                 }
               }
@@ -1947,10 +2106,11 @@
           );
           break;
         case 'email':
-          processAjax(settings.actions.emailFile.url,
+          ajaxProcess(this,
+            settings.actions.emailFile.url,
             { action: 'email',
               saveMode: fileSaveMode,
-              uri: currImage['src'],
+              uri: current_image['src'],
               imgBase64: img 
             }, function (response) {
               address = '';
@@ -1967,12 +2127,12 @@
           );
           break;
         case 'clipboard':
-          processAjax(
+          ajaxProcess(this,
             settings.actions.clipboard.url,
             { overwrite: overwrite,
               action: 'clipboard',
               saveMode: fileSaveMode,
-              uri: currImage['src'],
+              uri: current_image['src'],
               imgBase64: img 
             }
           );
@@ -1980,7 +2140,7 @@
         case 'download':
           $('#imager-filesave-download')
             .attr({ 'href': img,
-                    'download': $('#imager-filesave-filename').val(),
+                    'download': $('#imager-filesave-filename').val()
                  });
           break;
       }
@@ -1990,14 +2150,13 @@
 
     function deleteFile() {
       displayMessage('Deleting Image...');
-      processAjax(
+      ajaxProcess(this,
         settings.actions.deleteFile.url,
         { action: 'delete-file',
-          uri: currImage['src'],
+          uri: current_image['src']
         }
       );
     }
-
 
 
 /**
@@ -2074,17 +2233,12 @@
 * @param {type} postData
 * @param {type} processFunc
 */
-    function processAjax(url,postData,processFunc) {
+    function ajaxProcess($callingElement, url, postData, processFunc) {
       postData['filePath']   = settings.filePath;
-//      if (localStorage['imagerDebugMessages'] === "TRUE") {
-//        $imagerMessages.append("<h2>Process action: " + postData.action + "</h2>" +
-//          "<div>" + JSON.stringify(postData).substr(1,256) + "</div>\n");
-//      }
       $.ajax({
         type: "POST",
         url:   url, 
         data: postData, 
-        async: false,
         success: function (response_json) {
           clearTimeout(messageTimeout);
           $imagerBusy.hide();
@@ -2106,7 +2260,7 @@
             $imagerMessages.show();
             $('#imager-messages-content').html(out);
           }
-          if (processFunc) processFunc(response);   // Execute users function
+          if (processFunc) processFunc.call($callingElement,response);   // Execute users function
           if (localStorage['imagerDebugMessages'] === "FALSE") {
             setTimeout(function() {
               $imagerMessages.hide();
@@ -2127,7 +2281,7 @@
           }
         },
       });
-    }; // processAjax()
+    }; // ajaxProcess()
 
     return {
       init:   _init,

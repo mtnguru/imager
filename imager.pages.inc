@@ -64,8 +64,8 @@ function _imagerBuildWrapper(&$page) {
       ),
     ),
     'viewer'     => _imagerBuildViewer(),
-    'brightness' => _imagerBuildBrightness(),
-    'color'      => _imagerBuildColor(),
+//  'brightness' => _imagerBuildBrightness(),
+//  'color'      => _imagerBuildColor(),
     'filesave'   => _imagerBuildFilesave(),
 //  'status'     => _imagerBuildStatus(),
     'info'       => _imagerBuildInfo(),
@@ -76,7 +76,7 @@ function _imagerBuildWrapper(&$page) {
 //  'map'        => _imagerBuildMap(),
     'form'       => _imagerBuildForm(),
     'confirm'    => _imagerBuildConfirm(),
-//  'config'     => _imagerBuildConfig(),
+//  'config'     => _imagerBuildConfiguration(),
   );
 }
 
@@ -338,13 +338,6 @@ function _imagerBuildColor() {
           ),
         ),
       ),
-    ),
-    'buttons' => array(
-      '#prefix' => '<div id="imager-brightness-buttons" class="imager-buttons">',
-      '#suffix' => '</div>',
-      'apply' => _imagerBuildButton(1, 'color-apply', 'checkmark.png', t('Apply changes and exit')),
-      'reset' => _imagerBuildButton(2, 'color-reset', 'reset.png', t('Reset hue, saturation and lightness')),
-      'cancel' => _imagerBuildButton(3, 'color-cancel', 'redx.png', t('Exit without applying changes')),
     ),
   );
 }
@@ -671,7 +664,7 @@ function _imagerBuildConfirm() {
 }
 
 
-function _imagerBuildConfig() {
+function _imagerBuildConfiguration() {
   global $_imager_path;
   return array(
     '#prefix' => '<div id="imager-config">',
