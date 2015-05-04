@@ -182,14 +182,14 @@ function imager_theme() {
  * Create render arrays for imager popup
  *
  * @todo Is there an earlier hook better suited for this?
- * @todo Move most of this into imager.pages.inc
+ * @todo Move most of this into imager.popups.inc
  */
 function imager_page_alter(&$page) {
   // @todo using $imager_enable to determine if module is in use/loaded.
   //       is there a more proper way?
   global $_imager_enable;
   if (isset($_imager_enable)) {
-    module_load_include('inc', 'imager', 'imager.pages');
+    module_load_include('inc', 'imager', 'imager.popups');
     _imagerBuildWrapper($page);
   }
 }

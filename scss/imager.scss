@@ -72,7 +72,7 @@ $black: #000;
         margin: 0 auto;
       }
       .checked {
-        background-color: $lightergrey;
+        background-color: $grey;
       }
       .disabled {
         background-color: $grey;
@@ -103,11 +103,7 @@ $black: #000;
 }
 
 #imager-info {
-  position: fixed;
-  z-index: 1015;
   padding: 5px;
-  min-width: 200px;
-  max-width: 600px;
   background-color: $lightergrey;
   .title {
     text-align: center;
@@ -218,8 +214,6 @@ $black: #000;
 #imager-messages {
   background-color: $grey;
   padding: 10px;
-  position: fixed;
-  z-index: 1020;
   font-size: 80%;
   .info {}
   h2 {}
@@ -233,9 +227,6 @@ $black: #000;
 
 #imager-filesave {
   padding: 5px;
-  position: fixed;
-  z-index: 1050;
-  padding: 10px;
   background-color: $grey;
   #imager-filesave-filename {
     width: 30em;
@@ -247,10 +238,8 @@ $black: #000;
   }
 }
 
-.imager-dialog,
+#imager-brightness,
 #imager-color {
-  position: fixed;
-  z-index: 1050;
   background-color: $grey;
   .error {
     background-color: $red;
@@ -376,8 +365,11 @@ div#main {
       float: left;
       margin: 3px 3px 25px;
     }
+
+    .imager-text-right {
+      text-align: right;
+    }
     .imager-status-file {
-      color: $white;
     }
     table {
       border-spacing: 0;
@@ -386,6 +378,7 @@ div#main {
         padding: 2px 4px;
       }
       td {
+        min-width: 3em;
         padding: 3px;
       }
     }

@@ -1,24 +1,8 @@
-
+  
 /**
  * @file
  * JavaScript library to popup full image viewer/editor from images on pages
  * 
- * Provides image viewer:
- * - Hover over a thumbnail and a popup appears of the full image
- * - Use mouse to pan and zoom
- * - Arrow keys select the next image on underlying page
- * 
- * Image editor is built into the viewer:
- * - Rotate
- * - Crop
- * - Brightness/Contrast
- * - Hue/Saturation/Lightness
- * 
- * Edited images can be:
- * - Saved (new or overwrite) back into Drupal
- * - Downloaded to local file system
- * - Copied to the clipboard
- * - Emailed from Drupal
  */
 
 /**
@@ -34,24 +18,20 @@
    *   init()    Initialization imager
    *   attach()  Attach to thumbnails on source page
    */
+  
   window.imager = function imager(){
 
 //  localStorage.clear();
-    var settings = {};     // Settings passed in from Drupal.settings
     var $thumbnails;       // List of thumbnails on source page
-   
+    var Viewer = Drupal.imager.Viewer;
+    var Popups = Drupal.imager.Popups;
+
     // Elements
-    var $imagerWrapper;    // Wrapper around all imager html divs
     var $imagerViewer;     // Dialog - Viewer/Editor
-    var $imagerCanvas;     // canvas with current displayed image
-    var $imagerCanvas2;    // canvas with original full image - never shown
-    var $imagerInfo;       // popup for displaying text information
     var $imagerMap;        // popup for displaying map showing locations of images
     var $imagerConfirm;    // popup for confirming actions - delete image
     var $imagerEdit;       // popup for displaying text information
-    var $imagerMessages;   // Debug response debug popup
     var $imagerFilesave;   // Debug response debug popup
-    var $imagerBusy;       // Image busy gif popup
     var ias;               // imgAreaSelect instance
     var ctx;               // canvas context
     var ctx2;              // canvas context of original unshown image
@@ -59,13 +39,11 @@
     var cimg = document.createElement('IMG');
     var imgs = [];         // file paths and titles of all matched images on page
     var nimgs = 0;         // number of images
-    var current_image;         // current image being viewed
+    var currentImage;         // current image being viewed
     var viewMode = 0;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
     var editMode = 0;      // 0 - none, 1 - brightness/contrast, 2 - color (hsl)
     var elapsed = 0;       // # elapsed msec since last mouse up
     var fullScreen = 0;    // Are we currently in full screen mode
-    var editField = '';    // Name of current field being edited
-    var editFieldType = '';// Type of field currently being edited
     var fileSaveMode = ''; // Mode for saving files - drupal, local, clipboard
     var imageResMode = ''; // Save what resolution - canvas, cropped image, full image
     var confirmMode = '';  // Mode for the confirmation dialog - deleteFile
@@ -81,9 +59,6 @@
     var iw;  // Actual Image width
     var ih;  // Actual Image height
 
-    var vw;  // Image viewport width
-    var vh;  // Image viewport height
-
     // Status 
     var rotation;  // 0, 90, 180, 270 
     var initScale = 1;
@@ -92,639 +67,134 @@
     var dragging = false;
     var distance;
     var lastup = new Date();  // time of last mouseup event
-    var brightness = 0;
-    var contrast = 1;
-    var hue = 0;
-    var lightness = 0;
-    var saturation = 0;
 
-    // Points
-    var ptDownC = {}; // Last place mouse button was released - canvas 
-    var ptDownT = {}; // Last place mouse button was released - transformed
-    var ptSUlC  = {}; // Crop Selection Upper Left corner  - canvas
-    var ptSLrC  = {}; // Crop Selection Lower right corner - canvas
-    var ptSUlT  = {}; // Crop Selection Upper Left corner  - transformed
-    var ptSlrT  = {}; // Crop Selection Lower right corner - transformed
-    var ptCUlT  = {}; // Upper Left corner of canvas       - transformed
-    var ptCLrT  = {}; // Lower Right corner of canvas      - transformed
-    var ptNowC  = {}; // Current point, varies with use    - canvas
-    var ptNowT  = {}; // Current point, varies with use    - transformed
-    // Start Config dialog development
-
-/**
- * Base class from which all other dialog classes inherit from.
- *  
- * @param {type} spec
- * 
- * @returns {imager_L29.imager.dialogBaseC.that}
- */
-    var dialogBaseC = function dialogBaseC(spec) {
-      var that = {};
-
-      that.spec = spec;
-      that.spec.name = that.spec.name || 'unknown';
-      that.spec.dialogClass = that.spec.dialogClass || '';
-      that.spec.$elem || undefined;
-
-      // return if dialog is loaded
-      that.dialogHave = function dialogHave() {
-        return (that.spec.$elem) ? true : false;
+    var ptsC = function ptsC(spec) {
+      var name = spec.name;
+      var namex = spec.name + '-x';
+      var namey = spec.name + '-y';
+      var pt =  {'v': {'x': 0, 'y': 0},
+                 't': {'x': 0, 'y': 0}};
+      var doTransform = spec.transform || false;
+      if (doTransform) {
+        var namext = namex + '-tx';
+        var nameyt = namey + '-tx';
       }
 
-      // load the dialog using AJAX
-      that.dialogLoad = function dialogLoad() {
-        ajaxProcess(that,
-                    settings.actions.renderDialog.url,
-                    { action: 'render-dialog',
-                      dialogName: that.spec.name
-                    },
-                    that.dialogInsert);
+      pt.setPt = function setPt(x, y) {
+        pt.v.x = x;
+        pt.v.y = y;
+        var vals = {};
+        vals[namex] = parseInt(x);
+        vals[namey] = parseInt(y);
+        if (doTransform) {
+          pt.t = ctx.transformedPoint(x, y);
+          vals[namext] = parseInt(pt.t.x);
+          vals[nameyt] = parseInt(pt.t.y);
+        }
+        Popups.status.dialogUpdate(vals);
       };
 
-      // load the dialog using AJAX
-      that.dialogInsert = function dialogInsert(response) {
-        var status = response['status'];
-        $imagerWrapper.append(response['data']);
-        that.spec.$elem = $('#' + that.spec.cssId);
-        var $elem = that.spec.$elem;
-        that.dialogInit();
-        $elem.dialog(that.spec);
-        $elem.dialog({draggable: false}).parent().draggable();
-      };
+      pt.getPt = function getPt()     { return pt.v; }
+      pt.getTxPt = function getTxPt() { return pt.t; }
 
+      return pt;
+    }
 
-      // Check to see if dialog is epedialogConfie
-      that.dialogIsOpen = function dialogIsOpen() {
-        return (that.spec.$elem && that.spec.$elem.dialog('isOpen')) ? true : false;
+    var pt_down      = ptsC({'name': 'down',      'transform': true});
+    var pt_now       = ptsC({'name': 'now',       'transform': true});
+    var pt_crop_ul   = ptsC({'name': 'crop-ul',   'transform': true});
+    var pt_crop_lr   = ptsC({'name': 'crop-lr',   'transform': true});
+    var pt_canvas_ul = ptsC({'name': 'canvas-ul', 'transform': true});
+    var pt_canvas_lr = ptsC({'name': 'canvas-lr', 'transform': true});
+
+    Viewer.updateStatusModes = function updateStatusModes () {
+      Popups.status.dialogUpdate({
+        'view-mode': viewMode,
+        'edit-mode': editMode,
+        'full-screen': fullScreen,
+      });
+    }
+
+    Viewer.updateStatusFilters = function updateStatusFilters () {
+      Popups.status.dialogUpdate({
+        'rotation': rotation,
+        'zoom': parseInt((cscale * 100000) / 1000) / 100
+      });
+    }
+
+    Viewer.updateStatusGeometries = function updateStatusGeometries () {
+      Popups.status.dialogUpdate({
+        'max-canvas-width':     parseInt(mw),
+        'max-canvas-height':    parseInt(mh),
+        'actual-canvas-width':  parseInt(cw),
+        'actual-canvas-height': parseInt(ch),
+        'disp-image-width':     parseInt(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
+        'disp-image-height':    parseInt(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
+        'full-image-width':     parseInt(iw),
+        'full-image-height':    parseInt(ih),
+      });
+    }
+/**
+ * Set image editing mode - none, brightness, hsl. 
+ * 
+ * @param {type} newMode
+ */
+    Viewer.updateStatus = function updateStatus() {
+      Viewer.updateStatusModes();
+      Viewer.updateStatusFilters();
+      Viewer.updateStatusGeometries();
+    }
+
+    Drupal.imager.Viewer.setEditMode = function setEditMode(newMode) {
+      editMode = newMode;
+      switch (editMode) {
+        case 'none':   // no editing
+          Popups.brightness.dialogClose();
+          Popups.color.dialogClose();
+          break;
+        case 'toggle-brightness':
+          if (editMode === 1) {
+            setEditMode('none');
+            break;
+          }
+          // else fall through and set to brightness
+        case 'brightness':   // #edit-brightness
+          Viewer.setViewMode(1);
+          Popups.color.dialogClose();
+          Popups.brightness.dialogOpen();
+          break;
+        case 'toggle-color':   // #edit-color
+          if (editMode === 2) {
+            setEditMode('none');
+            break;
+          }
+          // else fall through and set to color
+        case 'color':   // #edit-color
+          Viewer.setViewMode(1);
+          Popups.brightness.dialogClose();
+          Popups.color.dialogOpen();
+          break;
       }
-
-      // Close the dialog if it's open
-      that.dialogClose = function dialogClose() {
-        if (that.spec.$elem) {
-          that.spec.$elem.dialog('close');
-        }
-      };
-      // Open the dialog if it exists, otherwise create it.
-      that.dialogOpen = function dialogOpen() {
-        if (spec.$elem) {
-          that.spec.$elem.dialog('open');
-        }
-        else {
-          that.dialogLoad();  
-        }
-      };
-      // Toggle the dialog if it exists, otherwise create it.
-      that.dialogToggle = function dialogToggle() {
-        if (that.dialogHave()) {
-          if (that.dialogIsOpen()) {
-            that.dialogClose();
-          }
-          else {
-            that.dialogOpen();
-          }
-        }
-        else { 
-          that.dialogLoad();
-        }
-      };
-
-      return that;
+      Popups.status.dialogUpdate({'edit-mode': editMode});
     };
 
-
-/**
- * Declare Configuration Dialog class - dialogConfigC - inherits from dialogBaseC 
- * 
- * @param {object} spec
- *   Specifications for opening dialog, can also have ad-hoc properties
- *   not used by jQuery dialog but needed for other purposes.
- * 
- * @returns {that}
- */
-    function dialogConfigC (spec) {
-      var dspec = $.extend({
-                     name: 'Configuration',
-                     autoOpen: true,
-                     title: 'Imager Configuration',
-                     zIndex: 1015,
-                     width: 'auto',
-                     dialogClass: 'imager-dialog',
-                     cssId: 'imager-config-content',
-                     height: 'auto',
-  //                 resize: 'auto',
-                     position:  { my: "center center",
-                                  at: "center center"
-                                }
-                   }, spec);
-      // Initialize the dialog.
-      var that = dialogBaseC(dspec);
-
-      /**
-       * Initialize checkboxes from localStorage
-       */
-      that.dialogInit = function dialogInit() {
-        if (localStorage.imagerBoundsEnable === "TRUE") {
-          $('#imager-bounds-enable').attr('checked','checked');
-        }
-        if (localStorage.imagerDebugStatus === "TRUE") {
-          $('#imager-debug-status').attr('checked','checked');
-        }
-        if (localStorage.imagerDebugMessages === "TRUE") {
-          $('#imager-debug-messages').attr('checked','checked');
-        }
-      };
-
-      /**
-       * Save information from the configuration dialog to localStorage
-       */
-      that.dialogSave = function dialogSave() {
-        if ($('#imager-debug-status').attr('checked')) {
-          localStorage.imagerDebugStatus = "TRUE";
-          dialogStatus.dialogOpen();
-        } else {
-          localStorage.imagerDebugStatus = "FALSE";
-          dialogStatus.dialogClose();
-        }
-        if ($('#imager-debug-messages').attr('checked')) {
-          localStorage.imagerDebugMessages = "TRUE";
-          $imagerMessages.show();
-        } else {
-          localStorage.imagerDebugMessages = "FALSE";
-          $imagerMessages.hide();
-        }
-        if ($('#imager-bounds-enable').attr('checked')) {
-          localStorage.imagerBoundsEnable = "TRUE";
-        } else {
-          localStorage.imagerBoundsEnable = "FALSE";
-        }
-        that.dialogClose();
-      };
-
-      /**
-       * User clicks on configure button in main viewer window
-       */
-      $('#mode-configure').click(function() { that.dialogToggle(); });
-
-      /**
-       * Dialog buttons are defined last to ensure methods are defined.
-       */
-      that.spec['buttons'] = { Save: that.dialogSave,
-                               Cancel: that.dialogClose
-                             };
-      return that;
-    };
-    var dialogConfig = dialogConfigC();
-
-/**
- * Declare Brightness/Contrast Dialog class - dialogBrightnessC - inherits from dialogBaseC 
- * 
- * @param {object} spec
- *   Specifications for opening dialog, can also have ad-hoc properties
- *   not used by jQuery dialog but needed for other purposes.
- * 
- * @returns {that}
- */
-    function dialogBrightnessC (spec) {
-      var dspec = $.extend({
-                     name: 'Brightness',
-                     autoOpen: true,
-                     title: 'Brightness/Contrast',
-                     zIndex: 1015,
-                     width: 'auto',
-                     dialogClass: 'imager-dialog imager-noclose',
-                     cssId: 'imager-brightness-content',
-                     height: 'auto',
-                     resizable: false,
-                     position:  { my: "center center",
-                                  at: "center center"
-                                }
-                   }, spec);
-      // Initialize the dialog.
-      var that = dialogBaseC(dspec);
-
-      /**
-       * Initialize checkboxes from localStorage
-       */
-      that.dialogInit = function dialogInit() {
-        $('#slider-brightness').change(function() { that.adjustBrightness($imagerCanvas2,$imagerCanvas);});
-        $('#slider-contrast').change(function()   { that.adjustBrightness($imagerCanvas2,$imagerCanvas);});
-        $('#slider-brightness').val(brightness);
-        $('#slider-contrast').val(contrast);
-      };
-
-      /*
-       * adjustBrightness($cvssrc,$cvsdst)
-       */
-      that.adjustBrightness = function adjustBrightness($cvssrc,$cvsdst) {
-        brightness = parseInt($('#slider-brightness').val());
-        contrast   = parseInt($('#slider-contrast').val())/100;
-        dialogStatus.dialogUpdate();
-
-        var multiplier = 1 + Math.min(150,Math.max(-150,brightness)) / 150;
-        contrast = Math.max(0,contrast+1);
-
-        var ctxsrc = $cvssrc[0].getContext('2d');
-        var ctxdst = $cvsdst[0].getContext('2d');
-
-        var w = $cvssrc.attr('width');
-        var h = $cvssrc.attr('height');
-   
-        var dataDesc = ctxsrc.getImageData(0,0,w,h); // left, top, width, height
-        var data = dataDesc.data;
-
-        var p = w*h;
-        var pix = p*4, pix1, pix2;
-
-        var mul, add;
-        if (contrast !== 1) {
-          mul = multiplier * contrast;
-          add = - contrast * 128 + 128;
-        } else {  // this if-then is not necessary anymore, is it?
-          mul = multiplier;
-          add = 0;
-        }
-        var r, g, b;
-        while (p--) {
-          if ((r = data[pix-=4] * mul + add) > 255 )
-            data[pix] = 255;
-          else if (r < 0)
-            data[pix] = 0;
-          else
-            data[pix] = r;
-
-          if ((g = data[pix1=pix+1] * mul + add) > 255 ) 
-            data[pix1] = 255;
-          else if (g < 0)
-            data[pix1] = 0;
-          else
-            data[pix1] = g;
-
-          if ((b = data[pix2=pix+2] * mul + add) > 255 ) 
-            data[pix2] = 255;
-          else if (b < 0)
-            data[pix2] = 0;
-          else
-            data[pix2] = b;
-        }
-    //  ctx.putImageData(dataDesc,0,0,0,0,iw,ih);  // left, top
-        ctxdst.putImageData(dataDesc,0,0);  // left, top
-      };
-
-      that.dialogReset = function dialogReset() {
-        brightness = 0;
-        contrast = 0;
-        that.dialogInit();
-        that.adjustBrightness($imagerCanvas2,$imagerCanvas);
-        dialogStatus.dialogUpdate();
-      };
-
-      that.dialogApply = function dialogApply() {
-        $imagerBusy.show();
-        $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
-                             height: ih});
-        ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
-        ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
-
-        that.adjustBrightness($imagerCanvas2,$imagerCanvas2);
-        cimg.src = $imagerCanvas2[0].toDataURL(); 
-        redraw();
-        setEditMode(0);
-        $imagerBusy.hide();
-      };
-
-      /**
-       * User clicks on brightness button in main viewer window
-       */
-      $('#edit-brightness').click(function()    { setEditMode((editMode === 1) ? 0 : 1); redraw();});
-
-      /**
-       * Dialog buttons are defined last to ensure methods are defined.
-       */
-      that.spec['buttons'] = { Apply: that.dialogApply,
-                               Reset: that.dialogReset,
-                               Cancel: that.dialogClose
-                             };
-      return that;
-    };
-    var dialogBrightness = dialogBrightnessC();
-
-/**
- * Declare Color - dialogColor - inherits from dialogBaseC 
- * 
- * @param {object} spec
- *   Specifications for opening dialog, can also have ad-hoc properties
- *   not used by jQuery dialog but needed for other purposes.
- * 
- * @returns {that}
- */
-    function dialogColorC (spec) {
-      var dspec = $.extend({
-                     name: 'Color',
-                     autoOpen: true,
-                     title: 'Hue/Saturation/Lightness',
-                     zIndex: 1015,
-                     width: 'auto',
-                     dialogClass: 'imager-dialog imager-noclose',
-                     cssId: 'imager-color-content',
-                     height: 'auto',
-                     resizable: false,
-                     position:  { my: "center center",
-                                  at: "center center"
-                                }
-                   }, spec);
-      // Initialize the dialog.
-      var that = dialogBaseC(dspec);
-
-      /**
-       * Initialize checkboxes from localStorage
-       */
-      that.dialogInit = function dialogInit() {
-        // brightness/contrast and HSL slider change events 
-        $('#slider-hue').change(function()        { that.adjustColor($imagerCanvas2,$imagerCanvas);});
-        $('#slider-saturation').change(function() { that.adjustColor($imagerCanvas2,$imagerCanvas);});
-        $('#slider-lightness').change(function()  { that.adjustColor($imagerCanvas2,$imagerCanvas);});
-        $('#slider-hue').val(0);
-        $('#slider-saturation').val(0);
-        $('#slider-lightness').val(0);
-      };
-
-      that.adjustColor = function adjustColor($cvssrc,$cvsdst) {
-        hue        = parseInt($('#slider-hue').val() * 100)/100;
-        saturation = parseInt($('#slider-saturation').val() * 100)/9000;
-        lightness = parseInt($('#slider-lightness').val() * 100)/10000;
-        dialogStatus.dialogUpdate();
-
-        var w = $cvssrc.attr('width');
-        var h = $cvssrc.attr('height');
-
-        var ctxsrc = $cvssrc[0].getContext('2d');
-        var ctxdst = $cvsdst[0].getContext('2d');
-
-        var dataDesc = ctxsrc.getImageData(0,0,w,h); // left, top, width, height
-        var data = dataDesc.data;
-
-        // this seems to give the same result as Photoshop
-        if (saturation < 0) {
-          var satMul = 1+saturation;
-        } else {
-          var satMul = 1+saturation*2;
-        }
-
-        hue = (hue%360) / 360;
-        var hue6 = hue * 6;
-
-        var rgbDiv = 1 / 255;
-
-        var light255 = lightness * 255;
-        var lightp1 = 1 + lightness;
-        var lightm1 = 1 - lightness;
-
-        var p = w * h;
-        var pix = p*4, pix1 = pix + 1, pix2 = pix + 2, pix3 = pix + 3;
-
-        while (p--) {
-
-          var r = data[pix-=4];
-          var g = data[pix1=pix+1];
-          var b = data[pix2=pix+2];
-
-          if (hue !== 0 || saturation !== 0) {
-            // ok, here comes rgb to hsl + adjust + hsl to rgb, all in one jumbled mess. 
-            // It's not so pretty, but it's been optimized to get somewhat decent performance.
-            // The transforms were originally adapted from the ones found in Graphics Gems, but have been heavily modified.
-            var vs = r;
-            if (g > vs) vs = g;
-            if (b > vs) vs = b;
-            var ms = r;
-            if (g < ms) ms = g;
-            if (b < ms) ms = b;
-            var vm = (vs-ms);
-            var l = (ms+vs)/510;
-            if (l > 0) {
-              if (vm > 0) {
-                if (l <= 0.5) {
-                  var s = vm / (vs+ms) * satMul;
-                  if (s > 1) s = 1;
-                  var v = (l * (1+s));
-                } else {
-                  var s = vm / (510-vs-ms) * satMul;
-                  if (s > 1) s = 1;
-                  var v = (l+s - l*s);
-                }
-                if (r === vs) {
-                  if (g === ms)
-                    var h = 5 + ((vs-b)/vm) + hue6;
-                  else
-                    var h = 1 - ((vs-g)/vm) + hue6;
-                } else if (g === vs) {
-                  if (b === ms)
-                    var h = 1 + ((vs-r)/vm) + hue6;
-                  else
-                    var h = 3 - ((vs-b)/vm) + hue6;
-                } else {
-                  if (r === ms)
-                    var h = 3 + ((vs-g)/vm) + hue6;
-                  else
-                    var h = 5 - ((vs-r)/vm) + hue6;
-                }
-                if (h < 0) h+=6;
-                if (h >= 6) h-=6;
-                var m = (l+l-v);
-                var sextant = h>>0;
-                if (sextant === 0) {
-                  r = v*255; g = (m+((v-m)*(h-sextant)))*255; b = m*255;
-                } else if (sextant === 1) {
-                  r = (v-((v-m)*(h-sextant)))*255; g = v*255; b = m*255;
-                } else if (sextant === 2) {
-                  r = m*255; g = v*255; b = (m+((v-m)*(h-sextant)))*255;
-                } else if (sextant === 3) {
-                  r = m*255; g = (v-((v-m)*(h-sextant)))*255; b = v*255;
-                } else if (sextant === 4) {
-                  r = (m+((v-m)*(h-sextant)))*255; g = m*255; b = v*255;
-                } else if (sextant === 5) {
-                  r = v*255; g = m*255; b = (v-((v-m)*(h-sextant)))*255;
-                }
-              }
-            }
-          }
-
-          if (lightness < 0) {
-            r *= lightp1;
-            g *= lightp1;
-            b *= lightp1;
-          } else if (lightness > 0) {
-            r = r * lightm1 + light255;
-            g = g * lightm1 + light255;
-            b = b * lightm1 + light255;
-          }
-
-          if (r < 0) 
-            data[pix] = 0;
-          else if (r > 255)
-            data[pix] = 255;
-          else
-            data[pix] = r;
-
-          if (g < 0) 
-            data[pix1] = 0;
-          else if (g > 255)
-            data[pix1] = 255;
-          else
-            data[pix1] = g;
-
-          if (b < 0) 
-            data[pix2] = 0;
-          else if (b > 255)
-            data[pix2] = 255;
-          else
-            data[pix2] = b;
-
-        }
-        ctxdst.putImageData(dataDesc,0,0);  // left, top
-      };
-
-      that.dialogReset = function dialogReset() {
-        hue = 0;
-        saturation = 0;
-        lightness = 0;
-        that.dialogInit();
-        that.adjustColor($imagerCanvas2,$imagerCanvas);
-        dialogStatus.dialogUpdate();
-      }
-
-
-      that.dialogApply = function dialogApply() {
-        $imagerBusy.show();
-        $imagerCanvas2.attr({width:  iw,       // Set canvas to same size as image
-                             height: ih});
-        ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
-        ctx2.drawImage(cimg,0,0);         // Copy full image into canvas
-
-        that.adjustColor($imagerCanvas2,$imagerCanvas2);
-        cimg.src = $imagerCanvas2[0].toDataURL(); 
-        redraw();
-        setEditMode(0);
-        $imagerBusy.hide();
-      };
-
-      /**
-       * User clicks on color button in main viewer window
-       */
-      $('#edit-color').click(function()    { setEditMode((editMode === 2) ? 0 : 2); redraw();});
-
-      /**
-       * Dialog buttons are defined last to ensure methods are defined.
-       */
-      that.spec['buttons'] = { Apply: that.dialogApply,
-                               Reset: that.dialogReset,
-                               Cancel: that.dialogClose
-                             };
-      return that;
-    };
-    var dialogColor = dialogColorC();
-
-/**
- * Declare Status dialog - dialogStatusC - inherits from dialogBaseC 
- * 
- * @param {object} spec
- *   Specifications for opening dialog, can also have ad-hoc properties
- *   not used by jQuery dialog but needed for other purposes.
- * 
- * @returns {that}
- */
-    function dialogStatusC (spec) {
-      var dspec = $.extend({
-                     name: 'Status',
-                     autoOpen: true,
-                     title: 'Imager Module Status',
-                     zIndex: 1015,
-                     width: 'auto',
-                     dialogClass: 'imager-dialog',
-                     cssId: 'imager-status-content',
-                     height: 'auto',
-                     resizable: false,
-                     position:  { my: "center center",
-                                  at: "center center"
-                                }
-                   }, spec);
-      // Initialize the dialog.
-      var that = dialogBaseC(dspec);
-
-      that.dialogUpdate = function dialogUpdate() {
-        if (localStorage.imagerDebugStatus === "FALSE") return;
-        var filename = (current_image) ? decodeURIComponent(current_image['src'].split('/').reverse()[0]) : 'none';
-        $('#imager-status-content').html(
-          '<div class="imager-status-file">Image file: ' + filename + '</div>' +
-          '<div class="imager-status-col">' +
-            '<table>' +
-              '<tr><th>Name</th><th>Value</th></tr>' +
-              '<tr><td>View Mode</td><td>'   + viewMode + '</td></tr>' +
-              '<tr><td>Edit Mode</td><td>'   + editMode + '</td></tr>' +
-              '<tr><td>Full Screen</td><td>' + fullScreen + '</td></tr>' +
-              '<tr><td>Distance</td><td>'    + parseInt(distance) + '</td></tr>' +
-              '<tr><td>Elapsed</td><td>'     + elapsed/1000 + '</td></tr>' +
-              '<tr><td>Zoom</td><td>'        + parseInt(cscale*10000)/10000 + '</td></tr>' +
-              '<tr><td>Rotation</td><td>'    + rotation + '</td></tr>' +
-              '<tr><td>Brightness</td><td>'  + brightness + '</td></tr>' +
-              '<tr><td>Contrast</td><td>'    + contrast + '</td></tr>' +
-              '<tr><td>Hue</td><td>'         + parseInt(hue*100)/100 + '</td></tr>' +
-              '<tr><td>Saturation</td><td>'  + parseInt(saturation*100)/100 + '</td></tr>' +
-              '<tr><td>Lightness</td><td>'   + parseInt(lightness*100)/100 + '</td></tr>' +
-            '</table>' +
-          '</div>' +
-          '<div class="imager-status-col">' +
-            '<table>' +
-              '<tr><th>Name</th><th>Width</th><th>Height</th></tr>' +
-              '<tr><td>Maximum Canvas</td><td>'   + parseInt(mw) + '</td><td>' + parseInt(mh) + '</td></tr>' +
-              '<tr><td>Actual Canvas</td><td>'    + parseInt(cw) + '</td><td>' + parseInt(ch) + '</td></tr>' +
-              '<tr><td>Displayed Image</td><td>'  + parseInt(ptCLrT.x-ptCUlT.x) + '</td><td>' + parseInt(ptCLrT.y-ptCUlT.y) + '</td></tr>' +
-              '<tr><td>Full Image</td><td>'+ iw + '</td><td>' + ih + '</td></tr>' +
-            '</table>' +
-  //      '</div>' +
-  //      '<div class="imager-status-col">' +
-            '<table>' +
-              '<tr><th>Name</th><th>X</th><th>Y</th></tr>' +
-              '<tr><td>Mouse Now</td><td>'     + parseInt(ptNowC.x) + '</td><td>'  + parseInt(ptNowC.y) + '</td></tr>' +
-              '<tr><td>Mouse Now Tx</td><td>'  + parseInt(ptNowT.x) + '</td><td>'  + parseInt(ptNowT.y) + '</td></tr>' +
-              '<tr><td>Mouse Down</td><td>'    + parseInt(ptDownC.x) + '</td><td>' + parseInt(ptDownC.y) + '</td></tr>' +
-              '<tr><td>Mouse Down Tx</td><td>' + parseInt(ptDownT.x) + '</td><td>' + parseInt(ptDownT.y) + '</td></tr>' +
-              '<tr><td>Upper Left Canvas Tx</td><td>'    + parseInt(ptCUlT.x)   + '</td><td>' + parseInt(ptCUlT.y)   + '</td></tr>' +
-              '<tr><td>Lower Right Canvas Tx</td><td>'   + parseInt(ptCLrT.x)   + '</td><td>' + parseInt(ptCLrT.y)   + '</td></tr>' +
-            '</table>' +
-          '</div>'
-        );
-      };
-      /**
-       * Initialize checkboxes from localStorage
-       */
-      that.dialogInit = function dialogInit() {
-        that.dialogUpdate();
-      };
-
-      /**
-       * User clicks on color button in main viewer window
-       */
-      $('#edit-color').click(function()    { setEditMode((editMode === 2) ? 0 : 2); redraw();});
-      return that;
-    };
-    var dialogStatus = dialogStatusC();
+    Viewer.getCurrentImage = function getCurrentImage() {
+      return currentImage;
+    }
 
 
     function _init(opts) {
-      settings = opts;   // Why do I make a local copy?  There must have been a reason.
+      Drupal.imager.settings = opts;   // Why do I make a local copy?  There must have been a reason.
 
-      $imagerCanvas2    = $('#imager-canvas-org');
-      $imagerCanvas2.hide();   // This is never displayed, it is used to save images temporarily
-      ctx2 = $imagerCanvas2[0].getContext('2d');           
+      Viewer.$canvas2    = $('#imager-canvas-org');
+      Viewer.$canvas2.hide();   // This is never displayed, it is used to save images temporarily
+      ctx2 = Viewer.$canvas2[0].getContext('2d');           
 
-      $imagerWrapper    = $('#imager-wrapper');
+      Drupal.imager.$wrapper  = $('#imager-wrapper');
+
       $imagerViewer    = $('#imager-viewer');
       $imagerViewer.hide();
 
-      $imagerInfo       = $('#imager-info');
-      $imagerInfo.hide();
-      initDraggable($imagerInfo,'info_location',-300,5);
-      
       $imagerMap       = $('#imager-map');
       $imagerMap.hide();
       initDraggable($imagerMap,'info_map',5,5);
@@ -737,16 +207,8 @@
       $imagerEdit.hide();
       initDraggable($imagerEdit,'edit_location',0,0);
 
-      $imagerMessages   = $('#imager-messages');
-      $imagerMessages.hide();
-      initDraggable($imagerMessages,'messages_location',200,5);
-
-      $imagerFilesave   = $('#imager-filesave');
-      $imagerFilesave.hide();
-      initDraggable($imagerFilesave,'filesave_location',200,400);
-
-      $imagerBusy = $('#imager-busy');
-      $imagerBusy.hide();
+      Popups.$imagerBusy = $('#imager-busy');
+      Popups.$imagerBusy.hide();
 
       $('#imager-form').empty();
 
@@ -756,12 +218,12 @@
         viewMode = 1;      // 0 - #mode-view, 1 - #mode-edit, 2 - #mode-crop
       }
 
-      $thumbnails   = $(settings.cssContainer);
+      $thumbnails   = $(Drupal.imager.settings.cssContainer);
       if ($thumbnails.length === 0) return; // No thumbnails found, exit 
 
-      $imagerCanvas     = $('#imager-canvas');
-      ctx  = $imagerCanvas[0].getContext('2d');
-      ias = $imagerCanvas.imgAreaSelect({
+      Viewer.$canvas     = $('#imager-canvas');
+      ctx  = Viewer.$canvas[0].getContext('2d');
+      ias = Viewer.$canvas.imgAreaSelect({
         instance: true,
         disable: true,
         handles: true,
@@ -770,11 +232,11 @@
         show: true
       });
 
+      initDialogs();
       initEvents();
-//    initThumbEvents();
-
       trackTransforms(ctx);  // Create transform history
       enablePanZoom(); 
+      Viewer.updateStatus();
     }
 
   /**
@@ -830,24 +292,30 @@
     /**
      * Change the current image in #image-viewer
      * 
-     * @param string image_path
-     *   Path to the current image
+     * @param {type} image_path
      * @returns {undefined}
      */
     var changeImage = function(image_path) {
       rotation = 0;  // 0, 90, 180, 270 
-      brightness = 0;
-      contrast = 1;
-      hue = 0;
-      lightness = 0;
-      saturation = 0;
+//    Popups.brightness.dialogReset();
+//    Popups.color.dialogReset();
 
       $imagerEdit.hide();
-      current_image = image_path;
-      cimg.src = current_image['src'];   // This begins loading the image - upon completion load event is fired
-      $imagerBusy.show();
+      currentImage = image_path;
+      cimg.src = currentImage['src'];   // This begins loading the image - upon completion load event is fired
+      Popups.$imagerBusy.show();
     };
 
+    // When image is loaded - load event is fired
+    cimg.addEventListener('load', function () {
+      Popups.$imagerBusy.hide();
+      initializeImage();
+  //  var nimg = Pixastic.process(cimg,"desaturate");
+      Viewer.redraw();                                        // Draw the image
+      showPopups();               // Hide the image viewer 
+      if (localStorage.imagerShowInfo === "TRUE") Popups.info.dialogUpdate();                                       //
+    }, false);
+   
     var initializeImage = function() {
       iw = cimg.width;
       ih = cimg.height;
@@ -856,8 +324,8 @@
         mh = $(window).height() - 10; // Maximum canvas height
         cw=mw;
         ch=mh;
-        hscale = ch/ih;
-        vscale = cw/iw;
+        var hscale = ch/ih;
+        var vscale = cw/iw;
         cscale = (hscale < vscale) ? hscale : vscale;
       } else {
         mw = $(window).width()  - 95; // Maximum canvas width
@@ -866,54 +334,51 @@
         cscale = cw/iw;
       }
       initScale = cscale;
-      ptDownC.x = cw/2;    // Just in case 
-      ptDownC.y = ch/2;
-      $imagerCanvas.attr({width:  cw,
-                       height: ch});
-      setEditMode(0);
-      ptNowC.x=0;    
-      ptNowC.y=0;
+      pt_down.setPt(cw/2, ch/2);
+      Viewer.$canvas.attr({width:  cw,
+                           height: ch});
+      Viewer.setEditMode('none');
+      pt_now.setPt(0,0);
       ctx.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
       ctx.clearRect(0,0,cw,ch);        // Clear the canvas
       rotation = 0;
       scale(cscale,false);                          // Set initial scaling to fit
+      Viewer.updateStatus();
     };
 
-    // When image is loaded - load event is fired
-    cimg.addEventListener('load', function () {
-      $imagerBusy.hide();
-      initializeImage();
-  //  var nimg = Pixastic.process(cimg,"desaturate");
-      redraw();                                        // Draw the image
-      showPopups();               // Hide the image viewer 
-      if (localStorage.imagerShowInfo === "TRUE") getInfo();                                       //
-    }, false);
-   
-    var redraw = function(){
-      ptCUlT = ctx.transformedPoint(0,0);
-      ptCLrT = ctx.transformedPoint($imagerCanvas[0].width,$imagerCanvas[0].height);
-      if ((rotation === 0) || (rotation === 180)) {
-        cscale = cw / Math.abs(ptCLrT.x - ptCUlT.x);
+    Viewer.copyCanvasToImg = function copyCanvasToImg () {
+      cimg.src = Viewer.$canvas[0].toDataURL();
+    }
+
+
+    Viewer.redraw = function redraw(){
+      // We possibly have done multiple transforms, instead of calculating
+      // the cumulative changes in scale, we apply the current transform matrix,
+      // and calculate the current scale.
+      setCanvasPoints();
+      if ((rotation === 0) || (rotation === 180)) { 
+        cscale = cw / Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
       } else {
-        cscale = cw / Math.abs(ptCLrT.y - ptCUlT.y);
+        cscale = cw / Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
       }
-      ctx.clearRect(ptCUlT.x,
-                    ptCUlT.y,
-                    ptCLrT.x-ptCUlT.x,
-                    ptCLrT.y-ptCUlT.y);
+      Popups.status.dialogUpdate({'zoom': parseInt((cscale * 100000) / 1000) / 100});
+      ctx.clearRect(pt_canvas_ul.getTxPt().x,
+                    pt_canvas_ul.getTxPt().y,
+                    pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x,
+                    pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
 
       // Alternatively:
   //       ctx.save();
   //       ctx.setTransform(1,0,0,1,0,0);
-  //       ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
+  //       ctx.clearRect(0,0,Viewer.$canvas[0].width,Viewer.$canvas[0].height);
   //       ctx.restore();
 
       ctx.drawImage(cimg,0,0);
-      dialogStatus.dialogUpdate();
     };
 
     var calcCanvasDims = function(sw,sh) {
-      if ((ch = sh*mw/sw) < mh) {   // width determines max size
+      ch = sh*mw/sw;
+      if (ch < mh) {   // width determines max size
         cw = mw;
       } else {                      // height determines max size
         ch = mh;
@@ -934,15 +399,17 @@
       }  else if (deg === -90) {
         rotation = (rotation === 0) ? 270 : rotation -= 90;
       }
+      Popups.status.dialogUpdate({
+        'rotation': rotation
+      });
       if (rotation === 0 || rotation === 180) {
         calcCanvasDims(iw,ih);
-        $imagerCanvas.attr({width: cw,
+        Viewer.$canvas.attr({width: cw,
                            height: ch});
         cscale=cw/iw;
-        ptNowC.x=cw/2; 
-        ptNowC.y=ch/2;
+        pt_now.setPt(cw/2, cw/2);
         ctx.setTransform(1,0,0,1,0,0);
-        ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
+        ctx.clearRect(0,0,Viewer.$canvas[0].width,Viewer.$canvas[0].height);
         if (rotation === 180) {
           ctx.translate(cw,ch);
           ctx.rotate(angleInRadians(rotation));
@@ -952,13 +419,12 @@
         }
       } else {
         calcCanvasDims(ih,iw);
-        $imagerCanvas.attr({width:  cw,
+        Viewer.$canvas.attr({width:  cw,
                             height: ch});
         cscale=cw/ih;
-        ptNowC.x=cw/2; 
-        ptNowC.y=ch/2;
+        pt_now.setPt(cw/2, cw/2);
         ctx.setTransform(1,0,0,1,0,0);
-        ctx.clearRect(0,0,$imagerCanvas[0].width,$imagerCanvas[0].height);
+        ctx.clearRect(0,0,Viewer.$canvas[0].width,Viewer.$canvas[0].height);
         if (rotation === 90) {
           ctx.translate(cw,0);
         } else {
@@ -968,7 +434,7 @@
       }
       initScale = cscale;
       ctx.scale(cscale,cscale);
-      redraw();
+      Viewer.redraw();
       showPopups();
     };
 
@@ -978,7 +444,10 @@
     
     var zoom = function(clicks){
       scale(Math.pow(scaleFactor,clicks),true);
-      redraw();
+      Viewer.redraw();
+      setStatusPoints();
+      updateStatusFilters();
+      updateStatusGeometries();
     };
 
     var scale = function(factor,checkScale) {
@@ -987,13 +456,12 @@
           factor = initScale / cscale;
         }
       }
-      ptNowT = ctx.transformedPoint(ptNowC.x,ptNowC.y);
-      ctx.translate(ptNowT.x,ptNowT.y);
+      ctx.translate( pt_now.getTxPt().x,  pt_now.getTxPt().y);
       ctx.scale(factor,factor);
-      ctx.translate(-ptNowT.x,-ptNowT.y);
+      ctx.translate(-pt_now.getTxPt().x, -pt_now.getTxPt().y);
       var npt;
       npt = outOfBounds();
-      if (npt != undefined) {
+      if (npt !== undefined) {
 //      ctx.restore();
         ctx.translate(npt.x,npt.y);
       }
@@ -1003,36 +471,55 @@
    * crop()
    */
     function crop() {
-      $imagerBusy.show();
+      Popups.$imagerBusy.show();
       if (viewMode !== 2) return;
-      setViewMode(1);
+      Viewer.setViewMode(1);
       var selection = ias.getSelection();
-      sw = selection.width;
-      sh = selection.height;
-      ptSUlC.x = selection.x1;
-      ptSUlC.y = selection.y1;
-      ptSLrC.x = selection.x2;
-      ptSLrC.y = selection.y2;
-      ptSUlT = ctx.transformedPoint(ptSUlC.x,ptSUlC.y);
-      ptSLrT = ctx.transformedPoint(ptSLrC.x,ptSLrC.y);
-      var niw = ptSLrT.x - ptSUlT.x;
-      var nih = ptSLrT.y - ptSUlT.y;
+      pt_crop_ul.setPt(selection.x1, selection.y1);
+      pt_crop_lr.setPt(selection.x2, selection.y2);
+      var niw = pt_crop_lr.getTxPt().x - pt_crop_ul.getTxPt().x;
+      var nih = pt_crop_lr.getTxPt().y - pt_crop_ul.getTxPt().y;
 
-      $imagerCanvas.attr({width:  niw,           // Make canvas same size as the image
+      Viewer.$canvas.attr({width:  niw,           // Make canvas same size as the image
                           height: nih});
       ctx.clearRect(0,0,cw,ch);
       ctx.setTransform(1,0,0,1,0,0);
-      ctx.drawImage(cimg,ptSUlT.x,ptSUlT.y,niw,nih,0,0,niw,nih);  // Copy cropped area from img into canvas
+      ctx.drawImage(cimg,
+                    pt_crop_ul.getTxPt().x,
+                    pt_crop_ul.getTxPt().y,
+                    niw,nih,0,0,niw,nih);  // Copy cropped area from img into canvas
 
-      cimg.src = $imagerCanvas[0].toDataURL();  // Copy canvas image back into img
+      cimg.src = Viewer.$canvas[0].toDataURL();  // Copy canvas image back into img
       calcCanvasDims(niw,nih);                  // Calculate maximum size of canvas
-      $imagerCanvas.attr({width:  cw,            // Make canvas proper size
+      Viewer.$canvas.attr({width:  cw,            // Make canvas proper size
                           height: ch});
       ctx.scale(cw/niw,ch/nih);                 // Scale image to fit canvas
   //  ctx.drawImage(cimg,0,0);                 // Draw image, not necessary, it's already drawn
-      dialogStatus.dialogUpdate();
-      $imagerBusy.hide();
+      Popups.status.dialogUpdate();
+      Popups.$imagerBusy.hide();
     }
+
+    var setCanvasPoints = function setCanvasPoints() {
+      switch (rotation) {
+        case 0:
+          pt_canvas_ul.setPt(0,0);
+          pt_canvas_lr.setPt(cw,ch);
+          break;
+        case 90:
+          pt_canvas_ul.setPt(cw,0);
+          pt_canvas_lr.setPt(0,ch);
+          break;
+        case 180:
+          pt_canvas_ul.setPt(cw,ch);
+          pt_canvas_lr.setPt(0,0);
+          break;
+        case 270:
+          pt_canvas_ul.setPt(0,ch);
+          pt_canvas_lr.setPt(cw,0);
+          break;
+      }
+    }
+
 
     /**
      * Check if panning or zooming is causing image to leave a margin at edges
@@ -1044,60 +531,46 @@
       var npt = {'x': 0, 
                  'y': 0};
       if (localStorage.imagerBoundsEnable === 'FALSE') return undefined;
-      var pw;
+      setCanvasPoints();
+      var msg = '';
+
+/*    var pw;
       var ph;
       switch (rotation) {
         case 0:
-          ptCUlT = ctx.transformedPoint(0,0);
-          ptCLrT = ctx.transformedPoint(cw,ch);
+        case 180:
           pw = iw * cscale;
           ph = ih * cscale;
           break;
         case 90:
-          ptCUlT = ctx.transformedPoint(cw,0);
-          ptCLrT = ctx.transformedPoint(0,ch);
-          pw = ih * cscale;
-          ph = iw * cscale;
-          break;
-        case 180:
-          ptCUlT = ctx.transformedPoint(cw,ch);
-          ptCLrT = ctx.transformedPoint(0,0);
-          pw = iw * cscale;
-          ph = ih * cscale;
-          break;
         case 270:
-          ptCUlT = ctx.transformedPoint(0,ch);
-          ptCLrT = ctx.transformedPoint(cw,0);
           pw = ih * cscale;
           ph = iw * cscale;
           break;
       }
       var msg = '<p>outOfBounds - cw: ' + cw + '  pw: ' + pw + '</p>';
-      msg += '<p>outOfBounds - ch: ' + ch + '  ph: ' + ph + '</p>';
-      var x1 = ptCUlT.x;
-      var y1 = ptCUlT.y;
-      var x2 = iw - ptCLrT.x;
-      var y2 = ih - ptCLrT.y;
+      msg += '<p>outOfBounds - ch: ' + ch + '  ph: ' + ph + '</p>'; */
+
+      var x1 = pt_canvas_ul.getTxPt().x;
+      var y1 = pt_canvas_ul.getTxPt().y;
+      var x2 = iw - pt_canvas_lr.getTxPt().x;
+      var y2 = ih - pt_canvas_lr.getTxPt().y;
       // @todo - When image is smaller than the canvas the image flips back and forth.
-//    if (cw < pw) {   // @todo
-        if (x2 < 0) {
-          msg += '<p>outOfBounds - right:' + x2 + '</p>';
-          npt.x = -x2;
-        }
-//    }
-//    if (ch < ph) {
-        if (y2 < 0) {
-          msg += '<p>outOfBounds - bottom:' + y2 + '</p>';
-          npt.y = -y2;
-        }
-//    }
+      if (x2 < 0) {
+        msg += '<p>outOfBounds - right:' + x2 + '</p>';
+        npt.x = -x2;
+      }
+      if (y2 < 0) {
+        msg += '<p>outOfBounds - bottom:' + y2 + '</p>';
+        npt.y = -y2;
+      }
       if (x1 < 0) {
-        msg += '<p>outOfBounds - left:' + ptCUlT.x + '</p>';
-        npt.x = ptCUlT.x;
+        msg += '<p>outOfBounds - left:' + pt_canvas_ul.getTxPt().x + '</p>';
+        npt.x = pt_canvas_ul.getTxPt().x;
       }
       if (y1 < 0) {
-        msg += '<p>outOfBounds - top:' + ptCUlT.y + '</p>';
-        npt.y = ptCUlT.y;
+        msg += '<p>outOfBounds - top:' + pt_canvas_ul.getTxPt().y + '</p>';
+        npt.y = pt_canvas_ul.getTxPt().y;
       }
       if (msg) {
         $('#imager-messages-content').html(msg);
@@ -1107,64 +580,17 @@
     };
 
 /**
- * Use AJAX to retrieve a rendered file entity and display in a popup dialog.
- */
-    function getInfo() {
-      $imagerBusy.show();
-      ajaxProcess(this,
-                  settings.actions.displayEntity.url,
-                  { action: 'display-entity',
-                    uri: current_image['src']
-                  },function(response) {
-        var status = response['status'];
-        var txt = "";
-        $imagerInfo.removeClass('error').show();
-        if (response['data']) {
-          $('#imager-info-content').html(response['data']);
-          $('.imager-info-edit').click(function (evt) {
-            editField = this.id.replace('imager-','');
-            var clientX = evt.clientX;
-            var clientY = evt.clientY;
-            // Display edit popup - render current field from default edit form  
-            $imagerBusy.show();
-            displayMessage('Contacting Server ... loading form field');
-            ajaxProcess(this,
-                        settings.actions.editFormFieldLoad.url,  
-                        { action: 'edit-form-field-load',
-                          uri: current_image['src'],
-                          field: editField
-                        },function(response) {
-              setViewMode(1);
-              var status = response['status'];
-              var txt = "";
-              if (response['data']) {
-                $('#imager-edit-content').html(response['data']['rendered']);
-                editFieldType = response['data']['type'];
-                if (settings.attachBehaviors) {
-                  settings.attachBehaviors('#imager-edit-content div');
-                }
-              }
-              
-              $imagerEdit.css('left',clientX - $imagerEdit.outerWidth() - 10).css('top',clientY);
-              $imagerEdit.show();
-            });
-          });
-        }
-      });
-    }
-
-/**
 * Use AJAX to get a map showing where the image was taken.
 * 
 * This isn't working yet.  Most likely problem is JavaScript files are not
 * getting loaded through AJAX.  Not sure if this is even possible.
 */
     function getMap() {
-      $imagerBusy.show();
-      ajaxProcess(this,
-                  settings.actions.displayMap.url,
+      Popups.$imagerBusy.show();
+      Drupal.imager.ajaxProcess(this,
+                  Drupal.imager.settings.actions.displayMap.url,
                   { action: 'display-map',
-                    uri: current_image['src']
+                    uri: currentImage['src']
                   },function(response) {
         var status = response['status'];
         var txt = "";
@@ -1181,18 +607,19 @@
   */
     function mouseDown (evt){
       document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-      ptDownC.x = evt.offsetX || (evt.pageX - $imagerCanvas[0].offsetLeft);
+      var x = evt.offsetX || (evt.pageX - Viewer.$canvas[0].offsetLeft);
+      var y;
       // @todo - pageY works intermittently
       //         Seems to be related to the div having css 'position: fixed'
       if (evt.offsetY) {
-        ptDownC.y = evt.offsetY || (evt.pageY - $imagerCanvas[0].offsetTop);
+        y = evt.offsetY || (evt.pageY - Viewer.$canvas[0].offsetTop);
       } else {
-        ptDownC.y = evt.layerY + $imagerCanvas[0].offsetTop;  
+        y = evt.layerY + Viewer.$canvas[0].offsetTop;  
       }
-      ptDownT = ctx.transformedPoint(ptDownC.x,ptDownC.y);
+      pt_down.setPt(x, y);
       dragging = true;
       distance = 0;
-      dialogStatus.dialogUpdate();
+      Popups.status.dialogUpdate({'distance': parseInt(distance)});
     };
 
 /**
@@ -1201,26 +628,30 @@
 * @param {type} evt
 */
     function mouseMove(evt){
-      ptNowC.x = evt.offsetX || (evt.pageX - $imagerCanvas[0].offsetLeft);
+      var x = evt.offsetX || (evt.pageX - Viewer.$canvas[0].offsetLeft);
+      var y;
       if (evt.offsetY) {
-        ptNowC.y = evt.offsetY || (evt.pageY - $imagerCanvas[0].offsetTop);
+        y = evt.offsetY || (evt.pageY - Viewer.$canvas[0].offsetTop);
       } else {
-        ptNowC.y = evt.layerY + $imagerCanvas[0].offsetTop;
+        y = evt.layerY + Viewer.$canvas[0].offsetTop;
       }
-      ptNowT = ctx.transformedPoint(ptNowC.x,ptNowC.y);
+      pt_now.setPt(x,y);
       if (dragging){
-        distance = Math.sqrt((Math.pow(ptDownC.x - ptNowC.x,2)) + (Math.pow(ptDownC.y - ptNowC.y,2)))
+        distance = Math.sqrt((Math.pow(pt_down.getPt().x - pt_now.getPt().x,2)) + 
+                             (Math.pow(pt_down.getPt().y - pt_now.getPt().y,2)));
+        Popups.status.dialogUpdate({'distance': parseInt(distance)});
         ctx.save();
-        ctx.translate(ptNowT.x-ptDownT.x,ptNowT.y-ptDownT.y);
+        ctx.translate(pt_now.getTxPt().x - pt_down.getTxPt().x,
+                      pt_now.getTxPt().y - pt_down.getTxPt().y);
         var npt;   // recommended x and y motions that won't go out of bounds
         npt = outOfBounds();
-        if (npt != undefined) {
+        if (npt !== undefined) {
           ctx.restore();
-          ctx.translate(ptNowT.x-ptDownT.x+npt.x,ptNowT.y-ptDownT.y+npt.y);
+          ctx.translate(pt_now.getTxPt().x - pt_down.getTxPt().x + npt.x,
+                        pt_now.getTxPt().y - pt_down.getTxPt().y + npt.y);
         }
-        redraw();
+        Viewer.redraw();
       }
-      dialogStatus.dialogUpdate();
     }
 
 /**
@@ -1232,6 +663,7 @@
       dragging = false;
       var now = new Date();
       elapsed = now - lastup;
+      Popups.status.dialogUpdate({'elapsed': elapsed*1000/1000000});
       lastup = now;
       if (distance < 20) {       // if mouse didn't move between clicks
         if (evt.ctrlKey) {
@@ -1244,12 +676,12 @@
             } else {
               hidePopups();
             }
-          } else if (viewMode == 0) {
-            setViewMode(1);
+          } else if (viewMode === 0) {
+            Viewer.setViewMode(1);
           }
         }
       }
-      dialogStatus.dialogUpdate();
+      Popups.status.dialogUpdate();
     }
 
 /**
@@ -1268,11 +700,11 @@
 */
     function enablePanZoom() {
       // canvas#image-canvas event handlers
-      $imagerCanvas[0].addEventListener('mousedown',mouseDown,false);
-      $imagerCanvas[0].addEventListener('mousemove',mouseMove,false);
-      $imagerCanvas[0].addEventListener('mouseup',mouseUp,false);
-      $imagerCanvas[0].addEventListener('DOMMouseScroll',mouseWheel,false);
-      $imagerCanvas[0].addEventListener('mousewheel',mouseWheel,false);
+      Viewer.$canvas[0].addEventListener('mousedown',mouseDown,false);
+      Viewer.$canvas[0].addEventListener('mousemove',mouseMove,false);
+      Viewer.$canvas[0].addEventListener('mouseup',mouseUp,false);
+      Viewer.$canvas[0].addEventListener('DOMMouseScroll',mouseWheel,false);
+      Viewer.$canvas[0].addEventListener('mousewheel',mouseWheel,false);
       ias.setOptions({disable: true, hide: true});
     }
 
@@ -1280,11 +712,11 @@
 * Enable events for cropping and disable events for cropping and zooming.
 */
     function enableCrop() {
-      $imagerCanvas[0].removeEventListener('mousedown',mouseDown);
-      $imagerCanvas[0].removeEventListener('mousemove',mouseMove);
-      $imagerCanvas[0].removeEventListener('mouseup',mouseUp);
-      $imagerCanvas[0].removeEventListener('DOMMouseScroll',mouseWheel);
-      $imagerCanvas[0].removeEventListener('mousewheel',mouseWheel);
+      Viewer.$canvas[0].removeEventListener('mousedown',mouseDown);
+      Viewer.$canvas[0].removeEventListener('mousemove',mouseMove);
+      Viewer.$canvas[0].removeEventListener('mouseup',mouseUp);
+      Viewer.$canvas[0].removeEventListener('DOMMouseScroll',mouseWheel);
+      Viewer.$canvas[0].removeEventListener('mousewheel',mouseWheel);
       ias.setOptions({enable: true, 
                       hide: false, 
                       show: true,
@@ -1299,15 +731,15 @@
 * 
 * @param {type} newMode
 */
-    function setViewMode(newMode) {
-      if (fullScreen && newMode == 0) newMode = 1;
+    Viewer.setViewMode = function setViewMode(newMode) {
+      if (fullScreen && newMode === 0) newMode = 1;
       switch (newMode) {
         case 0:   // #mode-view
-          if (viewMode == 2) enablePanZoom();      
+          if (viewMode === 2) enablePanZoom();      
           $('#mode-crop').removeClass('checked');
           break;
         case 1:   // #mode-lock - now mode not #mode-view
-          if (viewMode == 2) enablePanZoom();      
+          if (viewMode === 2) enablePanZoom();      
           $('#mode-crop').removeClass('checked');
           break;
         case 2:   // #mode-crop
@@ -1316,52 +748,17 @@
           break;
       };
       viewMode = newMode;
+      Popups.status.dialogUpdate({'view-mode': viewMode});
     };
 
 /**
 * Save the current image into a second offscreen canvas. 
 */
-    function setInitialImage() {
-      $imagerCanvas2.attr({width:  cw,     // Set image to be full size
-                           height: ch});
+    Viewer.setInitialImage = function setInitialImage() {
+      Viewer.$canvas2.attr({width:  iw,     // Set image to be full size
+                            height: ih});
       ctx2.setTransform(1,0,0,1,0,0);   // Set tranform matrix to identity matrix
-      ctx2.drawImage($imagerCanvas[0],0,0);
-    }
-
-/**
- * Set image editing mode - none, brightness, hsl. 
- * 
- * @param {type} newMode
- */
-    function setEditMode(newMode) {
-      editMode = newMode;
-      switch (editMode) {
-        case 0:   // no editing
-          $('#edit-brightness').removeClass('checked');
-          dialogBrightness.dialogClose();
-          $('#edit-color').removeClass('checked');
-          dialogColor.dialogClose();
-          break;
-        case 1:   // #edit-brightness
-          setInitialImage();
-          setViewMode(1);
-          $('#edit-color').removeClass('checked');
-          dialogColor.dialogClose();
-          $('#edit-brightness').addClass('checked');
-          dialogBrightness.dialogOpen();
-          break;
-        case 2:   // #edit-color
-          $('#slider-hue').val(0);
-          $('#slider-saturation').val(0);
-          $('#slider-lightness').val(0);
-          setInitialImage();
-          setViewMode(1);
-          $('#edit-brightness').removeClass('checked');
-          dialogBrightness.dialogClose();
-          $('#edit-color').addClass('checked');
-          dialogColor.dialogOpen();
-          break;
-      }
+      ctx2.drawImage(Viewer.$canvas[0],0,0);
     }
 
 /**
@@ -1372,17 +769,19 @@
     function setFullScreen(newMode) {
       if (newMode) {
         fullScreen = true;
-        $imagerWrapper.addClass('fullscreen');
+        Popups.status.dialogUpdate({'full-screen': fullScreen});
+        Drupal.imager.$wrapper.addClass('fullscreen');
         $('#mode-fullscreen').addClass('checked');
       } else {
-        $imagerWrapper.removeClass('fullscreen');
+        Drupal.imager.$wrapper.removeClass('fullscreen');
         fullScreen = false;
+        Popups.status.dialogUpdate({'full-screen': fullScreen});
         $('#mode-fullscreen').removeClass('checked');
       }
       setTimeout(function() {
-        setViewMode(1);
+        Viewer.setViewMode(1);
         initializeImage();
-        redraw();
+        Viewer.redraw();
       },250);
     }
 /**
@@ -1392,15 +791,15 @@
     $imagerViewer.show();
     if (localStorage.imagerShowInfo   === "TRUE") {
       $('#view-info').addClass('checked');
-      $imagerInfo.show();
+      Popups.info.dialogOpen();
     }
     if (localStorage.imagerDebugStatus === "TRUE") {
       $('#debug-status').addClass('checked');
-      dialogStatus.dialogOpen();
+      Popups.status.dialogOpen();
     }
     if (localStorage.imagerDebugMessages  === "TRUE") {
       $('#debug-messages').addClass('checked');
-      $imagerMessages.show();
+//    Popups.messages.dialogOpen();
     }
     if (localStorage.imagerShowMap  === "TRUE") {
       $('#view-map').addClass('checked');
@@ -1413,32 +812,34 @@
 */
   function hidePopups() {
     $imagerViewer.hide();
-    $imagerInfo.hide();
+    Popups.info.dialogClose();
     $imagerEdit.hide();
     $imagerMap.hide();
-    dialogStatus.dialogClose();
-    $imagerMessages.hide();
+    Popups.status.dialogClose();
+    Popups.messages.dialogClose();
     $imagerConfirm.hide();
-    setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
-    setEditMode(0);
+    Viewer.setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
+    Viewer.setEditMode('none');
   }
 
 
   function displayMessage(msg) {
-    $imagerMessages.show();
-    $('#imager-messages-content').html(msg);
+    return;
+    if (!Popups.messages.dialogIsOpen()) return;
+    $('#imager-messages-content').append(msg);
     if (localStorage['imagerDebugMessages'] === "FALSE") {
        messageTimeout = setTimeout(function() {
-         $imagerMessages.hide();
+         Popups.messages.dialogClose();
        },5000);
     }
   }
 
     function findImageFromThumbSrc(tsrc) {
+      var i;
       for(i=0; i < nimgs; i++) {
         if (tsrc === imgs[i]['tsrc']) {
-          current_image = imgs[i];
-          return current_image;
+          currentImage = imgs[i];
+          return currentImage;
         }
       }
       return undefined;
@@ -1452,9 +853,10 @@
 * @param {type} offset
 *   Number of images.
 * 
-* @returns {Drupal.behaviors.imager.attach.current_image['src']|String|src}
+* @returns {Drupal.behaviors.imager.attach.currentImage['src']|String|src}
 */
     function findNextImage(current,offset) {
+      var i;
       for(i=0; i < nimgs; i++) {
         if (current === imgs[i]) {
           if (offset === 1) {
@@ -1462,8 +864,8 @@
           } else {
             if (--i === -1) i = nimgs-1;
           }
-          current_image = imgs[i];
-          return current_image;
+          currentImage = imgs[i];
+          return currentImage;
         }
       }
       return undefined;
@@ -1481,7 +883,7 @@
         if (viewMode > 0) return;
         $(this).hide();
         hidePopups();
-        dialogStatus.dialogUpdate();
+        Popups.status.dialogUpdate();
       });
 
       // mouse enters the #imager-viewer div - do nothing
@@ -1494,10 +896,10 @@
         if (viewMode > 0) return false; 
         var el = evt.relatedTarget ? evt.relatedTarget : evt.toElement;
         var el1 = $(el).closest('#imager-info');        // if they went to the info viewer don't leave
-        if (el === $imagerInfo[0] || el1.length) return;
+//      if (el === $imagerInfo[0] || el1.length) return;
 
         hidePopups();
-        dialogStatus.dialogUpdate();
+        Popups.status.dialogUpdate();
       });
 
       
@@ -1509,15 +911,15 @@
     // div#image-buttons event handlers
       // click on #image-left - bring up next image to the left
       $('#image-left').click(function() {
-        setViewMode(1);
-        setEditMode(0);
-        changeImage(findNextImage(current_image,-1));   
+        Viewer.setViewMode(1);
+        Viewer.setEditMode('none');
+        changeImage(findNextImage(currentImage,-1));   
       });
       // click on #image-right - bring up next image to the right
       $('#image-right').click(function() {
-        setViewMode(1);
-        setEditMode(0);
-        changeImage(findNextImage(current_image,1));
+        Viewer.setViewMode(1);
+        Viewer.setEditMode('none');
+        changeImage(findNextImage(currentImage,1));
       });
       // click on #image-exit - Exit the large popup
       $('#image-exit').click(function() {
@@ -1528,18 +930,8 @@
           hidePopups();
         }
       });
-      $('#imager-messages-exit').click(function(evt) {
-        $imagerMessages.hide();
-        $('#debug-messages').removeClass('checked');
-        localStorage['imagerDebugMessages'] = "FALSE";
-      });
-      $('#imager-info-exit').click(function(evt) {
-        $imagerInfo.hide();
-        $imagerEdit.hide();
-        //$imagerEdit.hide();
-        $('#view-info').removeClass('checked');
-        localStorage['imagerShowInfo'] = "FALSE";
-      });
+
+      /*
       $('#imager-edit-exit').click(function(evt)  { $imagerEdit.hide(); });
       $('#imager-edit-apply').click(function(evt) { 
         $imagerEdit.hide(); 
@@ -1612,16 +1004,16 @@
             alert('Unknown editFieldType ' + editFieldType);
             break;
         }
-        $imagerBusy.show();
+        Popups.$imagerBusy.show();
         displayMessage('Saving ...');
-        ajaxProcess(this,
-                    settings.actions.saveFileEntityField.url,
+        Drupal.imager.ajaxProcess(this,
+                    Drupal.imager.settings.actions.saveFileEntityField.url,
                     { action: 'save-file-entity-field',
                       field: editField,
                       fieldType: editFieldType,
                       value: value,
                       format: format,
-                      uri: current_image['src']
+                      uri: currentImage['src']
                     }, function(response) {
                          var status = response['status'];
                          getInfo();
@@ -1638,25 +1030,25 @@
         if (localStorage.quickView === "FALSE") {
           localStorage.quickView = "TRUE";
           $(this).addClass('checked');
-          setViewMode(0);
+          Viewer.setViewMode(0);
         } else {
           localStorage.quickView = "FALSE";
           $(this).removeClass('checked');
-          setViewMode(1);
+          Viewer.setViewMode(1);
         }
-      });
+      }); */
 
 
 
       // click on #mode-crop - set mode to edit=2
       $('#mode-crop').click(function() {
         if (viewMode === 2) {
-          setViewMode(1);
+          Viewer.setViewMode(1);
         } else {
-          setViewMode(2);
-          setEditMode(0);
+          Viewer.setViewMode(2);
+          Viewer.setEditMode('none');
         }
-        dialogStatus.dialogUpdate();
+        Popups.status.dialogUpdate();
       });
 
     // div#view-buttons event handlers
@@ -1665,44 +1057,40 @@
       });
       $('#view-browser').click(function() {
 //      displayMessage('Extracting Image...');
-        $imagerBusy.show();
+        Popups.$imagerBusy.show();
         var img = getImage($('image-cropped').val(),false);
 //      displayMessage('Saving Image...');
-        ajaxProcess(this,
-                    settings.actions.viewBrowser.url,
+        Drupal.imager.ajaxProcess(this,
+                    Drupal.imager.settings.actions.viewBrowser.url,
                     { action: 'view-browser',
-                      uri: current_image['src'],
+                      uri: currentImage['src'],
                       imgBase64: img 
                     }, function (response) {
-                      address = '';
-                      path = response['data']['uri'];
+                      var address = '';
+                      var path = response['data']['uri'];
                       window.open(path,'_blank');
                     });
       });
       $('#view-zoom-fit').click(function() {
-        ptNowC.x = ptDownC.x;
-        ptNowC.y = ptDownC.y;
+        pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y);
         zoom(0);
       });
       $('#view-zoom-1').click(function() {
-        ptNowC.x = ptDownC.x;
-        ptNowC.y = ptDownC.y;
+        pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y);
         zoom(0);
       });
       $('#view-zoom-in').click(function() {
-        ptNowC.x = ptDownC.x;
-        ptNowC.y = ptDownC.y;
+        pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y);
         zoom(1);
       });
       $('#view-zoom-out').click(function() {
-        ptNowC.x = ptDownC.x;
-        ptNowC.y = ptDownC.y;
+        pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y);
         zoom(-1);
       });
       $('#mode-fullscreen').click(function() {
         if (screenfull.enabled) {
           // We can use `this` since we want the clicked element
-          screenfull.toggle($imagerWrapper[0]);
+          screenfull.toggle(Drupal.imager.$wrapper[0]);
           if (fullScreen) {
             setFullScreen(false);
           } else {
@@ -1714,22 +1102,8 @@
       document.addEventListener(screenfull.raw.fullscreenchange, function () {
         setFullScreen(screenfull.isFullscreen);
         initializeImage();
-        redraw();
-        setViewMode(1);
-      });
-
-      $('#view-info').click(function() {
-        if (localStorage.imagerShowInfo === "FALSE") {
-          localStorage.imagerShowInfo = "TRUE";
-          $(this).addClass('checked');
-          getInfo();
-        } else {
-          localStorage.imagerShowInfo = "FALSE";
-          $(this).removeClass('checked');
-          $imagerInfo.hide();
-          $imagerEdit.hide();
-          //$imagerEdit.hide();
-        }
+        Viewer.redraw();
+        Viewer.setViewMode(1);
       });
 
       $('#view-map').click(function() {
@@ -1743,137 +1117,61 @@
           $imagerMap.hide();
         }
       });
-      $('#imager-map-exit').click(function(evt) {
-        $imagerMap.hide();
-        $('#view-map').removeClass('checked');
-        localStorage['imagerShowMap'] = "FALSE";
-      });
+
     // div#edit-buttons click event handlers
       // Rotatthumb
-      $('#edit-ccw').click(function()          { rotate(-90); });
-      $('#edit-cw').click(function()           { rotate(90); });
+      $('#edit-ccw').click(function()          { Viewer.setEditMode('none');
+                                                 rotate(-90); });
+      $('#edit-cw').click(function()           { Viewer.setEditMode('none');
+                                                 rotate(90); });
       // Crop
       $('#edit-crop').click(crop);
-      $('#view-reset').click(function(evt)     { 
-         changeImage(current_image); 
-      });
-
-    // div#file-buttons click event handlers
-      function initFileSave(saveMode,saveTitle,filename,message) {
-        fileSaveMode = saveMode;
-        $('#imager-filesave-email').hide();
-        $('#imager-filesave-clipboard').hide();
-        $('#imager-filesave-download').hide();
-        $('#imager-filesave-new').hide();
-        $('#imager-filesave-overwrite').hide();
-        $('#imager-filesave-filename-container').hide();
-        switch (saveMode) {
-          case 'database':
-            $('#imager-filesave-new').show();
-            $('#imager-filesave-overwrite').show();
-            $('#imager-filesave-filename-container').show();
-            break;
-          case 'email':
-            $('#imager-filesave-email').show();
-            $('#imager-filesave-filename-container').show();
-            break;
-          case 'clipboard':
-            $('#imager-filesave-clipboard').show();
-            break;
-          case 'download':
-            $('#imager-filesave-download').show();
-            $('#imager-filesave-filename-container').show();
-            break;
-        }
-        setViewMode(1);
-        $('#imager-filesave-title').text(saveTitle);
-        $('#imager-filesave-filename').val(filename);
-        $('#imager-filesave-messages').html("<p>" + message + "</p>");
-        $('#canvas-resolution').html(cw + 'x' + ch);
-        $('#image-display-resolution').html(parseInt(ptCLrT.x - ptCUlT.x) + 'x' + parseInt(ptCLrT.y - ptCUlT.y));
-        $('#image-full-resolution').html(iw + 'x' + ih);
-        $('#scale').html(parseInt(cscale * 100) / 100);
-        $imagerFilesave.show();
-      };
-
-    // click on save to database
-      $('#file-database').click(function () {
-        initFileSave('database',"Save image to database",decodeURIComponent(current_image['src']).replace(/^.*\/files\//),'');
-      });
-
-    // click on download
-      $('#file-download').click(function () {
-        initFileSave('download',"Download image to local file system",decodeURIComponent(current_image['src'].split('/').reverse()[0]),
-                     'The download feature is under development.<br>It does not work in all browsers and is intermittent.');
-      });
-
-      $('#file-email').click(function () {
-        initFileSave('email',"Email image",decodeURIComponent(current_image['src'].split('/').reverse()[0]),
-                     'Email Image to somewhere');
-      });
-
-      $('#file-clipboard').click(function () {
-        initFileSave('clipboard','Send image to clipboard','image.png',
-                     'The clipboard feature is under development.<br>It does not work in all browsers.');
-      });
-
-      $('#imager-filesave-new').click(function () {
-        saveFile(false);
-      });
-      $('#imager-filesave-overwrite').click(function () {
-        saveFile(true);
-      });
-      $('#imager-filesave-download').click(function () {
-        saveFile(false);
-      });
-      $('#imager-filesave-clipboard').click(function () {
-        $imagerCanvas.select();
-        displayMessage('Sending the image to the clipboard is under construction');
-      });
-      $('#imager-filesave-email').click(function () {
-        saveFile(false);
-        $imagerBusy.hide();
-        $imagerFilesave.hide();
-      });
-      $('#imager-filesave-cancel').click(function () {
-        $imagerFilesave.hide();
-        redraw();
-      });
-      $('#file-delete').click(function () {
-        confirmMode = 'deleteFile';
-        $('#imager-confirm-content').html('<h4>Are you sure you want to permanently delete this image?</h4>');
-        $imagerConfirm.show();
-      });
-
-      $('#imager-confirm-apply').click(function () {
-        switch (confirmMode) {
-          case 'deleteFile': 
-            deleteFile();
-            hidePopups();
-            break;
-        }
-      });
-      $('#imager-confirm-exit').click(function () {
-        $imagerConfirm.hide();
-      });
+      $('#view-reset').click(function(evt)     { changeImage(currentImage); });
     }   // function initEvents()
+
+    function initDialog(name, buttonId) {
+      if (buttonId) {
+        var $button = $(buttonId);
+        if ($button) {
+          var popup = Popups[name + 'C']({ '$selectButton': $button });
+          Popups[name] = popup;
+          $button.click(function() { 
+            popup.dialogToggle(); 
+          });
+        }
+      }
+      else {
+        var popup = Popups[name + 'C']({ '$selectButton': undefined });
+        Popups[name] = popup;
+      }
+    }
+
+    function initDialogs() {
+      initDialog('color',              '#edit-color');
+      initDialog('brightness',         '#edit-brightness');
+      initDialog('config',             '#mode-configure');
+      initDialog('info',               '#view-info');
+      initDialog('status',              undefined);
+      initDialog('messages',            undefined);
+      initDialog('filesave_database',  '#file-database');
+    };
 
 
     function initThumbEvents() {
-      $imgs = [];
+      imgs = [];
       nimgs = 0;
 
-      $thumbnails   = $(settings.cssContainer);
-      if ($thumbnails.length == 0) return; // No thumbnails found, exit 
+      $thumbnails   = $(Drupal.imager.settings.cssContainer);
+      if ($thumbnails.length === 0) return; // No thumbnails found, exit 
       
       $thumbnails.each(function(index,value) {
         // Add image to imgs array
-        var $thumb = $(this).find(settings.cssImage);
+        var $thumb = $(this).find(Drupal.imager.settings.cssImage);
         imgs[nimgs] = {};
         imgs[nimgs]['container'] = $(this);
         imgs[nimgs]['thumb'] = $thumb;
         imgs[nimgs]['tsrc'] = $thumb.attr('src');
-        imgs[nimgs]['src'] = getFullPath($thumb.attr('src'))
+        imgs[nimgs]['src'] = getFullPath($thumb.attr('src'));
         nimgs++;
 
         // Unbind any current event handlers on thumbnails
@@ -1881,12 +1179,12 @@
 
         // User clicks in thumbnail image
         $thumb.click(function(evt) {
-          current_image = findImageFromThumbSrc($thumb.attr('src'));
-          if (viewMode == 1) {   // if the viewer is locked, select this image
-            changeImage(current_image);
+          currentImage = findImageFromThumbSrc($thumb.attr('src'));
+          if (viewMode === 1) {   // if the viewer is locked, select this image
+            changeImage(currentImage);
           } else {               // if the viewer is not locked, then lock it?
-            setViewMode(1);
-            dialogStatus.dialogUpdate();
+            Viewer.setViewMode(1);
+            Popups.status.dialogUpdate();
           }
           evt.stopPropagation();
           return false;
@@ -1900,9 +1198,9 @@
   /*      $(this).hoverIntent({   // hoverIntent requires at least jQuery 1.7
           over: function(evt) {
             if (viewMode > 0) return false;
-            current_image['src'] = getFullPath(this);
-            setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
-            changeImage(current_image['src']);
+            currentImage['src'] = getFullPath(this);
+            Viewer.setViewMode((localStorage.quickView === "TRUE") ? 0 : 1);
+            changeImage(currentImage['src']);
           },
           out: function(evt) {
             if (viewMode > 0) return false;
@@ -1923,7 +1221,7 @@
     //        console.debug("image mouseleave image has focus");
             } else {
               hidePopups();
-              dialogStatus.dialogUpdate();
+              Popups.status.dialogUpdate();
     //        console.debug("image mouseleave image doesn't have focus ");
             }
           },
@@ -1940,9 +1238,8 @@
  * and the next two path components.
  * Otherwise look for the parent element to be a link to the full image.
  *
- * @param {type} thumbnail
- * 
- * @returns path to full image
+ * @param {type} tsrc
+ * @returns {unresolved}
  */
     function getFullPath(tsrc) {
       var src;
@@ -1954,7 +1251,7 @@
         var slashes = 0;
         while (slashes < 3) {
            index++;
-           if (tsrc.charAt(index) == '/') { 
+           if (tsrc.charAt(index) === '/') { 
              slashes++;
            }
         }
@@ -1969,195 +1266,6 @@
       }
       return src;
     }
-
-/**
- * Create a Data URI from the current image. 
- * 
- * @param {boolean} stream
- * 
- * @returns {Data URI - image is embedded}
- */
-    function getImage(stream) {
-      var img;
-      var pt;
-      var mimeType = "";
-      if (current_image['src'].match(/\.png$/i)) {
-        mimeType = "image/png";
-      } else if (current_image['src'].match(/\.jpe*g$/i)){
-        mimeType = "image/jpeg";
-      }
-      switch (imageResMode = $('input[name="resolution"]:checked').val()) {
-        case 'screen':
-          img = $imagerCanvas[0].toDataURL(mimeType);
-          break;
-        case 'image-cropped':
-          ctx2.setTransform(1,0,0,1,0,0);
-          var ncw;
-          var nch;
-          if (rotation == 0 || rotation == 180) {
-            ncw = Math.abs(ptCLrT.x-ptCUlT.x),
-            nch = Math.abs(ptCLrT.y-ptCUlT.y),
-            $imagerCanvas2.attr({width:  ncw,      // Set canvas to same size as image
-                                 height: nch});
-            if (rotation == 0)  {
-//            ctx2.rotate(angleInRadians(rotation));
-              pt = ctx.transformedPoint(0,0);
-              ctx2.drawImage(cimg,-pt.x,
-                                  -pt.y);
-
-            } else { // rotation == 180
-              ctx2.translate(ncw,nch);
-              ctx2.rotate(angleInRadians(rotation));
-              pt = ctx.transformedPoint(cw,ch);
-              ctx2.drawImage(cimg,-pt.x,
-                                  -pt.y);
-            }
-          } else {
-            ncw = Math.abs(ptCLrT.y-ptCUlT.y),
-            nch = Math.abs(ptCLrT.x-ptCUlT.x),
-            $imagerCanvas2.attr({width:  ncw,      // Set canvas to same size as image
-                                 height: nch});
-            if (rotation == 90) {
-              ctx2.translate(ncw,0);
-              ctx2.rotate(angleInRadians(rotation));
-              pt = ctx.transformedPoint(cw,0);   // Find Upper left corner of canvas in original image
-              ctx2.drawImage(cimg,-pt.x,   // parseInt(pt1.x),
-                                  -pt.y);  // parseInt(pt2.y),
-            } else {
-              ctx2.translate(0,nch);
-              ctx2.rotate(angleInRadians(rotation));
-              pt = ctx.transformedPoint(0,ch);   // Find Upper left corner of canvas in original image
-              ctx2.drawImage(cimg,-pt.x,
-                                  -pt.y);
-            }
-          }
-          img = $imagerCanvas2[0].toDataURL(mimeType);
-          break;
-        case 'image-full':
-          var tcw;
-          var tch;
-          ctx2.setTransform(1,0,0,1,0,0);
-          if (rotation == 0 || rotation == 180) {
-            tcw = iw;
-            tch = ih
-            $imagerCanvas2.attr({width:  tcw,      // Set canvas to same size as image
-                                 height: tch});
-            if (rotation == 180)  {
-              ctx2.translate(iw,ih);
-            }
-          } else {
-            tcw = ih;
-            tch = iw
-            $imagerCanvas2.attr({width:  tcw,      // Set canvas to same size as image
-                                 height: tch});
-            if (rotation == 90) {
-              ctx2.translate(ih,0);
-            } else {
-              ctx2.translate(0,iw);
-            }
-          }
-          ctx2.rotate(angleInRadians(rotation));
-          ctx2.drawImage(cimg,0,0);                 // Copy full image into canvas
-          img = $imagerCanvas2[0].toDataURL(mimeType);
-          break;
-      }
-      if (stream) {
-        img.replace(mimeType, "image/octet-stream");
-      }
-      return img;
-    };
-
-    function saveFile(overwrite) {
-      displayMessage('Extracting Image...');
-      $imagerBusy.show();
-      var img = getImage($('input[name="resolution"]:checked').val(),false);
-      displayMessage('Saving Image...');
-      switch (fileSaveMode) {
-        case 'database':
-          ajaxProcess(this,
-            settings.actions.saveFile.url,
-            { overwrite: overwrite,
-              action: 'save-file',
-              saveMode: fileSaveMode,
-              uri: current_image['src'],
-              imgBase64: img 
-            }, function (response) {
-              if (response['file_new']) {
-                current_image['container'].after(response['file_new']);
-                // @TODO The two unwrap are hardcoded to remove two extra divs.  
-                // Can this be done in PHP when it is rendered.
-                // Maybe a Views tpl.php file.
-                var $row = current_image['container'].next().find(settings.cssContainer);
-                $row.unwrap().unwrap();
-              }
-              if (response['file_old']) {
-                current_image['container'].html(response['file_old']);
-                // @TODO - The following code is ugly, 
-                // Views wraps a couple extra divs around the output.
-                // The following code removes those divs so just 
-                // .views-row remains and everything below it remains.
-                var $row = current_image['container'].find(settings.cssContainer).child();
-                while (current_image['container'][0] != $row.parent()[0]) {
-                  $row.unwrap();
-                }
-              }
-              Drupal.attachBehaviors($row);
-            }
-          );
-          break;
-        case 'email':
-          ajaxProcess(this,
-            settings.actions.emailFile.url,
-            { action: 'email',
-              saveMode: fileSaveMode,
-              uri: current_image['src'],
-              imgBase64: img 
-            }, function (response) {
-              address = '';
-              path = response['data']['attachPath'];
-              body = response['data']['body'];
-              subject = response['data']['subject'];
-              var mailto_link = 'mailto:' + address + 
-                                '?subject=' + encodeURIComponent(subject) + 
-                                '&body=' + body +
-                                '&attachment=' + path;
-
-              window.location.href = mailto_link;
-            }
-          );
-          break;
-        case 'clipboard':
-          ajaxProcess(this,
-            settings.actions.clipboard.url,
-            { overwrite: overwrite,
-              action: 'clipboard',
-              saveMode: fileSaveMode,
-              uri: current_image['src'],
-              imgBase64: img 
-            }
-          );
-          break;
-        case 'download':
-          $('#imager-filesave-download')
-            .attr({ 'href': img,
-                    'download': $('#imager-filesave-filename').val()
-                 });
-          break;
-      }
-      $imagerBusy.hide();
-      $imagerFilesave.hide();
-    };
-
-    function deleteFile() {
-      displayMessage('Deleting Image...');
-      ajaxProcess(this,
-        settings.actions.deleteFile.url,
-        { action: 'delete-file',
-          uri: current_image['src']
-        }
-      );
-    }
-
 
 /**
 * Track the history of transforms done to this image.
@@ -2181,11 +1289,11 @@
         return restore.call(ctx);
       };
 
-      pt  = svg.createSVGPoint();
+      var pt  = svg.createSVGPoint();
       ctx.transformedPoint = function(x,y){
         pt.x=x; pt.y=y;
         return pt.matrixTransform(xform.inverse());
-      }
+      };
 
       var scale = ctx.scale;
       ctx.scale = function(sx,sy){
@@ -2226,22 +1334,25 @@
     };   // trackTransforms
 
 /**
-* Process all AJAX requests.
-* 
-* @todo Drupal probably has an API for this.
-* 
-* @param {type} postData
-* @param {type} processFunc
-*/
-    function ajaxProcess($callingElement, url, postData, processFunc) {
-      postData['filePath']   = settings.filePath;
+ * Process all AJAX requests.
+ * 
+ * @todo Drupal probably has an API for this.
+ * 
+ * @param {type} $callingElement
+ * @param {type} url
+ * @param {type} postData
+ * @param {type} processFunc
+ * @returns {undefined}
+ */
+    Drupal.imager.ajaxProcess = function($callingElement, url, postData, processFunc) {
+      postData['filePath']   = Drupal.imager.settings.filePath;
       $.ajax({
         type: "POST",
         url:   url, 
         data: postData, 
         success: function (response_json) {
           clearTimeout(messageTimeout);
-          $imagerBusy.hide();
+          Popups.$imagerBusy.hide();
           var response = JSON.parse(response_json);
           var display = false;
           var out = [];
@@ -2257,35 +1368,35 @@
           }
 
           if (display) {
-            $imagerMessages.show();
+            Popups.messages.dialogOpen();
             $('#imager-messages-content').html(out);
           }
           if (processFunc) processFunc.call($callingElement,response);   // Execute users function
           if (localStorage['imagerDebugMessages'] === "FALSE") {
             setTimeout(function() {
-              $imagerMessages.hide();
+              Popups.messages.dialogClose();
             },3000);
           }
         },
         error: function(evt) {
-          $imagerBusy.hide();
+          Popups.$imagerBusy.hide();
           clearTimeout(messageTimeout);
-          $imagerMessages.show();
+          Popups.messages.dialogOpen();
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText + 
                                              '<br>Action: ' + postData.action + '</p>');
           if (processFunc) processFunc(response,evt);   // Execute users error function
           if (localStorage['imagerDebugMessages'] === "FALSE") {
             setTimeout(function() {
-              $imagerMessages.hide();
+            Popups.messages.dialogClose();
             },10000);
           }
-        },
+        }
       });
     }; // ajaxProcess()
 
     return {
       init:   _init,
-      attach: _attach,
+      attach: _attach
     };
   };
 })(jQuery);

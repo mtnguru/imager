@@ -10,8 +10,7 @@
  *
  * Given the URI of an image file, determine the FID, load the file_entity,
  * add edit buttons (images) to editable fields in render array,
- * render..enables users so users can edit the file_entity fields, render it and return
- *
+ * render it, encode into json and print it
  */
 function imager_display_entity() {
 //dpm($_POST, 'imager_display_entity - $_POST');
@@ -277,7 +276,6 @@ function imager_email_file() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
-  $slash = '/';
   $uri = urldecode(check_plain($_POST['uri']));
 //$out['debug'] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
   $ps = _imager_get_paths($uri);
@@ -291,14 +289,21 @@ function imager_email_file() {
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
 
-  $out['data']['attachPath'] = variable_get('imager_email_attach_linux') . $slash . 
-                               $ps[filename] . '.' . $ps[suffix];
+  if (strstr($_SERVER['HTTP_USER_AGENT'],'inux')) {
+    $out['data']['attachPath'] = variable_get('imager_email_attach_linux') . '/' . 
+                                 $ps[filename] . '.' . $ps[suffix];
+  }
+  else {  // Assume Windows
+    $out['data']['attachPath'] = variable_get('imager_email_attach_windows') . '\\' . 
+                                 $ps[filename] . '.' . $ps[suffix];
+  }
   $view = file_view($file, variable_get('imager_email_view_mode'));
   unset($view['links']);
   unset($view['#contextual_links']);
   unset($view['#pre_render']);
   unset($view['file']);
   $out['data']['body'] = drupal_html_to_text(drupal_render($view));
+//$out['data']['body'] = drupal_render($view);
   $out['data']['subject'] = "Dairy Specialists - photo - $ps[filename]";
   print json_encode($out);
 }
@@ -324,6 +329,7 @@ function imager_view_browser() {
   $tmp_path = '/tmp/' . $ps[filename] . '.' . $ps[suffix];
   $html_path = $dir . '/file.html';
   $image_path = $dir . '/image.jpg';
+  // @TODO The following paths need to be unique.
   $html_uri  = $GLOBALS['base_url'] . '/tmp/file.html';
   $image_uri = $GLOBALS['base_url'] . '/tmp/image.jpg';
 
@@ -454,7 +460,7 @@ function imager_save_file_entity_field() {
  * Retrieve the rendered content of a dialog
  */
 function imager_render_dialog() {
-  module_load_include('inc', 'imager', 'imager.pages');
+  module_load_include('inc', 'imager', 'imager.popups');
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
   $dialog_name = check_plain($_POST['dialogName']);

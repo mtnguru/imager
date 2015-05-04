@@ -26,6 +26,7 @@
  * @global type $_imager_path
  *   Path to imager module.
  * 
+ * 
  * @param type $page
  *   Render array for page.
  */
@@ -41,9 +42,17 @@ function _imagerBuildWrapper(&$page) {
         array('system', 'ui.draggable'),
       ),
       'js' => array(
-        $_imager_path . '/js/hoverintent.js',
-        $_imager_path . '/js/jquery.imgareaselect.min.js',
-        $_imager_path . '/js/screenfull.js',
+        $_imager_path . '/js/vendor/hoverintent.js',
+        $_imager_path . '/js/vendor/jquery.imgareaselect.min.js',
+        $_imager_path . '/js/vendor/screenfull.js',
+        $_imager_path . '/js/popups/imager.base.js',
+        $_imager_path . '/js/popups/imager.config.js',
+        $_imager_path . '/js/popups/imager.filesave.js',
+        $_imager_path . '/js/popups/imager.info.js',
+        $_imager_path . '/js/popups/imager.color.js',
+        $_imager_path . '/js/popups/imager.brightness.js',
+        $_imager_path . '/js/popups/imager.status.js',
+        $_imager_path . '/js/popups/imager.messages.js',
         $_imager_path . '/js/imager.js',
         $_imager_path . '/js/imager.drupal.js',
         array(
@@ -66,11 +75,11 @@ function _imagerBuildWrapper(&$page) {
     'viewer'     => _imagerBuildViewer(),
 //  'brightness' => _imagerBuildBrightness(),
 //  'color'      => _imagerBuildColor(),
-    'filesave'   => _imagerBuildFilesave(),
+//  'filesave'   => _imagerBuildFilesave(),
 //  'status'     => _imagerBuildStatus(),
-    'info'       => _imagerBuildInfo(),
+//  'info'       => _imagerBuildInfo(),
     'edit'       => _imagerBuildEdit(),
-    'messages'   => _imagerBuildMessages(),
+//  'messages'   => _imagerBuildMessages(),
     'canvasorg'  => _imagerBuildCanvas(),
     'busy'       => _imagerBuildBusy(),
 //  'map'        => _imagerBuildMap(),
@@ -119,15 +128,13 @@ function theme_imager_add_button($variables) {
   if ($element['#wraplink']) {
     $out = '<a href="#" id="' . $element['#id'] . '">' .
              '<img ' .
-             'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
-//           'class="imager-filesave-button" ' .
-             'alt="" title="' . $element['#title'] . '" />' . 
+               'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
+               'alt="" title="' . $element['#title'] . '" />' . 
            '</a>';
   }
   else {
     $out = '<img id="' . $element['#id'] . '" ' .
-           'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
-//         'class="imager-filesave-button" ' .
+             'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
            'alt="" title="' . $element['#title'] . '">'; 
   }
   return $out;
@@ -211,7 +218,7 @@ function _imagerBuildViewer() {
         'edit_color' => _imagerBuildButton(4, 'edit-color', 'color_wheel.png', t('Edit Hue, Saturation and Lightness')),
         'edit_ccw' => _imagerBuildButton(5, 'edit-ccw', 'rotate-left.png', t('Rotate image 90 degrees counter-clockwise')),
         'edit_cw' => _imagerBuildButton(6, 'edit-cw', 'rotate-right.png', t('Rotate image 90 degrees clockwise')),
-        // 'edit-reset' does not work.  It must be used by another program
+     // 'edit-reset' does not work.  It must be used by another program
         'view_reset' => _imagerBuildButton(7, 'view-reset', 'reset.png', t('Reset the image back to the original')),
       ),
       'file_buttons' => array(
@@ -289,13 +296,6 @@ function _imagerBuildBrightness() {
         ),
       ),
     ),
-    'buttons' => array(
-      '#prefix' => '<div id="imager-brightness-buttons" class="imager-buttons">',
-      '#suffix' => '</div>',
-      'apply' => _imagerBuildButton(1, 'brightness-apply', 'checkmark.png', t('Apply changes and exit')),
-      'reset' => _imagerBuildButton(2, 'brightness-reset', 'reset.png', t('Reset brightness and contrast')),
-      'cancel' => _imagerBuildButton(3, 'brightness-cancel', 'redx.png', t('Exit without applying changes')),
-    ),
   );
 }
 
@@ -354,10 +354,6 @@ function _imagerBuildFilesave() {
     'content' => array(
       '#prefix' => '<div id="imager-filesave-content" class="imager-content">',
       '#suffix' => '</div>',
-      'title' => array(
-        '#weight' => 1,
-        '#markup' => t('<h2 id="imager-filesave-title">' . t('bogus') . '</h2>'),
-      ),
       'messages' => array(
         '#weight' => 2,
         '#prefix' => '<div id="imager-filesave-messages">',
@@ -371,19 +367,6 @@ function _imagerBuildFilesave() {
         '#markup' => "<div>" . t('File name:') . "</div><input id='imager-filesave-filename' type='text' />",
       ),
       'table' => _imagerBuildResTable(4),
-    ),
-    'buttons' => array(
-      '#prefix' => '<div id="imager-filesave-buttons" class="imager-buttons">',
-      '#suffix' => '</div>',
-      'clipboard' => _imagerBuildButton(2, 'imager-filesave-clipboard', 'clipboard.png', t('Send image to clipboard and exit')),
-      'file_download' => array(
-        '#weight' => 3,
-        'image' => _imagerBuildButton(3, 'imager-filesave-download', 'download.png', t('Download image to local file system'), true),
-      ),
-      'email' => _imagerBuildButton(4, 'imager-filesave-email', 'mail.png', t('Email image using default email client')),
-      'new' => _imagerBuildButton(4, 'imager-filesave-new', 'database_add.png', t('Create new database entry and exit')),
-      'overwrite' => _imagerBuildButton(5, 'imager-filesave-overwrite', 'database_go.png', t('Overwrite existing database entry')),
-      'cancel' => _imagerBuildButton(6, 'imager-filesave-cancel', 'redx.png', t('Cancel saving file')),
     ),
   );
 }
@@ -401,7 +384,7 @@ function _imagerBuildResTable($weight) {
     '#attributes' => array('class' => 'table-no-striping'),
     '#theme' => 'table',
     '#header' => array(
-//          t(' '),      // @todo Uncommenting these lines causes PHP error.
+//          t('d'),      // @todo Uncommenting these lines causes PHP error.
 //          t('Image'),
 //          t('Resolution'),
 //          t('Geometry'),
@@ -450,11 +433,110 @@ function _imagerBuildStatus() {
     '#prefix' => '<div id="imager-status">',
     '#suffix' => '</div>',
     'content' => array(
-      '#prefix' => '<div id="imager-status-content" class="imager-content">',
-      '#suffix' => '</div>',
+      '#attributes' => array('id' => array('imager-status-content')),
       '#weight' => 1,
-      '#type' => 'markup',
-      '#markup' => 'Placeholder for status popup',
+      '#type' => 'container',
+      'col_left' => array(
+        '#type' => 'container',
+        '#attributes' => array('class' => array('imager-status-col')),
+        'table_general' => array(
+          '#type' => 'table',
+          '#theme' => 'table',
+          '#header' => array(
+            t('Name'),
+            t('Value'),
+          ),
+          '#rows' => array(
+            array( 'View Mode',   
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-view-mode')),
+            array( 'Edit Mode',   
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-edit-mode')),
+            array( 'Full Screen', 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-full-screen')),
+            array( 'Distance',    
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-distance')),
+            array( 'Elapsed',     
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-elapsed')),
+            array( 'Zoom',        
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-zoom')),
+            array( 'Rotation',    
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-rotation')),
+            array( 'Brightness',  
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-brightness')),
+            array( 'Contrast',    
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-contrast')),
+            array( 'Hue',         
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-hue')),
+            array( 'Saturation',  
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-saturation')),
+            array( 'Lightness',   
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-lightness')),
+          ),
+        ),
+      ),
+      'col_right' => array(
+        '#type' => 'container',
+        '#attributes' => array('class' => array('imager-status-col')),
+        'table_geometries' => array(
+          '#type' => 'table',
+          '#theme' => 'table',
+          '#header' => array(
+            t('Name'),
+            t('Width'),
+            t('Value'),
+          ),
+          '#rows' => array(
+            array( 'Maximum Canvas',  
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-max-canvas-width'), 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-max-canvas-height')),
+            array( 'Actual Canvas',   
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-actual-canvas-width'), 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-actual-canvas-height')),
+            array( 'Displayed Image', 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-disp-image-width'), 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-disp-image-height')),
+            array( 'Full Image',      
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-full-image-width'), 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-full-image-height')),
+          ),
+        ),
+        'table_points' => array(
+          '#type' => 'table',
+          '#title' => 'Points',
+          '#theme' => 'table',
+          '#header' => array(
+            t('Name'),
+            t('X'),
+            t('Y'),
+          ),
+          '#rows' => array(
+            array( 'Mouse Now',          
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-now-x'),          
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-now-y')),
+            array( 'Mouse Now Tx',       
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-now-x-tx'),        
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-now-y-tx')),
+            array( 'Mouse Down',         
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-down-x'),         
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-down-y')),
+            array( 'Mouse Down Tx',      
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-down-x-tx'),       
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-down-y-tx')),
+            array( 'Crop Upper Left',         
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-crop-ul-x'),         
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-crop-ul-y')),
+            array( 'Crop Lower Right',      
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-crop-lr-x'),       
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-crop-lr-y')),
+            array( 'Upper Left Canvas',  
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-canvas-ul-x'),  
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-canvas-ul-y')),
+            array( 'Lower Right Canvas', 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-canvas-lr-x'), 
+                   array('data' => '', 'class' => 'imager-text-right', 'id' => 'imager-status-canvas-lr-y')),
+          ),
+        ),
+      ),
     ),
   );
 }
@@ -525,11 +607,6 @@ function _imagerBuildMessages() {
       '#weight' => 1,
       '#type' => 'markup',
       '#markup' => t('Placeholder for messages popup'),
-    ),
-    'buttons' => array(
-      '#prefix' => '<div id="imager-filesave-buttons" class="imager-buttons">',
-      '#suffix' => '</div>',
-      'exit' => _imagerBuildButton(2, 'imager-messages-exit', 'redx.png', t('Exit Messages dialog')),
     ),
   );
 }
