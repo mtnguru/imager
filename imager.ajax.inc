@@ -33,19 +33,20 @@ function imager_display_entity() {
 
   $out['data'] = drupal_render($view);
   print json_encode($out);
-};
+}
+
+;
 
 /**
  * Ajax handler to render a Google map showing image location
  *
- * Doesn't work, JavaScript files aren't loaded
+ * Does not work, JavaScript files are not loaded
  *
  */
 function imager_display_map() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
-  $icon_path = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'imager') . '/icons';
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
@@ -54,7 +55,9 @@ function imager_display_map() {
   $view = file_view($file, $view_mode);
   $out['data'] = drupal_render($view);
   print json_encode($out);
-};
+}
+
+;
 
 /**
  * Ajax handler to load and render the file_entity_edit form
@@ -68,9 +71,9 @@ function imager_edit_form_load() {
   $uri = urldecode(check_plain($_POST['uri']));
   $cmp = _imager_extract_path_components($uri);
   $puri = "public://$cmp[dir]$cmp[filename].$cmp[suffix]";
+
 //$out['debug'] .= "uri: " . $uri . "<br>\n";
 //$out['debug'] .= "public uri: " . $puri . "<br>\n";
-
   $fid = _imager_get_fid($puri);
 //$out['debug'] .= "fid: " . $fid . "<br>\n";
   $file = file_load($fid);
@@ -86,8 +89,8 @@ function imager_edit_form_load() {
  *
  * @todo This is a kludge, look for a property or API that can return the #type
  *
- * @param type $elem
- * @param type $level
+ * @param array $elem
+ * @param int $level
  *   Used for debugging by printing a hierarchical output while searching
  *
  * @return string
@@ -104,7 +107,6 @@ function _imager_get_field_type($elem, $level) {
       }
     }
     elseif (is_object($value)) {
-
     }
     else {
       if ($key === '#type') {
@@ -121,6 +123,7 @@ function _imager_get_field_type($elem, $level) {
             if ($elem['value']['#type'] === 'textarea') {
               return 'textarea';
             }
+            break;
           default:
             break;
         }
@@ -135,8 +138,6 @@ function _imager_get_field_type($elem, $level) {
  *
  * The URI of the current image is used to determine the file_entity FID.
  * Load the file_entity and use that to initialize the form field
- *
- * @param type $uri
  */
 function imager_edit_form_field_load() {
   module_load_include('inc', 'file_entity', 'file_entity.pages');
@@ -148,19 +149,19 @@ function imager_edit_form_field_load() {
   $file = file_load($fid);
 
   $field_name = preg_replace('/\-/', '_', check_plain($_POST['field']));
-  $file_type = file_type_load('image');
   $form_id = 'file_entity_edit';
   $form = drupal_get_form($form_id, $file);
   $field = $form[$field_name];
   $out['data']['rendered'] = drupal_render($field);
-  $out['data']['type'] .= _imager_get_field_type($field, 1);
+  $out['data']['type'] = _imager_get_field_type($field[LANGUAGE_NONE][0], 1);
 //$out['debug'] .= '#type: ' . $out['data']['type'];
   print json_encode($out);
 }
 
 /**
+ * Write POSTed image to file path.
  *
- * @param type $path
+ * @param string $path
  */
 function _imager_write_image($path) {
   $filtered_data = explode(',', check_plain($_POST['imgBase64']));
@@ -169,21 +170,23 @@ function _imager_write_image($path) {
   fclose($fp);
 }
 
+
 /**
- *
- * @param type $spath
- * @param type $dpath
+ * @param $spath
+ *   Source path for image.
+ * @param $dpath
+ *   Destination path for image.
+ * @param null $type
+ *   if $type == browser then scale to saved configuration settings.
  */
 function _imager_convert_image($spath, $dpath, $type = NULL) {
-  // reduce image file size using jpeg quality of 50 and copy to $npath
-//$out['debug'] .= "convert: " . $spath . " to " . $dpath . "<br>\n";
   switch ($type) {
     case 'browser':
       $geometry = variable_get('imager_browser_width', 1200) . 'x' .
-                  variable_get('imager_browser_height', 1200);  
+        variable_get('imager_browser_height', 1200);
       $cmd = "/usr/bin/convert -quality 70 -scale $geometry \"$spath\" \"$dpath\"";
       break;
-    default: 
+    default:
       $cmd = "/usr/bin/convert -quality 70 \"$spath\" \"$dpath\"";
       break;
   }
@@ -200,7 +203,10 @@ function _imager_convert_image($spath, $dpath, $type = NULL) {
  * Create drupal public or private path and a new image
  * filename using the URI of the old image
  *
- * @param type $uri
+ * @param string $uri
+ *
+ * @return object $ps
+ *   Array of paths for this image.
  */
 function _imager_get_paths($uri) {
   $ps = _imager_extract_path_components($uri);
@@ -224,8 +230,6 @@ function _imager_get_paths($uri) {
 
 /**
  * Save an edited image - can be overwritten or a new file created
- *
- * @param type $uri
  */
 function imager_save_image() {
   $out['action'] = check_plain($_POST['action']);
@@ -233,9 +237,6 @@ function imager_save_image() {
 
   $overwrite = check_plain($_POST['overwrite']);
   $uri = urldecode(check_plain($_POST['uri']));
-
-//$out['debug']  = "imager_save_image() overwrite: " . $overwrite . "<br>\n";
-//$out['debug'] .= "imager_save_image() start uri: " . $uri . "<br>\n";
 
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
@@ -282,28 +283,36 @@ function imager_email_file() {
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
   $dir = variable_get('imager_email_local_path');
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
-  $image_path = $dir . '/' . $ps[filename] . '.' . $ps[suffix];
+  $image_path = $dir . '/' . $ps['filename'] . '.' . $ps['suffix'];
   _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $image_path);
 
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
 
-  if (strstr($_SERVER['HTTP_USER_AGENT'],'inux')) {
-    $out['data']['attachPath'] = variable_get('imager_email_attach_linux') . '/' . 
-                                 $ps[filename] . '.' . $ps[suffix];
+  if (strstr($_SERVER['HTTP_USER_AGENT'], 'inux')) {
+    $out['data']['attachPath'] = variable_get('imager_email_attach_linux') . '/' .
+      $ps['filename'] . '.' . $ps['suffix'];
   }
   else {  // Assume Windows
-    $out['data']['attachPath'] = variable_get('imager_email_attach_windows') . '\\' . 
-                                 $ps[filename] . '.' . $ps[suffix];
+    $out['data']['attachPath'] = variable_get('imager_email_attach_windows') . '\\' .
+      $ps['filename'] . '.' . $ps['suffix'];
   }
   $view = file_view($file, variable_get('imager_email_view_mode'));
   unset($view['links']);
   unset($view['#contextual_links']);
   unset($view['#pre_render']);
   unset($view['file']);
-  $out['data']['body'] = drupal_html_to_text(drupal_render($view));
-//$out['data']['body'] = drupal_render($view);
+//$out['data']['body'] = drupal_html_to_text(drupal_render($view));
+  $html = drupal_render($view);
+  $html = preg_replace('/<\/div>/i', "\n", $html);
+//   $html = preg_replace('/<\/li>/i',"\n",$html);
+//   $html = preg_replace('/<li>/i','',$html);
+//   $html = preg_replace('/<\/ul>/i','',$html);
+//   $html = preg_replace('/<\/p>/i',"\n",$html);
+  $html = preg_replace('/\&nbsp;/', ' ', $html);
+  $html = preg_replace('/<[^>]+>/i', '', $html);
+  $out['data']['body'] = $html;
   $out['data']['subject'] = "Dairy Specialists - photo - $ps[filename]";
   print json_encode($out);
 }
@@ -326,11 +335,11 @@ function imager_view_browser() {
   $dir = DRUPAL_ROOT . '/tmp';
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
 
-  $tmp_path = '/tmp/' . $ps[filename] . '.' . $ps[suffix];
+  $tmp_path = '/tmp/' . $ps['filename'] . '.' . $ps['suffix'];
   $html_path = $dir . '/file.html';
   $image_path = $dir . '/image.jpg';
   // @TODO The following paths need to be unique.
-  $html_uri  = $GLOBALS['base_url'] . '/tmp/file.html';
+  $html_uri = $GLOBALS['base_url'] . '/tmp/file.html';
   $image_uri = $GLOBALS['base_url'] . '/tmp/image.jpg';
 
   _imager_write_image($tmp_path);
@@ -341,7 +350,6 @@ function imager_view_browser() {
   unset($view['#contextual_links']);
   $content = drupal_render($view);
   $content = preg_replace('/<h2.*h2>/', '', $content);  // Remove the title
-  $location = variable_get('imager_browser_location');
   if (variable_get('imager_browser_location') == 'Above') {
     $body = '<img src="' . $image_uri . '" />' . $content;
   }
@@ -350,11 +358,11 @@ function imager_view_browser() {
   }
   $title = $file->file['field_file_imager_title_text'][LANGUAGE_NONE]['0']['safe_value'];
   $page = '<html>' .
-            '<head>' .
-              '<title>' . $title . '</title>' .
-            '</head>' .
-            '<body>' . $body . '</body>' .
-          '</html>';
+    '<head>' .
+    '<title>' . $title . '</title>' .
+    '</head>' .
+    '<body>' . $body . '</body>' .
+    '</html>';
   $fp = fopen($html_path, 'w');
   fwrite($fp, $page);
   fclose($fp);
@@ -372,20 +380,12 @@ function imager_delete_file() {
   $uri = urldecode(check_plain($_POST['uri']));
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
-//$out['debug'] .= "deleteFile() fid: " . $fid . "<br>\n";
-
   $file = file_load($fid);
   $force = TRUE;
   file_delete($file, $force);
 
   $out['status'] = 'pass';
   print json_encode($out);
-  // Delete file entity - Hide .views-row
-  // Save new file entity - Render and insert after current image.
-  // Overwrite file entity - Render and insert after, color before in blue
-  // Edit image - Render and replace views-row.
-  // Edit fields through Imager viewer - Render and replace views-row
-//module_invoke_all('imager_modify', 'delete', $file);
 }
 
 /**
@@ -394,7 +394,7 @@ function imager_delete_file() {
 function imager_save_file_entity_field() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
-  $field_name = preg_replace('/\-/', '_', check_plain($_POST['field']));
+  $field_name = preg_replace('/\-/', '_', check_plain($_POST['fieldName']));
   $field_type = check_plain($_POST['fieldType']);
 
   $uri = urldecode(check_plain($_POST['uri']));
@@ -406,46 +406,47 @@ function imager_save_file_entity_field() {
   //dpm(check_plain($_POST), 'POST');
   switch ($field_type) {
     case 'hierarchical_select':
-      $file->{$field_name}['und'][0]['tid'] = check_plain($_POST['value']);
+      $file->{$field_name}[LANGUAGE_NONE][0]['tid'] = check_plain($_POST['value']);
       break;
 
     case 'date_combo':
-      date_default_timezone_set($file->{$field_name}['und'][0]['timezone']);
+      date_default_timezone_set($file->{$field_name}[LANGUAGE_NONE][0]['timezone']);
       $datetime = gmdate('Y-m-d H:i:s', strtotime(check_plain($_POST['value'])));
-      $file->{$field_name}['und'][0]['value'] = $datetime;
+      $file->{$field_name}[LANGUAGE_NONE][0]['value'] = $datetime;
       break;
 
     case 'radios':
-      $file->{$field_name}['und'][0]['tid'] = check_plain($_POST['value']);
+      $file->{$field_name}[LANGUAGE_NONE][0]['tid'] = check_plain($_POST['value']);
       break;
 
     case 'textfield':
-      // Kludge - if value contains a number in parantheses,
+      // Kludge - if value contains a number in parenthesis
       if (preg_match('/\((\d*)\)/', check_plain($_POST['value']), $matches)) {
         // treat it as an entity reference from autocomplete
-        $file->{$field_name}['und'][0]['target_id'] = $matches[1];
+        $file->{$field_name}[LANGUAGE_NONE][0]['target_id'] = $matches[1];
       }
       else {
         // otherwise its a normal text field
         $vals = str_getcsv(check_plain($_POST['value']), ",", '"');
 //      dpm($vals, 'vals - str_getcsv');
 //      dpm($file, 'vals - $file');
-        unset($file->{$field_name}['und']);
+        unset($file->{$field_name}[LANGUAGE_NONE]);
         foreach ($vals as $key => $value) {
-          $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid;
+//        $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid;
 //        dpm($tid, "tid");
-          $file->{$field_name}['und'][$key]['tid'] = $tid;
+//        $file->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $tid;
+          $file->{$field_name}[LANGUAGE_NONE][$key]['value'] = $value;
         }
       }
       break;
 
     case 'textarea':
-      $file->{$field_name}['und'][0]['value'] = check_plain($_POST['value']);
-      $file->{$field_name}['und'][0]['format'] = check_plain($_POST['format']);
+      $file->{$field_name}[LANGUAGE_NONE][0]['value'] = check_plain($_POST['value']);
+      $file->{$field_name}[LANGUAGE_NONE][0]['format'] = check_plain($_POST['format']);
       break;
 
     case 'checkbox_tree':
-      $file->{$field_name}['und'][0]['tid'] = check_plain($_POST['value']);
+      $file->{$field_name}[LANGUAGE_NONE][0]['tid'] = check_plain($_POST['value']);
       break;
 
     default:
@@ -460,18 +461,20 @@ function imager_save_file_entity_field() {
  * Retrieve the rendered content of a dialog
  */
 function imager_render_dialog() {
+  global $_imager_path;
+  $_imager_path = drupal_get_path('module', 'imager');
   module_load_include('inc', 'imager', 'imager.popups');
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
   $dialog_name = check_plain($_POST['dialogName']);
-  $func_name = '_imagerBuild' . $dialog_name;
+  $func_name = '_imager_build_' . $dialog_name;
   if (function_exists($func_name)) {
     $render = $func_name();
     $out['data'] = drupal_render($render);
   }
   else {
     $out['status'] = 'error';
-    $out['error'] = 'Function does not exist: - ' + $func_name;
+    $out['error'] = 'Function does not exist: - ' . $func_name;
   }
   print json_encode($out);
 }
@@ -481,11 +484,12 @@ function imager_render_dialog() {
  *
  * Extract the Base, site, addl dirs, file name, file suffix
  *
- * @param type $uri
+ * @param string $uri
  *
  * @return array of path components
  */
 function _imager_extract_path_components($uri) {
+  $cmp = [];
   if (preg_match('/(^http.*files)\/(.+\/)([^\/]+)\.([a-zA-Z]+$)/', $uri, $matches)) {
     $cmp['root'] = $matches[1];
     $cmp['dir'] = $matches[2];
@@ -504,14 +508,16 @@ function _imager_extract_path_components($uri) {
 /**
  * Given the public: URI of an image, search the database and find the FID
  *
- * @param type $puri
+ * @param string $puri
  *
- * @return FID
+ * @return int
+ *   File ID of the file at path $puri.
  */
 function _imager_get_fid($puri) {
   $results = db_query('SELECT fid,uri ' .
-                      'FROM {file_managed} ' .
-                      'WHERE uri = :uri', array(':uri' => $puri));
+    'FROM {file_managed} ' .
+    'WHERE uri = :uri', array(':uri' => $puri));
+  $fid = 0;
   foreach ($results as $image) {
     $fid = $image->fid;
   }
@@ -521,16 +527,21 @@ function _imager_get_fid($puri) {
 /**
  * Create a unique filename for a new image
  *
- * @param type $cmp
+ * @param string $dir
+ *   Directory file will be saved in.
+ * @param array $cmp
+ *   Array of paths for this image.
  *
- * @return new filename
+ * @return string
+ *   New file name
  */
 function _imager_make_uniq_filepath($dir, $cmp) {
   $n = 0;
   do {
     ++$n;
     $path = "$dir/$cmp[dir]$cmp[filename]_$n.$cmp[suffix]";
-  } while (file_exists($path));
+  }
+  while (file_exists($path));
   return $cmp['filename'] . "_" . $n;
 }
 

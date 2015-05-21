@@ -1,44 +1,53 @@
-
 /**
  * @file
  */
 
 /**
+ * Note: Variables ending with capital C or M designate Classes and Modules.
+ * They can be found in their own files using the following convention:
+ *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
+ *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.inc
+ * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
+ */
+
+/**
  * Wrap file in JQuery();
- * 
+ *
  * @param $
  */
 (function ($) {
-  
-/**
- * Declare Configuration Dialog class - configC - inherits from dialogBaseC 
- * 
- * @param {object} spec
- *   Specifications for opening dialog, can also have ad-hoc properties
- *   not used by jQuery dialog but needed for other purposes.
- * 
- * @returns {dialog}
- */
-  Drupal.imager.Popups.configC = function (spec) {  
-    var Popups = Drupal.imager.Popups;
-    var Viewer = Drupal.imager.Viewer;
+  "use strict";
+
+  /**
+   * Declare Configuration Dialog class - configC - inherits from dialogBaseC
+   *
+   * @param {object} spec
+   *   Specifications for opening dialog, can also have ad-hoc properties
+   *   not used by jQuery dialog but needed for other purposes.
+   *
+   * @returns {dialog}
+   */
+  Drupal.imager.popups.configC = function (spec) {
+    var Popups = Drupal.imager.popups;
+    var Viewer = Drupal.imager.viewer;
     var popup;
 
     var dspec = $.extend({
-                   name: 'Configuration',
-                   autoOpen: false,
-                   title: 'Imager Configuration',
-                   zIndex: 1015,
-                   width: 'auto',
-                   dialogClass: 'imager-dialog',
-                   cssId: 'imager-config',
-                   height: 'auto',
+      name: 'Configuration',
+      autoOpen: false,
+      title: 'Imager Configuration',
+      zIndex: 1015,
+      width: 'auto',
+      dialogClass: 'imager-dialog',
+      cssId: 'imager-config',
+      height: 'auto',
 //                 resize: 'auto',
-                   position:  { my: "left",
-                                at: "right",
-                                of: spec.$selectButton
-                              }
-                 }, spec);
+      position: {
+        my: "left",
+        at: "right",
+        of: spec.$selectButton
+      }
+    }, spec);
     // Initialize the dialog.
     popup = Popups.baseC(dspec);
 
@@ -58,13 +67,13 @@
      */
     popup.dialogInit = function dialogInit() {
       if (localStorage.imagerBoundsEnable === "TRUE") {
-        $('#imager-bounds-enable').attr('checked','checked');
+        $('#imager-bounds-enable').attr('checked', 'checked');
       }
       if (localStorage.imagerDebugStatus === "TRUE") {
-        $('#imager-debug-status').attr('checked','checked');
+        $('#imager-debug-status').attr('checked', 'checked');
       }
       if (localStorage.imagerDebugMessages === "TRUE") {
-        $('#imager-debug-messages').attr('checked','checked');
+        $('#imager-debug-messages').attr('checked', 'checked');
       }
     };
 
@@ -75,20 +84,23 @@
       if ($('#imager-debug-status').attr('checked')) {
         localStorage.imagerDebugStatus = "TRUE";
         Popups.status.dialogOpen();
-      } else {
+      }
+      else {
         localStorage.imagerDebugStatus = "FALSE";
         Popups.status.dialogClose();
       }
       if ($('#imager-debug-messages').attr('checked')) {
         localStorage.imagerDebugMessages = "TRUE";
         Popups.messages.dialogOpen();
-      } else {
+      }
+      else {
         localStorage.imagerDebugMessages = "FALSE";
         Popups.messages.dialogClose();
       }
       if ($('#imager-bounds-enable').attr('checked')) {
         localStorage.imagerBoundsEnable = "TRUE";
-      } else {
+      }
+      else {
         localStorage.imagerBoundsEnable = "FALSE";
       }
       popup.dialogClose();
@@ -97,9 +109,10 @@
     /**
      * Dialog buttons are defined last to ensure methods are defined.
      */
-    popup.spec['buttons'] = { Save: popup.dialogSave,
-                             Cancel: popup.dialogClose
-                           };
+    popup.spec['buttons'] = {
+      Save: popup.dialogSave,
+      Cancel: popup.dialogClose
+    };
     return popup;
   };
 })(jQuery);

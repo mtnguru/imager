@@ -1,0 +1,92 @@
+/*
+Error: Undefined variable: "$lightergreu".
+        on line 354 of imager.scss
+
+349:     .option {
+350:       font-size: 100%;
+351:       padding-left: 0.5em;
+352:     }
+353:     .description {
+354:       color: $lightergreu;
+355:     }
+356:   }
+357:   #imager-status-content {
+358:     text-align: center;
+359:     .imager-status-col {
+
+Backtrace:
+imager.scss:354
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/script/tree/variable.rb:49:in `_perform'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/script/tree/node.rb:50:in `perform'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:378:in `visit_prop'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `block in visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `block (2 levels) in visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `map'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `block in visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:173:in `with_environment'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:412:in `visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `block in visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `block (2 levels) in visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `map'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `block in visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:173:in `with_environment'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:412:in `visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `block in visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `block (2 levels) in visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `map'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:414:in `block in visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:173:in `with_environment'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:412:in `visit_rule'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `block in visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `block in with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:115:in `with_frame'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/stack.rb:79:in `with_base'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:152:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:52:in `map'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:52:in `visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:161:in `block in visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:173:in `with_environment'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:160:in `visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:36:in `block in visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:180:in `visit_root'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/base.rb:36:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:151:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/visitors/perform.rb:8:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/root_node.rb:36:in `css_tree'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/tree/root_node.rb:29:in `render_with_sourcemap'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/engine.rb:368:in `_render_with_sourcemap'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/engine.rb:285:in `render_with_sourcemap'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/plugin/compiler.rb:490:in `update_stylesheet'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/plugin/compiler.rb:209:in `each'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/plugin.rb:82:in `update_stylesheets'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/exec/sass_scss.rb:329:in `watch_or_update'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/exec/sass_scss.rb:50:in `process_result'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/exec/base.rb:40:in `parse'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/lib/sass/exec/base.rb:19:in `parse!'
+/var/lib/gems/1.9.1/gems/sass-3.4.2/bin/scss:13:in `<top (required)>'
+/usr/local/bin/scss:23:in `load'
+/usr/local/bin/scss:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: Undefined variable: \"$lightergreu\".\A         on line 354 of imager.scss\A \A 349:     .option {\A 350:       font-size: 100%;\A 351:       padding-left: 0.5em;\A 352:     }\A 353:     .description {\A 354:       color: $lightergreu;\A 355:     }\A 356:   }\A 357:   #imager-status-content {\A 358:     text-align: center;\A 359:     .imager-status-col {"; }

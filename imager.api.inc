@@ -17,14 +17,15 @@
  * Overwrite file entity - Render and insert after, color before in blue
  * Edit image - Render and replace views-row.
  * Edit fields through Imager viewer - Render and replace views-row
- * 
- * @param type $action
- * @param type $fid
- * 
- * @return rendered file_entity to replace original
+ *
+ * @param string $action
+ * @param int $fid
+ *
+ * @return string
+ *   Rendered file_entity to replace original
  */
 function hook_imager_modify($action, $fid) {
-  $views_row = '<h2>hook_imager_modify</h2><div><Replacement dude</div>';
+  $views_row = '<h2>hook_imager_modify</h2><div>Replacement dude</div>';
   // Execute a view that takes an FID and returns rendered HTML.
   return $views_row;
 }

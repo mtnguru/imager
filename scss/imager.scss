@@ -22,7 +22,7 @@ $black: #000;
     border-spacing: 2px;
     td {
       line-height: 1;
-      border-top: 0px;
+      border-top: 0;
       padding: 2px;
     }
     th {
@@ -36,23 +36,25 @@ $black: #000;
   width: 100%;
 }
 
+.imager-viewer-dialog {
+  z-index: 1010 !important;
+  .ui-dialog-titlebar {
+    display: none;
+  }
+}
+
 #imager-viewer {
-  z-index: 1010;
-  position: fixed;
-  top: 0px;
-  left: 0px;
   overflow: auto;
-  padding: 3px;
-  background-color: $darkgrey;
+  padding: 2px;
+  background-color: $grey;
   button {
     background-color: $lightgrey;
   }
   #imager-canvas-wrapper {
     float: left;
     #imager-canvas-org {
-      display: hidden;
+//    display: hidden;
     }
-    #imager-canvas {}
   }
   #button-wrapper {
     float: left;
@@ -61,14 +63,14 @@ $black: #000;
     }
     .buttons {
       background-color: $lightergrey;
-      padding: 3px;
+      padding: 2px 1px;
       margin: 0 2px 2px 0;
       text-align: center;
-      font-size: 75%;
+      font-size: 60%;
       img {
         border-radius: 4px;
         display: block;
-        padding: 3px;
+        padding: 2px;
         margin: 0 auto;
       }
       .checked {
@@ -80,14 +82,6 @@ $black: #000;
       .specific {
         background-color: $darkgrey;
       }
-    }
-    #file-buttons {
-      margin-bottom: 65px;
-    }
-    #debug-buttons {
-      z-index: 1009;
-      position: absolute;
-      bottom: 7px;
     }
   }
 }
@@ -123,13 +117,6 @@ $black: #000;
     float: none;
     clear: both;
   }
-  #imager-info-buttons {
-    float: right;
-    z-index: 1110;
-    img {
-      float: left;
-    }
-  }
   #imager-info-geometry {
     clear: both;
   }
@@ -145,11 +132,8 @@ $black: #000;
 }
 
 #imager-edit {
-  max-width: 700px;
-  position: fixed;
   padding: 10px;
   background-color: $lightgrey;
-  z-index: 1020;
   .form-item {
     margin: 0;
   }
@@ -168,16 +152,35 @@ $black: #000;
       background-image: none;
     }
   }
+  .field-widget-text-textarea {
+    .fieldset-wrapper {
+      margin: 0;
+    }
+    fieldset {
+      .form-wrapper {
+        display: none;
+      }
+    }
+  }
+}
+
+.imager-confirm-dialog {
+  .ui-dialog-titlebar {
+    display: none;
+  }
 }
 
 #imager-confirm {
   max-width: 700px;
-  position: fixed;
   z-index: 1020;
-  background-color: $grey;
-  padding: 0 10px;
+  background-color: $lightgrey;
+  padding: 1.2em 10px 0;
   .imager-content {
     margin: 0;
+  }
+  #imager-confirm-content {
+    font-size: 140%;
+    padding: 0 2em;
   }
   #imager-confirm-buttons {
     position: static;
@@ -196,27 +199,20 @@ $black: #000;
   .description {
     max-width: 300px;
   }
-  #imager-map-buttons {
-    float: right;
-    z-index: 1110;
-    background-color: $lightgrey;
-    img {
-      float: left;
-    }
-  }
 }
 
 #imager-messages.error {
-  background-color: $red;
-  background-image: none;
+  background: $red none;
 }
 
 #imager-messages {
   background-color: $grey;
   padding: 10px;
   font-size: 80%;
-  .info {}
-  h2 {}
+  .info {
+  }
+  h2 {
+  }
   .error {
     padding: 0.5em;
     background-color: $red;
@@ -229,7 +225,7 @@ $black: #000;
   padding: 5px;
   background-color: $grey;
   #imager-filesave-filename {
-    width: 30em;
+    width: 15em;
     font-size: 90%;
   }
   #resolution {
@@ -271,7 +267,6 @@ $black: #000;
     margin: 0 auto;
     width: auto;
   }
-  padding: 5px;
   position: fixed;
   z-index: 1050;
   input {
@@ -314,7 +309,7 @@ div#main {
     display: none;
   }
 }
-  
+
 .dialogStatus {
   position: fixed;
   z-index: 1014;
@@ -356,7 +351,7 @@ div#main {
       padding-left: 0.5em;
     }
     .description {
-      color: #666;
+      color: $lightergreu;
     }
   }
   #imager-status-content {
@@ -383,4 +378,18 @@ div#main {
       }
     }
   }
+}
+
+.imgareaselect-outer {
+  z-index: 1011 !important;
+}
+
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
+
+#page-wrapper {
+  overflow-y: scroll;
+  height: 100%;
 }

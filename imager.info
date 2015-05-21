@@ -3,5 +3,5 @@ description = Hovering over a thumbnail pops up a window showing full image wher
 core = 7.x
 package = "Media"
 
-files[]  = imager.module
+files[] = imager.module
 configure = admin/config/media/imager

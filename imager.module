@@ -134,34 +134,19 @@ function imager_menu() {
  * Implement HOOK_views_pre_view().
  *
  * Determine if this view needs imager module, if so load it
+ *
+ * @param $view
+ * @param $display_id
+ * @param $args
  */
 function imager_views_pre_view(&$view, &$display_id, &$args) {
-  if (preg_match('/' . variable_get('imager_views_css_class') . '/', 
-                 $view->display['default']->display_options['css_class'])) {
+  global $_imager_enable;
+  if (preg_match('/' . variable_get('imager_views_css_class') . '/',
+    $view->display['default']->display_options['css_class'])) {
     if (!preg_match('/browser/', $view->name)) {
-      _imager_start();
+      $_imager_enable = TRUE;
     }
   }
-  return;
-}
-
-
-function _imager_start() {
-  global $_imager_enable;
-  $_imager_enable = TRUE;
-
-//@TODO - find out why the itok token doesn't work right and get rid of 
-//        the following line - only needs to be executed once.
-//variable_set('file_entity_allow_insecure_download', TRUE);
-}
-
-/**
- *
- * @param type $view
- *
- * @return type
- */
-function imager_views_pre_render(&$view) {
   return;
 }
 
@@ -179,42 +164,34 @@ function imager_theme() {
 /**
  * Implement HOOK_page_alter().
  *
- * Create render arrays for imager popup
+ * If some other hook has enabled the Imager module, build the wrapper DIV
+ * that will contain the Imager HTML.
  *
- * @todo Is there an earlier hook better suited for this?
- * @todo Move most of this into imager.popups.inc
+ * @param $page
  */
 function imager_page_alter(&$page) {
-  // @todo using $imager_enable to determine if module is in use/loaded.
-  //       is there a more proper way?
   global $_imager_enable;
   if (isset($_imager_enable)) {
     module_load_include('inc', 'imager', 'imager.popups');
-    _imagerBuildWrapper($page);
+    _imager_build_wrapper($page);
   }
 }
 
 /**
- * Page callback: Form constructor for the file edit form.
+ * Form constructor for the file edit form.
  *
- * Path: file/%file/edit
+ * @todo - James Test to see if this function is still used.
  *
- * @param object $file
- *   A file object from file_load().
+ * @param $form
+ * @param $form_state
  *
- * @see file_entity_menu()
- *
- * @todo Rename this form to file_edit_form to ease into core.
+ * @return mixed
  */
 function imager_file_entity_edit($form, &$form_state) {
-  drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $file->type, '@title' => $file->filename)), PASS_THROUGH);
-
-  //$form_state['file'] = $file;
+  // @todo What happened to the file.  I don't think this function is used anymore.
+  // drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $file->type, '@title' => $file->filename)), PASS_THROUGH);
 
   $form['#attributes']['class'][] = 'file-form';
-  //if (!empty($file->type)) {
-  //  $form['#attributes']['class'][] = 'file-' . $file->type . '-form';
-  //}
 
   // Basic file information.
   // These elements are just values so they are not even sent to the client.
@@ -234,7 +211,7 @@ function imager_file_entity_edit($form, &$form_state) {
     '#weight' => -10,
   );
 
-  // Add a 'replace this file' upload field if the file is writeable.
+  // Add a 'replace this file' upload field if the file can be written to.
   /*
   if (file_entity_file_is_writeable($file)) {
     // Set up replacement file validation.
@@ -253,7 +230,6 @@ function imager_file_entity_edit($form, &$form_state) {
 
 
   //$form['preview'] = file_view_file($file, 'preview');
-
   $form['additional_settings'] = array(
     '#type' => 'vertical_tabs',
     '#weight' => 99,
@@ -315,7 +291,6 @@ function imager_file_entity_edit($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Associated with'),
     '#maxlength' => 60,
-    
     '#autocomplete_path' => 'user/autocomplete',
     // '#default_value' => !empty($file->uid) ? user_load($file->uid)->name : '',
     '#weight' => -1,
@@ -354,17 +329,17 @@ function imager_file_entity_edit($form, &$form_state) {
   );
    */
 
-
   //$langcode = function_exists('entity_language') ? entity_language('file', $file) : NULL;
   //field_attach_form('file', $file, $form, $form_state, $langcode);
-
   return $form;
 }
 
 /**
  * Implements HOOK_entity_info_alter().
  *
- * @param type $entity_info
+ * Adds view modes to file entities.
+ *
+ * @param array $entity_info
  */
 function imager_entity_info_alter(&$entity_info) {
   //Not sure if it's still an issue, but a previous commenter noted that Media module only recognizes view modes with the prefix media_. Also, as you can see by the entity type 'file', this is for after the switch-to-file-entity patch.
@@ -387,16 +362,14 @@ function imager_entity_info_alter(&$entity_info) {
 }
 
 /**
- * Implement hook_field_attach_view_alter().
- */
-function imager_field_attach_view_alter(&$output, $context) {
-  return;
-}
-
-/**
  * Implement hook_file_view_alter
+ *
+ * Add filename, owner, filesize, fid and image geometry to the file view.
+ *
+ * @param $build
+ * @param $type
  */
-function imager_file_view_alter(&$build,$type) {
+function imager_file_view_alter(&$build, $type) {
   // Exit if view_mode != configured view mode for information dialog
   if ($build['#view_mode'] !== variable_get('imager_information_view_mode')) {
     return $build;
@@ -406,11 +379,12 @@ function imager_file_view_alter(&$build,$type) {
 
   if ($file->filesize > 1000000) {
     $filesize = (round($file->filesize / 100000) / 10) . ' MB';
-  } else {
+  }
+  else {
     $filesize = (round($file->filesize / 100) / 10) . ' KB';
   }
 
-  if (isset($build['field_description'])) {   
+  if (isset($build['field_description'])) {
     $build['field_description']['#prefix'] = '<br>';
   }
   $build['sfield_filename'] = array(
@@ -420,12 +394,12 @@ function imager_file_view_alter(&$build,$type) {
     '#field_name' => 'sfield_filename',
     '#field_type' => 'text',
     '#formatter' => 'text_default',
-    '#items' => array ('anything'),
+    '#items' => array('anything'),
     '#prefix' => '<br>',
     '#label_display' => 'inline',
     '#theme' => 'field',
     '#title' => 'File Name',
-    '#optional' => true,
+    '#optional' => TRUE,
     '#weight' => 20,
     0 => array(
       '#markup' => $file->filename,
@@ -438,11 +412,11 @@ function imager_file_view_alter(&$build,$type) {
     '#field_name' => 'sfield_owner',
     '#field_type' => 'text',
     '#formatter' => 'text_default',
-    '#items' => array ('anything'),
+    '#items' => array('anything'),
     '#label_display' => 'inline',
     '#theme' => 'field',
     '#title' => 'File Owner',
-    '#optional' => true,
+    '#optional' => TRUE,
     '#weight' => 21,
     0 => array(
       '#markup' => user_load($file->uid)->name,
@@ -455,11 +429,11 @@ function imager_file_view_alter(&$build,$type) {
     '#field_name' => 'sfield_filesize',
     '#field_type' => 'text',
     '#formatter' => 'text_default',
-    '#items' => array ('anything'),
+    '#items' => array('anything'),
     '#label_display' => 'inline',
     '#theme' => 'field',
     '#title' => 'File Size',
-    '#optional' => true,
+    '#optional' => TRUE,
     '#weight' => 23,
     0 => array(
       '#markup' => $filesize,
@@ -472,11 +446,11 @@ function imager_file_view_alter(&$build,$type) {
     '#field_name' => 'sfield_geometry',
     '#field_type' => 'text',
     '#formatter' => 'text_default',
-    '#items' => array ('anything'),
+    '#items' => array('anything'),
     '#label_display' => 'inline',
     '#theme' => 'field',
     '#title' => 'Geometry',
-    '#optional' => true,
+    '#optional' => TRUE,
     '#weight' => 24,
     0 => array(
       '#markup' => $geometry,
@@ -489,15 +463,14 @@ function imager_file_view_alter(&$build,$type) {
     '#field_name' => 'sfield_fid',
     '#field_type' => 'text',
     '#formatter' => 'text_default',
-    '#items' => array ('anything'),
+    '#items' => array('anything'),
     '#label_display' => 'inline',
     '#theme' => 'field',
     '#title' => 'File ID',
-    '#optional' => true,
+    '#optional' => TRUE,
     '#weight' => 25,
     0 => array(
       '#markup' => $file->fid,
     ),
   );
-  return;
 }
