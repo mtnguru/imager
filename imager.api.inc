@@ -11,18 +11,19 @@
  */
 
 /**
- * Notify of changes made to images and file_entities
- * Delete file entity - Hide .views-row
- * Save new file entity - Render and insert after current image.
- * Overwrite file entity - Render and insert after, color before in blue
- * Edit image - Render and replace views-row.
- * Edit fields through Imager viewer - Render and replace views-row
+ * Implement hook to refresh images on thumbnail source page.
+ *
+ * Changes to images and file entity fields can be reflected back to the
+ * thumbnail source page.  Your hook returns a rendered file entity for
+ * the file entity that was altered.
  *
  * @param string $action
+ *   Action to be executed.
  * @param int $fid
+ *   File ID of image to reload.
  *
  * @return string
- *   Rendered file_entity to replace original
+ *   Rendered file_entity that replace original
  */
 function hook_imager_modify($action, $fid) {
   $views_row = '<h2>hook_imager_modify</h2><div>Replacement dude</div>';

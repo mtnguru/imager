@@ -1,9 +1,9 @@
 /**
  * @file
- * Create and manage the dialog to save files to database, download, email.
+ * Declare Imager module FileSave dialog - Drupal.imager.popups.filesaveC.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -12,14 +12,14 @@
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   "use strict";
   /**
-   * Declare Filesave Dialog class
+   * Declare Filesave Dialog class.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -40,7 +40,7 @@
       width: 'auto',
       dialogClass: 'imager-dialog imager-noclose',
       cssId: 'imager-filesave',
-//                 cssIdFinal:  'imager-filesave-database',
+      // cssIdFinal:  'imager-filesave-database',
       height: 'auto',
       resizable: false,
       position: {
@@ -53,10 +53,10 @@
     var popup = Drupal.imager.popups.baseC(dspec);
 
     var database = function database(overwrite) {
-//    displayMessage('Extracting Image...');
+      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var img = getImage($('input[name="resolution"]:checked').val(), false);
-//    displayMessage('Saving Image...');
+      // displayMessage('Saving Image...');
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.saveFile.url,
         {
@@ -68,7 +68,7 @@
         }, function (response) {
           if (response['file_new']) {
             Viewer.getImage().$container.after(response['file_new']);
-            // @TODO The two unwrap are hardcoded to remove two extra divs.  
+            // @TODO The two unwrap are hardcoded to remove two extra divs.
             // Can this be done in PHP when it is rendered.
             // Maybe a Views tpl.php file.
             var $row = Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
@@ -76,16 +76,16 @@
           }
           if (response['file_old']) {
             Viewer.getImage().$container.html(response['file_old']);
-            // @TODO - The following code is ugly, 
-            // Views wraps a couple extra divs around the output.
-            // The following code removes those divs so just 
-            // .views-row remains and everything below it remains.
-//          var $row =Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
-//          $row.unwrap().unwrap();
+            /* @TODO - The following code is ugly,
+               Views wraps a couple extra divs around the output.
+               The following code removes those divs so just
+               .views-row remains and everything below it remains.
+                        var $row =Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
+                        $row.unwrap().unwrap(); */
             var $child = Viewer.getImage().$container.children()[0];
             var $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer);
-//          var $row =$child.find(Drupal.imager.settings.cssContainer);
-//          var $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer).child();
+            // Var $row =$child.find(Drupal.imager.settings.cssContainer);
+            // var $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer).child();
             while (Viewer.getImage().$container[0] !== $row.parent()[0]) {
               $row.unwrap();
             }
@@ -99,19 +99,17 @@
     };
 
     var download = function download() {
-//    displayMessage('Extracting Image...');
+      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var dataurl = getImage($('input[name="resolution"]:checked').val(), false);
-//    displayMessage('Saving Image...');
-//    $('#file-download-link').attr({ 'href': dataurl,
-//                                          'download': $('#imager-filesave-filename').val()
-//                                       });
-
-//    window.open(dataurl,'Download');
-//    window.location.assign(dataurl);
-
-//    var uriContent = "data:application/octet-stream," + encodeURIComponent(dataurl);
-//    window.open(uriContent, 'Download image smiley image');
+      /* displayMessage('Saving Image...');
+         $('#file-download-link').attr({ 'href': dataurl,
+                                               'download': $('#imager-filesave-filename').val()
+                                      });
+         window.open(dataurl,'Download');
+         window.location.assign(dataurl);
+         var uriContent = "data:application/octet-stream," + encodeURIComponent(dataurl);
+         window.open(uriContent, 'Download image smiley image'); */
       window.open(dataurl, 'Download image smiley image');
 
       Popups.$busy.hide();
@@ -133,10 +131,10 @@
     }
 
     var email = function email() {
-//    displayMessage('Extracting Image...');
+      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var img = getImage($('input[name="resolution"]:checked').val(), false);
-//    displayMessage('Saving Image...');
+      // displayMessage('Saving Image...');
       Popups.$busy.hide();
       popup.dialogClose();
       Core.ajaxProcess(this,
@@ -162,10 +160,10 @@
     };
 
     var clipboard = function email() {
-//    displayMessage('Extracting Image...');
+      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var img = getImage($('input[name="resolution"]:checked').val(), false);
-//    displayMessage('Saving Image...');
+      // displayMessage('Saving Image...');
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.clipboard.url,
         {
@@ -190,12 +188,15 @@
         case 'database':
           $('#file-database').removeClass('checked');
           break;
+
         case 'email':
           $('#file-email').removeClass('checked');
           break;
+
         case 'download':
           $('#file-download').removeClass('checked');
           break;
+
         case 'clipboard':
           $('#file-clipboard').removeClass('checked');
           break;
@@ -228,6 +229,7 @@
             }
           });
           break;
+
         case 'email':
           popup.spec.$elem.dialog({
             'title': 'Send image to Email',
@@ -237,6 +239,7 @@
             }
           });
           break;
+
         case 'download':
           popup.spec.$elem.dialog({
             'title': 'Download Image',
@@ -246,6 +249,7 @@
             }
           });
           break;
+
         case 'clipboard':
           popup.spec.$elem.dialog({
             'title': 'Send image to Clipboard',
@@ -279,6 +283,7 @@
         case 'screen':
           img = Viewer.$canvas[0].toDataURL(mimeType);
           break;
+
         case 'image-cropped':
           Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
           var ncw;
@@ -288,48 +293,57 @@
             ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
               nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
               Viewer.$canvas2.attr({
-                width: ncw,      // Set canvas to same size as image
+                width: ncw,
+                // Set canvas to same size as image.
                 height: nch
               });
-            if (status.rotation === 0) {
-//            Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-              pt.setPt(0, 0);
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+              if (status.rotation === 0) {
+                // Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
+                pt.setPt(0, 0);
+                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
                 -pt.getTxPt().y);
 
-            }
-            else { // status.rotation === 180
-              Viewer.ctx2.translate(ncw, nch);
-              Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-              pt.setPt(status.cw, status.ch);
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+              }
+              else {
+
+                // status.rotation === 180
+                Viewer.ctx2.translate(ncw, nch);
+                Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
+                pt.setPt(status.cw, status.ch);
+                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
                 -pt.getTxPt().y);
-            }
+              }
           }
           else {
             ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
               nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
               Viewer.$canvas2.attr({
-                width: ncw,      // Set canvas to same size as image
+                width: ncw,
+                // Set canvas to same size as image.
                 height: nch
               });
-            if (status.rotation === 90) {
-              Viewer.ctx2.translate(ncw, 0);
-              Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-              pt.setPt(status.cw, 0);   // Find Upper left corner of canvas in original image
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,   // parseInt(pt1.x),
-                -pt.getTxPt().y);  // parseInt(pt2.y),
-            }
-            else {
-              Viewer.ctx2.translate(0, nch);
-              Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-              pt.setPt(0, status.ch);   // Find Upper left corner of canvas in original image
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+              if (status.rotation === 90) {
+                Viewer.ctx2.translate(ncw, 0);
+                Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
+                pt.setPt(status.cw, 0);
+                // Find Upper left corner of canvas in original image.
+                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+                // parseInt(pt1.x),
+                - pt.getTxPt().y);
+                // parseInt(pt2.y),
+              }
+              else {
+                Viewer.ctx2.translate(0, nch);
+                Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
+                pt.setPt(0, status.ch);
+                // Find Upper left corner of canvas in original image.
+                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
                 -pt.getTxPt().y);
-            }
+              }
           }
           img = Viewer.$canvas2[0].toDataURL(mimeType);
           break;
+
         case 'image-full':
           var tcw;
           var tch;
@@ -337,7 +351,8 @@
           if (status.rotation === 0 || status.rotation === 180) {
             tcw = Viewer.image().iw;
             Viewer.$canvas2.attr({
-              width: tcw,      // Set canvas to same size as image
+              width: tcw,
+              // Set canvas to same size as image.
               height: tch
             });
             if (status.rotation === 180) {
@@ -348,7 +363,8 @@
             tcw = Viewer.image().ih;
             tch = Viewer.image().iw;
             Viewer.$canvas2.attr({
-              width: tcw,      // Set canvas to same size as image
+              width: tcw,
+              // Set canvas to same size as image.
               height: tch
             });
             if (status.rotation === 90) {
@@ -359,7 +375,8 @@
             }
           }
           Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-          Viewer.ctx2.drawImage(img, 0, 0);                 // Copy full image into canvas
+          Viewer.ctx2.drawImage(img, 0, 0);
+          // Copy full image into canvas.
           img = Viewer.$canvas2[0].toDataURL(mimeType);
           break;
       }

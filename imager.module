@@ -190,7 +190,6 @@ function imager_page_alter(&$page) {
 function imager_file_entity_edit($form, &$form_state) {
   // @todo What happened to the file.  I don't think this function is used anymore.
   // drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $file->type, '@title' => $file->filename)), PASS_THROUGH);
-
   $form['#attributes']['class'][] = 'file-form';
 
   // Basic file information.

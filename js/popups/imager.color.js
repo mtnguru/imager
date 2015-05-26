@@ -1,8 +1,9 @@
 /**
  * @file
+ * Declare Imager module Color dialog - Drupal.imager.popups.colorC.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -10,14 +11,10 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
-/**
- * Wrap file in JQuery();
- *
- * @param $
- */
 (function ($) {
   "use strict";
   /**
+   * Define the color dialog - Hue/Saturation/Lightness.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -73,7 +70,6 @@
     };
 
     popup.dialogInit = function dialogInit() {
-      // brightness/contrast and HSL slider change events 
       popup.init();
       if (popup.dialogIsOpen()) {
         $('#slider-hue').change(function () {
@@ -103,10 +99,11 @@
       var ctxsrc = $cvssrc[0].getContext('2d');
       var ctxdst = $cvsdst[0].getContext('2d');
 
-      var dataDesc = ctxsrc.getImageData(0, 0, w, h); // left, top, width, height
+      var dataDesc = ctxsrc.getImageData(0, 0, w, h);
+      // left, top, width, height.
       var data = dataDesc.data;
 
-      // this seems to give the same result as Photoshop
+      // This seems to give the same result as Photoshop.
       var satMul;
       if (saturation < 0) {
         satMul = 1 + saturation;
@@ -136,7 +133,7 @@
         var v;
 
         if (hue !== 0 || saturation !== 0) {
-          // ok, here comes rgb to hsl + adjust + hsl to rgb, all in one jumbled mess. 
+          // ok, here comes rgb to hsl + adjust + hsl to rgb, all in one jumbled mess.
           // It's not so pretty, but it's been optimized to get somewhat decent performance.
           // The transforms were originally adapted from the ones found in Graphics Gems, but have been heavily modified.
           var vs = r;
@@ -204,7 +201,7 @@
                 h -= 6;
               }
               var m = (l + l - v);
-              var sextant = h >> 0;
+              var sextant = h > > 0;
               if (sextant === 0) {
                 r = v * 255;
                 g = (m + ((v - m) * (h - sextant))) * 255;
@@ -299,7 +296,7 @@
         }
 
       }
-      ctxdst.putImageData(dataDesc, 0, 0);  // left, top
+      ctxdst.putImageData(dataDesc, 0, 0);
     };
 
     popup.dialogReset = function dialogReset() {
@@ -311,7 +308,6 @@
         popup.adjustColor(Viewer.$canvas2, Viewer.$canvas);
       }
     };
-
 
     popup.dialogApply = function dialogApply() {
       Popups.$busy.show();
@@ -333,9 +329,7 @@
       });
     };
 
-    /**
-     * Dialog buttons are defined last to ensure methods are defined.
-     */
+    // Dialog buttons are defined last to ensure methods are defined.
     popup.spec['buttons'] = {
       Apply: popup.dialogApply,
       Reset: popup.dialogReset,

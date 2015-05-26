@@ -1,17 +1,13 @@
 /**
  * @file
+ * Creates namespaces and provide utility routines needed by Imager module.
  */
 
-/**
- * Wrap file in JQuery();
- *
- * @param $
- */
 (function ($) {
 
   "use strict";
 
-// Create the Drupal.imager namespace and subspaces.
+  // Create the Drupal.imager namespace and subspaces.
   Drupal.imager = {
     'popups': {},
     'viewer': {}
@@ -24,11 +20,11 @@
     var messageTimeout;
 
     var displayMessage = function displayMessage(msg) {
-//    $imagerMessages.show();
+      // $imagerMessages.show();
       $('#imager-messages-content').html(msg);
       if (localStorage['imagerDebugMessages'] === "FALSE") {
         messageTimeout = setTimeout(function () {
-//        $imagerMessages.hide();
+          // $imagerMessages.hide();
         }, 5000);
       }
     };
@@ -51,7 +47,7 @@
         data: postData,
         success: function (response_json) {
           clearTimeout(messageTimeout);
-//        Popups.$busy.hide();
+          Popups.$busy.hide();
           var response = JSON.parse(response_json);
           var display = false;
           var out;
@@ -72,15 +68,15 @@
           }
           if (processFunc) {
             processFunc.call($callingElement, response);
-          }   // Execute users function
+          }
           if (localStorage['imagerDebugMessages'] === "FALSE") {
-            setTimeout(function () {
-              Popups.messages.dialogClose();
-            }, 3000);
+            // setTimeout(function () {
+            // --popups.messages.dialogClose();
+            // }, 3000);
           }
         },
         error: function (evt) {
-//        Popups.$busy.hide();
+          Popups.$busy.hide();
           clearTimeout(messageTimeout);
           Popups.messages.dialogOpen();
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +
@@ -130,13 +126,11 @@
       point.getTxPt = function getTxPt() {
         return point.t;
       };
-
       return point;
     };
 
-
     /**
-     * Given the path to a thumbnail determine the path of the full image
+     * Given the path to a thumbnail determine the path of the full image.
      *
      * If '/styles/' is part of the path then simply remove /styles/
      * and the next two path components.
@@ -169,9 +163,6 @@
         else {
           src = tsrc.substr(0, sindex) + tsrc.substr(index + 1);
         }
-//    @deprecated
-//    } else if ($(thumbnail).parent().attr('href')) {
-//      src = $(thumbnail).parent().attr('href');
       }
       return src;
     };
@@ -180,6 +171,7 @@
      * Given an angle degrees, calculate it in radians.
      *
      * @param deg
+     *
      * @returns {number}
      *   Angle in radians
      */

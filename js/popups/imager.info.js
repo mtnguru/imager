@@ -1,9 +1,9 @@
 /**
  * @file
- * Create the file_entity Information dialog
+ * Create the file_entity Information dialog.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -13,13 +13,15 @@
 
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   "use strict";
+
   /**
+   * Define the Information dialog class.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -108,9 +110,6 @@
         });
     };
 
-    /**
-     * Dialog buttons are defined last to ensure methods are defined.
-     */
     return popup;
   };
 })(jQuery);

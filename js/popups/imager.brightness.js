@@ -1,8 +1,9 @@
 /**
  * @file
+ * Imager module brightness dialog.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -10,21 +11,17 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
-/**
- * Wrap file in JQuery();
- *
- * @param $
- */
 (function ($) {
   "use strict";
   /**
-   * Declare Brightness/Contrast Dialog class - dialogBrightnessC - inherits from dialogBaseC
+   * Define Brightness/Contrast Dialog class - Drupal.imager.popups.brightnessC.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {popup}
+   * @returns {object}
+   *   Popup dialog reference.
    */
   Drupal.imager.popups.brightnessC = function brightnessC(spec) {
     var Popups = Drupal.imager.popups;
@@ -60,8 +57,8 @@
       popup.dialogInit();
     };
 
-    // @TODO - this will fail if the dialog is being closed because another is being opened.  
-    // Add a report variable to both open and close
+    // @TODO - this will fail if the dialog is being closed because another is being opened.
+    // Add a report variable to both open and close.
     popup.dialogOnClose = function dialogOnClose() {
       Viewer.setEditMode('view');
     };
@@ -99,7 +96,8 @@
       var w = $cvssrc.attr('width');
       var h = $cvssrc.attr('height');
 
-      var dataDesc = ctxsrc.getImageData(0, 0, w, h); // left, top, width, height
+      var dataDesc = ctxsrc.getImageData(0, 0, w, h);
+      // left, top, width, height.
       var data = dataDesc.data;
 
       var p = w * h;
@@ -110,7 +108,8 @@
         mul = multiplier * contrast;
         add = -contrast * 128 + 128;
       }
-      else {  // this if-then is not necessary anymore, is it?
+      else {
+        // This if-then is not necessary anymore, is it?
         mul = multiplier;
         add = 0;
       }
@@ -152,8 +151,7 @@
           }
         }
       }
-      //  ctx.putImageData(dataDesc,0,0,0,0,iw,ih);  // left, top
-      ctxdst.putImageData(dataDesc, 0, 0);  // left, top
+      ctxdst.putImageData(dataDesc, 0, 0);
     };
 
     popup.dialogReset = function dialogReset() {
@@ -174,7 +172,7 @@
     };
 
     popup.dialogUpdate = function dialogUpdate() {
-      // Update dialog with new information
+      // Update dialog with new information.
     };
 
     popup.updateStatus = function updateStatus() {
@@ -184,9 +182,7 @@
       });
     };
 
-    /**
-     * Dialog buttons are defined last to ensure methods are defined.
-     */
+    // Dialog buttons are defined last to ensure methods are defined.
     popup.spec['buttons'] = {
       Apply: popup.dialogApply,
       Reset: popup.dialogReset,

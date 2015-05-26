@@ -1,8 +1,9 @@
 /**
  * @file
+ * Declare Imager module Configuration dialog - Drupal.imager.popups.configC.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -11,7 +12,7 @@
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
@@ -19,7 +20,7 @@
   "use strict";
 
   /**
-   * Declare Configuration Dialog class - configC - inherits from dialogBaseC
+   * Declare Configuration Dialog class - configC - inherits from dialogBaseC.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -41,7 +42,7 @@
       dialogClass: 'imager-dialog',
       cssId: 'imager-config',
       height: 'auto',
-//                 resize: 'auto',
+      // resize: 'auto',
       position: {
         my: "left",
         at: "right",
@@ -63,7 +64,7 @@
     };
 
     /**
-     * Initialize checkboxes from localStorage
+     * Initialize checkboxes from localStorage.
      */
     popup.dialogInit = function dialogInit() {
       if (localStorage.imagerBoundsEnable === "TRUE") {
@@ -78,7 +79,7 @@
     };
 
     /**
-     * Save information from the configuration dialog to localStorage
+     * Save information from the configuration dialog to localStorage.
      */
     popup.dialogSave = function dialogSave() {
       if ($('#imager-debug-status').attr('checked')) {
@@ -106,9 +107,7 @@
       popup.dialogClose();
     };
 
-    /**
-     * Dialog buttons are defined last to ensure methods are defined.
-     */
+    // Dialog buttons are defined last to ensure methods are defined.
     popup.spec['buttons'] = {
       Save: popup.dialogSave,
       Cancel: popup.dialogClose

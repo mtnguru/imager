@@ -2,12 +2,13 @@
  * @file
  * Imager module initialization and thumbnail management.
  *
+ * Builds list of thumbnails and initializes Viewer dialog.
  * - Initializes imager JavaScript library.
  * - Builds list of thumbnails
- * - Finds next thumbnail when user clicks Arrow button in Viewer
- **/
+ * - Finds next thumbnail when user clicks Arrow button in Viewer.
+ */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -16,17 +17,18 @@
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   Drupal.imager.start = function imager() {
 
-    var $thumbnails;       // List of thumbnails on source page
+    var $thumbnails;
+    // List of thumbnails on source page.
     var Popups = Drupal.imager.popups;
-    var images = [];         // array of imageC - imager.image.js
-
+    var images = [];
+    // Array of imageC - imager.image.js
     /**
      * Initialize Imager JavaScript library.
      *
@@ -35,7 +37,8 @@
      */
     function _init(opts) {
       Drupal.imager.settings = opts;
-      Drupal.imager.core = Drupal.imager.coreM();      // Utility functions
+      Drupal.imager.core = Drupal.imager.coreM();
+      // Utility functions.
       Drupal.imager.$wrapper = $('#imager-wrapper');
       Drupal.imager.popups.$busy = $('#imager-busy').hide();
 
@@ -57,7 +60,7 @@
       } // No thumbnails found, exit
 
       $thumbnails.each(function (index, value) {
-        // Add image to images array
+        // Add image to images array.
         var $thumb = $(this).find(Drupal.imager.settings.cssImage);
         images.push(Drupal.imager.imageC({
           '$container': $(this),
@@ -66,10 +69,10 @@
           'src': Drupal.imager.core.getFullPath($thumb.attr('src'))
         }));
 
-        // Unbind any current event handlers on thumbnails
+        // Unbind any current event handlers on thumbnails.
         $thumb.parent().unbind('click');
 
-        // User clicks in thumbnail image
+        // User clicks in thumbnail image.
         $thumb.click(function (evt) {
           var image = findImageFromThumbSrc($thumb.attr('src'));
           if (Popups.viewer.dialogIsOpen()) {
@@ -81,7 +84,8 @@
           evt.stopPropagation();
           return false;
         });
-      });  // thumbnails.each()
+      });
+      // thumbnails.each()
     }
 
     /**
@@ -113,7 +117,6 @@
       }
       return undefined;
     };
-
 
     function findImageFromThumbSrc(srcThumb) {
       var i;

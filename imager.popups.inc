@@ -5,17 +5,16 @@
  * Define render arrays for Imager popups.
  */
 
-
 /**
  * Insert into $page the render arrays for all imager dialogs, popups, forms.
  *
- * @global string $_imager_path
- *   Path to imager module.
- *
  * @param array $page
  *   Render array for current page.
+ *
+ * @global string $_imager_path
+ *   Path to imager module.
  */
-function _imager_build_wrapper(&$page) {
+function _imager_build_wrapper(array &$page) {
   global $_imager_path;
   $_imager_path = drupal_get_path('module', 'imager');
   $page['content']['imager_wrapper'] = array(
@@ -24,6 +23,7 @@ function _imager_build_wrapper(&$page) {
     '#weight' => -100,
     '#attached' => array(
       'library' => array(
+        array('system', 'ui.dialog'),
         array('system', 'ui.draggable'),
       ),
       'js' => array(
@@ -62,22 +62,22 @@ function _imager_build_wrapper(&$page) {
         $_imager_path . '/css/imager.css',
       ),
     ),
-//  Render arrays are not loaded until needed.  Then they are loaded with AJAX.
-//  To load a render array before that uncomment it here.
-//  'viewer'     => _imager_build_viewer(),
-//  'brightness' => _imager_build_brightness(),
-//  'color'      => _imager_build_color(),
-//  'filesave'   => _imager_build_filesave(),
-//  'status'     => _imager_build_status(),
-//  'info'       => _imager_build_info(),
-//  'edit'       => _imager_build_edit(),
-//  'messages'   => _imager_build_messages(),
-//  'canvasorg'  => _imager_build_canvas(),
+  // Render arrays are not loaded until needed.  Then they are loaded with AJAX.
+  // To load a render array before that uncomment it here.
+  // 'viewer'     => _imager_build_viewer(),
+  // 'brightness' => _imager_build_brightness(),
+  // 'color'      => _imager_build_color(),
+  // 'filesave'   => _imager_build_filesave(),
+  // 'status'     => _imager_build_status(),
+  // 'info'       => _imager_build_info(),
+  // 'edit'       => _imager_build_edit(),
+  // 'messages'   => _imager_build_messages(),
+  // 'canvasorg'  => _imager_build_canvas(),
     'busy' => _imager_build_busy(),
-//  'map'        => _imager_build_map(),
-//  'form'       => _imager_build_form(),
-//  'confirm'    => _imager_build_confirm(),
-//  'config'     => _imager_build_configuration()
+  // 'map'        => _imager_build_map(),
+  // 'form'       => _imager_build_form(),
+  // 'confirm'    => _imager_build_confirm(),
+  // 'config'     => _imager_build_configuration()
   );
 }
 
@@ -89,15 +89,15 @@ function _imager_build_wrapper(&$page) {
  *
  * @todo Use buttons instead of images
  *
- * @param integer $weight
- *   Weight is used to determine the order of the buttons
+ * @param int $weight
+ *   Weight is used to determine the order of the buttons.
  * @param string $id
- *   CSS ID of button
+ *   CSS ID of button.
  * @param string $image
- *   Location of image
+ *   Location of image.
  * @param string $title
- *   Title - pops up on hover
- * @param boolean $wraplink
+ *   Title - pops up on hover.
+ * @param bool $wraplink
  *   Wrap the button image in a link?
  *
  * @return array
@@ -107,7 +107,8 @@ function _imager_build_button($weight, $id, $image, $title, $wraplink = FALSE) {
   $item = array(
     '#id' => $id,
     '#weight' => $weight,
-    '#title' => t($title),  // I know, don't use t() on a variable.
+    // $title is a string literal being passed into this function.
+    '#title' => $title,
     '#image' => $image,
     '#theme' => 'imager_add_button',
     '#wraplink' => $wraplink,
@@ -124,20 +125,20 @@ function _imager_build_button($weight, $id, $image, $title, $wraplink = FALSE) {
  * @return string
  *   HTML for button
  */
-function theme_imager_add_button($variables) {
+function theme_imager_add_button(array $variables) {
   global $_imager_path;
   $element = $variables['element'];
   if ($element['#wraplink']) {
-    $out = '<a href="#" id="' . $element['#id'] . '">' .
-      '<img ' .
-      'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
-      'alt="" title="' . $element['#title'] . '" />' .
-      '</a>';
+    $out = '<a href="#" id="' . $element['#id'] . '"><img src="' .
+        $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' .
+        $element["#image"] . '" alt="" title="' .
+        $element['#title'] . '" /></a>';
   }
   else {
-    $out = '<img id="' . $element['#id'] . '" ' .
-      'src="' . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' . $element["#image"] . '" ' .
-      'alt="" title="' . $element['#title'] . '">';
+    $out = '<img id="' . $element['#id'] . '" src="' .
+        $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/' .
+        $element["#image"] . '" alt="" title="' .
+        $element['#title'] . '">';
   }
   return $out;
 }
@@ -183,7 +184,6 @@ function _imager_build_viewer() {
           '#weight' => 0,
         ),
         'mode_view' => _imager_build_button(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
-//      'mode_lock' => _imager_build_button(2, 'mode-lock', 'lock.png', t('Lock image to screen')),
         'mode_fullscreen' => _imager_build_button(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
         'mode_configure' => _imager_build_button(4, 'mode-configure', 'configure.png', t('Configure settings')),
       ),
@@ -201,7 +201,6 @@ function _imager_build_viewer() {
         'view_browser' => _imager_build_button(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
         'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')),
         'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
-        //      'view_edit'       => _imager_build_button(4, 'view-edit', 'edit.png', t('Edit image title, categories, etc.')),
         'view_zoom_in' => _imager_build_button(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
         'view_zoom_out' => _imager_build_button(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
       ),
@@ -221,7 +220,7 @@ function _imager_build_viewer() {
         'edit_color' => _imager_build_button(4, 'edit-color', 'color_wheel.png', t('Edit Hue, Saturation and Lightness')),
         'edit_ccw' => _imager_build_button(5, 'edit-ccw', 'rotate-left.png', t('Rotate image 90 degrees counter-clockwise')),
         'edit_cw' => _imager_build_button(6, 'edit-cw', 'rotate-right.png', t('Rotate image 90 degrees clockwise')),
-        // 'edit-reset' does not work.  It must be used by another program
+        // 'edit-reset' does not work.  It must be used by another program.
         'view_reset' => _imager_build_button(7, 'view-reset', 'reset.png', t('Reset the image back to the original')),
       ),
       'file_buttons' => array(
@@ -238,21 +237,7 @@ function _imager_build_viewer() {
         'file_delete' => _imager_build_button(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
         'file_download' => _imager_build_button(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
         'file_email' => _imager_build_button(4, 'file-email', 'mail.png', t('E-mail image')),
-        //      'file_clipboard'   => _imager_build_button(5, 'file-clipboard', 'clipboard.png', t('Send image to clipboard')),
       ),
-//    'debug_buttons' => array(
-//      '#prefix' => '<div id="debug-buttons" class="buttons">',
-//      '#suffix' => '</div>',
-//      '#weight' => -5,
-//      'title' => array(
-//        '#type' => 'markup',
-//        '#markup' => t('Debug'),
-//        '#prefix' => '<div>',
-//        '#suffix' => '</div>',
-//      ),
-//      'debug_status' => _imager_build_button(1, 'debug-status', 'bug.png', t('Toggle status output')),
-//      'debug_messages' => _imager_build_button(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
-//    ),
     ),
     'imager_canvas_wrapper' => array(
       '#prefix' => '<div id="imager-canvas-wrapper">',
@@ -371,7 +356,7 @@ function _imager_build_filesave() {
         '#prefix' => '<div id="imager-filesave-filename-container">',
         '#suffix' => '</div>',
         '#type' => 'markup',
-        '#markup' => "<span>" . t('File name: ') . "</span><input id='imager-filesave-filename' type='text' />",
+        '#markup' => "<span>" . t('File name:') . " </span><input id='imager-filesave-filename' type='text' />",
       ),
     ),
   );
@@ -380,7 +365,8 @@ function _imager_build_filesave() {
 /**
  * Build the render table for image resolutions to select when saving images.
  *
- * @param integer $weight
+ * @param int $weight
+ *   Weight determines position within dialog.
  *
  * @return array
  *   Render array for image resolution selection table.
@@ -392,11 +378,11 @@ function _imager_build_resolution_table($weight) {
     '#attributes' => array('class' => 'table-no-striping'),
     '#theme' => 'table',
     '#header' => array(
-      t(''),      // @todo Uncommenting these lines causes PHP error.
+      '',
       t('Image'),
       t('Resolution'),
       t('Geometry'),
-      t('Ratio')
+      t('Ratio'),
     ),
     '#sticky' => FALSE,
     '#rows' => array(
@@ -462,88 +448,88 @@ function _imager_build_status() {
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-edit-mode'
-              )
+                'id' => 'imager-status-edit-mode',
+              ),
             ),
             array(
               'Full Screen',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-full-screen'
-              )
+                'id' => 'imager-status-full-screen',
+              ),
             ),
             array(
               'Distance',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-distance'
-              )
+                'id' => 'imager-status-distance',
+              ),
             ),
             array(
               'Elapsed',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-elapsed'
-              )
+                'id' => 'imager-status-elapsed',
+              ),
             ),
             array(
               'Zoom',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-zoom'
-              )
+                'id' => 'imager-status-zoom',
+              ),
             ),
             array(
               'Rotation',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-rotation'
-              )
+                'id' => 'imager-status-rotation',
+              ),
             ),
             array(
               'Brightness',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-brightness'
-              )
+                'id' => 'imager-status-brightness',
+              ),
             ),
             array(
               'Contrast',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-contrast'
-              )
+                'id' => 'imager-status-contrast',
+              ),
             ),
             array(
               'Hue',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-hue'
-              )
+                'id' => 'imager-status-hue',
+              ),
             ),
             array(
               'Saturation',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-saturation'
-              )
+                'id' => 'imager-status-saturation',
+              ),
             ),
             array(
               'Lightness',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-lightness'
-              )
+                'id' => 'imager-status-lightness',
+              ),
             ),
           ),
         ),
@@ -565,52 +551,52 @@ function _imager_build_status() {
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-max-canvas-width'
+                'id' => 'imager-status-max-canvas-width',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-max-canvas-height'
-              )
+                'id' => 'imager-status-max-canvas-height',
+              ),
             ),
             array(
               'Actual Canvas',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-actual-canvas-width'
+                'id' => 'imager-status-actual-canvas-width',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-actual-canvas-height'
-              )
+                'id' => 'imager-status-actual-canvas-height',
+              ),
             ),
             array(
               'Displayed Image',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-disp-image-width'
+                'id' => 'imager-status-disp-image-width',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-disp-image-height'
-              )
+                'id' => 'imager-status-disp-image-height',
+              ),
             ),
             array(
               'Full Image',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-full-image-width'
+                'id' => 'imager-status-full-image-width',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-full-image-height'
-              )
+                'id' => 'imager-status-full-image-height',
+              ),
             ),
           ),
         ),
@@ -629,104 +615,104 @@ function _imager_build_status() {
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-now-x'
+                'id' => 'imager-status-now-x',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-now-y'
-              )
+                'id' => 'imager-status-now-y',
+              ),
             ),
             array(
               'Mouse Now Tx',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-now-x-tx'
+                'id' => 'imager-status-now-x-tx',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-now-y-tx'
-              )
+                'id' => 'imager-status-now-y-tx',
+              ),
             ),
             array(
               'Mouse Down',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-down-x'
+                'id' => 'imager-status-down-x',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-down-y'
-              )
+                'id' => 'imager-status-down-y',
+              ),
             ),
             array(
               'Mouse Down Tx',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-down-x-tx'
+                'id' => 'imager-status-down-x-tx',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-down-y-tx'
-              )
+                'id' => 'imager-status-down-y-tx',
+              ),
             ),
             array(
               'Crop Upper Left',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-crop-ul-x'
+                'id' => 'imager-status-crop-ul-x',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-crop-ul-y'
-              )
+                'id' => 'imager-status-crop-ul-y',
+              ),
             ),
             array(
               'Crop Lower Right',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-crop-lr-x'
+                'id' => 'imager-status-crop-lr-x',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-crop-lr-y'
-              )
+                'id' => 'imager-status-crop-lr-y',
+              ),
             ),
             array(
               'Upper Left Canvas',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-canvas-ul-x'
+                'id' => 'imager-status-canvas-ul-x',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-canvas-ul-y'
-              )
+                'id' => 'imager-status-canvas-ul-y',
+              ),
             ),
             array(
               'Lower Right Canvas',
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-canvas-lr-x'
+                'id' => 'imager-status-canvas-lr-x',
               ),
               array(
                 'data' => '',
                 'class' => 'imager-text-right',
-                'id' => 'imager-status-canvas-lr-y'
-              )
+                'id' => 'imager-status-canvas-lr-y',
+              ),
             ),
           ),
         ),
@@ -843,9 +829,9 @@ function _imager_build_map() {
       '#weight' => 1,
       '#type' => 'markup',
       '#markup' => '<h3>' . t('Interactive Map - Under Construction') . '</h3>' .
-        '<p>The plan is to put a full interactive map with markers showing all photos on originating page.  ' .
-        'The current image\'s marker will be centered and highlighted with a different color.</p>' .
-        '<img alt="" id="imager-map-image" src="' . $GLOBALS['base_url'] . '/' . $_imager_path . '/icons/fakemap.png">',
+      '<p>The plan is to put a full interactive map with markers showing all photos on originating page.  ' .
+      'The current image\'s marker will be centered and highlighted with a different color.</p>' .
+      '<img alt="" id="imager-map-image" src="' . $GLOBALS['base_url'] . '/' . $_imager_path . '/icons/fakemap.png">',
     ),
     'buttons' => array(
       '#prefix' => '<div id="imager-map-buttons" class="imager-buttons">',
@@ -857,7 +843,7 @@ function _imager_build_map() {
 }
 
 /**
- * Load the file_entity_edit form - default form for image file type
+ * Load the file_entity_edit form - default form for image file type.
  *
  * Loading the full form as the page loads ensures all javascript code for
  * form fields are also loaded.

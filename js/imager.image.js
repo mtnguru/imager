@@ -1,11 +1,10 @@
 /**
  * @file
- * JavaScript library to popup full image viewer/editor from images on pages
- *
+ * JavaScript library to popup full image viewer/editor from images on pages.
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */

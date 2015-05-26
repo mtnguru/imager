@@ -1,8 +1,9 @@
 /**
  * @file
+ * Declare Imager module Confirmation dialog - Drupal.imager.popups.confirmC.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -11,20 +12,21 @@
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   "use strict";
   /**
-   * Declare Filesave Dialog class
+   * Declare Confirmation Dialog class.
    *
-   * @param {object} spec
+   * @param {Object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {popup}
+   * @returns {Object}
+   *   Reference to the popup.
    */
   Drupal.imager.popups.confirmC = function confirmC(spec) {
     var Popups = Drupal.imager.popups;
@@ -39,7 +41,6 @@
       width: 'auto',
       dialogClass: 'imager-confirm-dialog imager-noclose',
       cssId: 'imager-confirm',
-//                 cssIdFinal:  'imager-confirm-database',
       height: 'auto',
       resizable: false,
       position: {
@@ -67,7 +68,6 @@
     };
 
     popup.deleteImage = function deleteImage() {
-//    displayMessage('Deleting Image...');
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.deleteFile.url,
         {

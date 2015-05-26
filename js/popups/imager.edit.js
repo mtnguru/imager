@@ -1,9 +1,9 @@
 /**
  * @file
- * Create the file_entity File Entity Editdialog
+ * Declare Imager module file_entity Edit dialog - Drupal.imager.popups.editC.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -13,13 +13,14 @@
 
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   "use strict";
   /**
+   * Declare the file_entity edit dialog.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -87,8 +88,7 @@
 
     popup.dialogUpdate = function dialogUpdate() {
       Popups.$busy.show();
-      // Display edit popup - render current field from default edit form  
-//    displayMessage('Contacting Server ... loading form field');
+      // Display edit popup - render current field from default edit form.
       popup.spec.$elem.dialog({
         'position': {
           my: "left",
@@ -132,12 +132,14 @@
             }
           });
           break;
+
         case 'textfield':
           var $elems = $('#imager-edit-content input');
           value = $elems[0].value;
           break;
+
         case 'textarea':
-          // Find which editor is in use                                                   
+          // Find which editor is in use.
           var $elems = $('#imager-edit-content select');
           var editor = $elems[0].value;
           format = editor;
@@ -149,19 +151,22 @@
             if (editor === 'full_html') {
               var $elems = $('#imager-edit-content textarea.form-textarea');
               $elems.each(function (index, elem) {
-                value = $(elem).val();   // Last one wins - this is what we want
+                value = $(elem).val();
+                // Last one wins - this is what we want.
               });
             }
             else {
               if (editor === 'plain_text') {
                 var $elems = $('#imager-edit-content textarea.form-textarea');
                 $elems.each(function (index, elem) {
-                  value = $(elem).val();   // Last one wins - this is what we want
+                  value = $(elem).val();
+                  // Last one wins - this is what we want.
                 });
               }
             }
           }
           break;
+
         case 'date_combo':
           var $elems = $('#imager-edit-content input');
           var date;
@@ -176,26 +181,31 @@
             }
           });
           value = date + ' ' + time;
-//         alert('datetime  ' + date + '  ' + time);                                        
+          // alert('datetime  ' + date + '  ' + time);
           break;
+
         case 'hierarchical_select':
           var $elems = $('#imager-edit-content select');
           $elems.each(function (index, elem) {
-            value = $(elem).val();   // Last one wins - this is what we want               
+            value = $(elem).val();
+            // Last one wins - this is what we want.
           });
           break;
+
         case 'checkbox_tree':
           var $elems = $('#imager-edit-content input:checked');
           $elems.each(function (index, elem) {
-            value = $(elem).val();   // Last one wins - this is what we want               
+            value = $(elem).val();
+            // Last one wins - this is what we want.
           });
           break;
+
         default:
           alert('Unknown editFieldType ' + popup.settings.editFieldType);
           break;
       }
       Drupal.imager.popups.$busy.show();
-//    displayMessage('Saving ...');
+      // displayMessage('Saving ...');
       Drupal.imager.core.ajaxProcess(this,
         Drupal.imager.settings.actions.saveFileEntityField.url,
         {
@@ -217,9 +227,6 @@
       Save: popup.save,
       Cancel: popup.dialogClose
     };
-    /**
-     * Dialog buttons are defined last to ensure methods are defined.
-     */
     return popup;
   };
 })(jQuery);

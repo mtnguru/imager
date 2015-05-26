@@ -1,9 +1,11 @@
-/*!
+/**
+ * @file
+ * @file!
  * hoverIntent r7 // 2013.03.11 // jQuery 1.9.1+
- * http://cherne.net/brian/resources/jquery.hoverIntent.html
+ * http://cherne.net/brian/resources/jquery.hoverIntent.html.
  *
  * You may use hoverIntent under the terms of the MIT license.
- * Copyright 2007, 2013 Brian Cherne
+ * Copyright 2007, 2013 Brian Cherne.
  */
 (function (e) {
   e.fn.hoverIntent = function (t, n, r) {

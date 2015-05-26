@@ -1,9 +1,9 @@
 /**
  * @file
- *
+ * Declare Imager module Status dialog - Drupal.imager.popups.statusC.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -12,13 +12,14 @@
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   "use strict";
   /**
+   * Declare Status dialog class.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -67,7 +68,7 @@
     };
 
     popup.dialogInit = function dialogInit() {
-//    Query all other dialogs for their status
+      // Query all other dialogs for their status.
     };
 
     popup.dialogUpdate = function dialogUpdate(status) {
@@ -75,10 +76,8 @@
         var key;
         for (key in status) {
           $('#imager-status-' + key).html(status[key]);
-        }
-        ;
-      }
-      ;
+        };
+      };
     };
 
     return popup;

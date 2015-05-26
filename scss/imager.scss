@@ -351,7 +351,7 @@ div#main {
       padding-left: 0.5em;
     }
     .description {
-      color: $lightergreu;
+      color: $lightergrey;
     }
   }
   #imager-status-content {
@@ -384,12 +384,15 @@ div#main {
   z-index: 1011 !important;
 }
 
+/*
 html, body {
   overflow: hidden;
   height: 100%;
 }
 
+#main-wrapper,
 #page-wrapper {
   overflow-y: scroll;
   height: 100%;
 }
+*/

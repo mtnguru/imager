@@ -5,14 +5,14 @@
  * Attaches Imager to Drupal.behaviors.  Assigns paths and constants needed
  * for running Imager with Drupal.
  * Once page is loaded imager.init() is run once to initialize Imager
- * imager. imager.attach() is run every time content has changed either intially
- * or with AJAX.
+ * imager. imager.attach() is run every time content has changed either
+ * initially or with AJAX.
  *
  * This file can be replaced with a similar file to make Imager run
  * as a standalone JavaScript library independent from Drupal.
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
@@ -21,18 +21,18 @@
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery().
  *
  * @param $
  */
 (function ($) {
   var imager;
   Drupal.behaviors.imager = {
-    // attach functions are executed by Drupal upon page load or ajax loads.
+    // Attach functions are executed by Drupal upon page load or ajax loads.
     attach: function (context, settings) {
 
-      // Initialize paths and variables needed in JavaScript
-      // Run imager.init() to initialize Imager and assign event handlers
+      // Initialize paths and variables needed in JavaScript.
+      // Run imager.init() to initialize Imager and assign event handlers.
       $('#imager-wrapper').once(function () {
         var basepath = Drupal.settings.basePath;
         imager = Drupal.imager.start();

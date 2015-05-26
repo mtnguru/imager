@@ -1,6 +1,6 @@
 /**
  * @file
- * Imager module base class - Drupal.imager.popups.baseC
+ * Declare Imager module base class - Drupal.imager.popups.baseC.
  *
  * The dialog base class is the basis for all popups in the Imager module.
  *
@@ -33,29 +33,21 @@
  * impC                       dialogUpdate()
  */
 
-/**
+/*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
- *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.inc
+ *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.inc.
  */
 
 /**
- * Wrap file in JQuery();
+ * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
   "use strict";
 
-  /**
-   *
-   * @param {type} name
-   * @param {type} buttonId
-   * @param {type} processFunc
-   *
-   *
-   */
   /**
    * Initialize a dialog.
    *
@@ -78,7 +70,7 @@
     if (buttonId) {
       var $button = $(buttonId);
       if ($button) {
-        // Execute dialogs constructor
+        // Execute dialogs constructor.
         popup = Popups[name + 'C']({'$selectButton': $button});
         if (processFunc) {
           $button.click(processFunc);
@@ -89,31 +81,31 @@
       }
     }
     else {
-      // Execute dialogs constructor
+      // Execute dialogs constructor.
       popup = Popups[name + 'C']({'$selectButton': undefined});
     }
     Popups[name] = popup;
     return popup;
   };
 
-
   Drupal.imager.popups.baseC = function baseC(spec) {
     var popup = {};
     popup.settings = {};
     spec = spec || {};
 
-    var $selectButton = spec.$selectButton || undefined;  // The button that was clicked to popup this dialog
+    var $selectButton = spec.$selectButton || undefined;
+    // The button that was clicked to popup this dialog.
     popup.spec = spec || {};
     popup.spec.name = popup.spec.name || 'unknown';
     popup.spec.dialogClass = popup.spec.dialogClass || '';
     popup.spec.$elem = popup.spec.$elem || undefined;
 
-    // return if popup is loaded
+    // Return if popup is loaded.
     popup.dialogHave = function dialogHave() {
       return (popup.spec.$elem) ? true : false;
     };
 
-    // load the dialog using AJAX
+    // Load the dialog using AJAX.
     popup.dialogLoad = function dialogLoad() {
       Drupal.imager.core.ajaxProcess(popup,
         Drupal.imager.settings.actions.renderDialog.url,
@@ -124,7 +116,7 @@
         popup.dialogCreate);
     };
 
-    // load the popup using AJAX
+    // Load the popup using AJAX.
     popup.dialogCreate = function dialogCreate(response) {
       var status = response['status'];
       Drupal.imager.$wrapper.append(response['data']);
@@ -133,16 +125,16 @@
         popup.spec.$elem.removeClass(popup.spec.cssId).addClass(popup.spec.cssIdFinal);
       }
       var $elem = popup.spec.$elem;
-      $elem.dialog(popup.spec);    // Create the popup
+      $elem.dialog(popup.spec);
+      // Create the popup.
       popup.dialogOnCreate();
     };
-
 
     popup.dialogIsOpen = function dialogIsOpen() {
       return (popup.spec.$elem && popup.spec.$elem.dialog('isOpen')) ? true : false;
     };
 
-    // Close the dialog if it's open
+    // Close the dialog if it's open.
     popup.dialogClose = function dialogClose() {
       if (popup.spec.$elem) {
         if ($selectButton) {
