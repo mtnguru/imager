@@ -130,7 +130,7 @@ function imager_menu() {
 }
 
 /**
- * Implements HOOK_views_pre_view().
+ * Implements hook_views_pre_view().
  *
  * Determine if this view needs imager module, if so set $_imager_enable = true.
  */
@@ -142,11 +142,10 @@ function imager_views_pre_view(&$view, &$display_id, &$args) {
       $_imager_enable = TRUE;
     }
   }
-  return;
 }
 
 /**
- * Implements HOOK_theme().
+ * Implements hook_theme().
  */
 function imager_theme() {
   return array(
@@ -157,14 +156,15 @@ function imager_theme() {
 }
 
 /**
- * Implements HOOK_page_alter().
+ * Implements hook_page_alter().
  *
  * If some other hook has enabled the Imager module, build the wrapper DIV
  * that will contain the Imager HTML.
  *
- * @param $page
+ * @param array $page
+ *   Page render array.
  */
-function imager_page_alter(&$page) {
+function imager_page_alter(array &$page) {
   global $_imager_enable;
   if (isset($_imager_enable)) {
     module_load_include('inc', 'imager', 'imager.popups');
@@ -175,16 +175,15 @@ function imager_page_alter(&$page) {
 /**
  * Form constructor for the file edit form.
  *
- * @todo - James Test to see if this function is still used.
+ * @param array $form
+ *   Form.
+ * @param array $form_state
+ *   Form state.
  *
- * @param $form
- * @param $form_state
- *
- * @return mixed
+ * @return array $form
+ *   Return the form render array. 
  */
-function imager_file_entity_edit($form, &$form_state) {
-  // @todo What happened to the file.  I don't think this function is used anymore.
-  // drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $file->type, '@title' => $file->filename)), PASS_THROUGH);
+function imager_file_entity_edit(array $form, array &$form_state) {
   $form['#attributes']['class'][] = 'file-form';
 
   // Basic file information.
@@ -192,20 +191,20 @@ function imager_file_entity_edit($form, &$form_state) {
   foreach (array('fid', 'type', 'uid', 'timestamp') as $key) {
     $form[$key] = array(
       '#type' => 'value',
-      //    '#value' => isset($file->$key) ? $file->$key : NULL,
+      // '#value' => isset($file->$key) ? $file->$key : NULL,
     );
   }
 
   $form['filename'] = array(
     '#type' => 'textfield',
     '#title' => t('Name'),
-    //  '#default_value' => $file->filename,
+    // '#default_value' => $file->filename,
     '#required' => TRUE,
     '#maxlength' => 255,
     '#weight' => -10,
   );
 
-  //$form['preview'] = file_view_file($file, 'preview');
+  // $form['preview'] = file_view_file($file, 'preview');
   $form['additional_settings'] = array(
     '#type' => 'vertical_tabs',
     '#weight' => 99,
@@ -214,7 +213,7 @@ function imager_file_entity_edit($form, &$form_state) {
   // File destination information for administrators.
   $form['destination'] = array(
     '#type' => 'fieldset',
-    //  '#access' => user_access('administer files') && file_entity_file_is_writeable($file),
+    // '#access' => user_access('administer files') && file_entity_file_is_writeable($file),
     '#title' => t('Destination'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -238,7 +237,7 @@ function imager_file_entity_edit($form, &$form_state) {
     '#type' => 'radios',
     '#title' => t('Destination'),
     '#options' => $options,
-    //  '#default_value' => file_uri_scheme($file->uri),
+    // '#default_value' => file_uri_scheme($file->uri),
   );
 
   // File user information for administrators/
@@ -268,7 +267,6 @@ function imager_file_entity_edit($form, &$form_state) {
     '#title' => t('Associated with'),
     '#maxlength' => 60,
     '#autocomplete_path' => 'user/autocomplete',
-    // '#default_value' => !empty($file->uid) ? user_load($file->uid)->name : '',
     '#weight' => -1,
     '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
@@ -286,23 +284,17 @@ function imager_file_entity_edit($form, &$form_state) {
     '#value' => t('Delete'),
     '#weight' => 10,
     '#submit' => array('file_entity_edit_delete_submit'),
-    //  '#access' => file_entity_access('delete', $file),
+    // '#access' => file_entity_access('delete', $file),
   );
-
-  //$langcode = function_exists('entity_language') ? entity_language('file', $file) : NULL;
-  //field_attach_form('file', $file, $form, $form_state, $langcode);
   return $form;
 }
 
 /**
- * Implements HOOK_entity_info_alter().
+ * Implements hook_entity_info_alter().
  *
  * Adds view modes to file entities.
- *
- * @param array $entity_info
  */
-function imager_entity_info_alter(&$entity_info) {
-  //Not sure if it's still an issue, but a previous commenter noted that Media module only recognizes view modes with the prefix media_. Also, as you can see by the entity type 'file', this is for after the switch-to-file-entity patch.
+function imager_entity_info_alter(array &$entity_info) {
   $entity_info['file']['view modes']['media_imager_info'] = array(
     'label' => t('Imager Info'),
     'custom settings' => TRUE,
@@ -315,22 +307,15 @@ function imager_entity_info_alter(&$entity_info) {
     'label' => t('Imager Browser'),
     'custom settings' => TRUE,
   );
-//$entity_info['file']['view modes']['media_imager_map'] = array(
-//  'label' => t('Imager Map'),
-//  'custom settings' => TRUE,
-//);
 }
 
 /**
- * Implements hook_file_view_alter
+ * Implements hook_file_view_alter.
  *
  * Add filename, owner, filesize, fid and image geometry to the file view.
- *
- * @param $build
- * @param $type
  */
-function imager_file_view_alter(&$build, $type) {
-  // Exit if view_mode != configured view mode for information dialog
+function imager_file_view_alter(array &$build, $type) {
+  // Exit if view_mode != configured view mode for information dialog.
   if ($build['#view_mode'] !== variable_get('imager_information_view_mode')) {
     return $build;
   }
@@ -438,15 +423,15 @@ function imager_file_view_alter(&$build, $type) {
 /**
  * Check if a library variant has been installed.
  *
- * @param $library
+ * @param array $library
  *   Library info array.
- * @param $variant
+ * @param string $variant
  *   Variant name.
  *
- * @return
+ * @return boolean
  *   TRUE if the variant exists, FALSE otherwise.
  */
-function imager_library_detect_variant($library, $variant) {
+function imager_library_detect_variant(array $library, $variant) {
   if (!empty($library['variants'][$variant]['files'])) {
     $files = $library['variants'][$variant]['files'];
 
