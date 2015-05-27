@@ -26,6 +26,10 @@ function _imager_build_wrapper(array &$page) {
         array('system', 'ui.dialog'),
         array('system', 'ui.draggable'),
       ),
+      'css' => array(
+        $_imager_path . '/css/imgareaselect-animated.css',
+        $_imager_path . '/css/imager.css',
+      ),
       'js' => array(
         $_imager_path . '/js/vendor/hoverintent.js',
         $_imager_path . '/js/vendor/jquery.imgareaselect.min.js',
@@ -57,11 +61,8 @@ function _imager_build_wrapper(array &$page) {
           ),
         ),
       ),
-      'css' => array(
-        $_imager_path . '/css/imgareaselect-animated.css',
-        $_imager_path . '/css/imager.css',
-      ),
     ),
+
   // Render arrays are not loaded until needed.  Then they are loaded with AJAX.
   // To load a render array before that uncomment it here.
   // 'viewer'     => _imager_build_viewer(),
@@ -79,8 +80,9 @@ function _imager_build_wrapper(array &$page) {
   // 'confirm'    => _imager_build_confirm(),
   // 'config'     => _imager_build_configuration()
   );
+  //$page['content']['imager_wrapper']['#attached']['imager_library_load'][] = array('jquery.imgareaselect');
+  //$page['content']['imager_wrapper']['#attached'][] = array('screenfull');
 }
-
 
 /**
  * Construct render array for a button.
@@ -953,4 +955,56 @@ function _imager_build_configuration() {
       ),
     ),
   );
+}
+
+/**
+ * Smart library loader.
+ *
+ * Checks for  packed or minified version and falls back to the default
+ * version if neither of them were found.
+ *
+ * @param string $name
+ *   Library name.
+ * @param array $variants
+ *   Array of allowed variants.
+ *
+ * @return array
+ *   Associative array of library information as returned from libraries_info().
+ *
+ * @see libraries_load()
+ */
+function imager_library_load($name, array $variants = NULL) {
+  $loaded = &drupal_static(__FUNCTION__, array());
+
+  if (!isset($loaded[$name])) {
+    $loaded[$name] = array();
+
+    $library = cache_get($name, 'cache_libraries');
+    if ($library) {
+      $library = $library->data;
+    }
+    else {
+      $library = libraries_detect($name);
+      cache_set($name, $library, 'cache_libraries');
+    }
+
+    if (empty($variants)) {
+      $variants = array('packed', 'minified', NULL);
+    }
+
+    foreach ((array) $variants as $variant) {
+      if ($variant) {
+        if (!empty($library['variants'][$variant]['installed'])) {
+          $loaded[$name] = libraries_load($name, $variant);
+          break;
+        }
+      }
+      elseif ($library['installed']) {
+        $loaded[$name] = libraries_load($name, $variant);
+        break;
+      }
+    }
+
+    return $loaded[$name];
+  }
 }

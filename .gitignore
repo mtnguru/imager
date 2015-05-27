@@ -2,3 +2,5 @@ nbproject
 *.swp
 .sass-cache
 js/ui-lightness
+icons
+.idea

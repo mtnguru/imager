@@ -201,7 +201,7 @@
                 h -= 6;
               }
               var m = (l + l - v);
-              var sextant = h > > 0;
+              var sextant = h >> 0;
               if (sextant === 0) {
                 r = v * 255;
                 g = (m + ((v - m) * (h - sextant))) * 255;

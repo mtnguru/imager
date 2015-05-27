@@ -3,4 +3,4 @@ description = Example of using the Imager module hooks
 core = 7.x
 package = "Media"
 
-files[] = imager_example.module
+dependencies[] = imager

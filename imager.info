@@ -1,7 +1,21 @@
 name = "Imager"
-description = Hovering over a thumbnail pops up a window showing full image where it can be zoomed, panned, rotated, cropped and saved
+description = Image viewing and editing module - clicking on a thumbnail brings up a dialog where you can view, pan, zoom, rotate, crop and change brightness/contrast and hue/saturation/lightness.
+
 core = 7.x
 package = "Media"
 
-files[] = imager.module
 configure = admin/config/media/imager
+
+dependencies[] = entity
+dependencies[] = file_entity
+
+; jQuery imgAreaSelect.
+libraries[jquery.imgareaselect][download][type] = file
+libraries[jquery.imgareaselect][download][url] = http://odyniec.net/projects/imgareaselect/jquery.imgareaselect-0.9.10.zip
+libraries[jquery.imgareaselect][download][subtree] = jquery.imgareaselect-0.9.10
+
+; ; screenfull.js
+; libraries[jquery.imgareaselect][download][type] = file
+; libraries[jquery.imgareaselect][download][url] = http://odyniec.net/projects/imgareaselect/jquery.imgareaselect-0.9.10.zip
+; libraries[jquery.imgareaselect][download][subtree] = jquery.imgareaselect-0.9.10
+

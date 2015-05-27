@@ -6,7 +6,7 @@
  */
 
 /**
- * Implement hook_imager_modify().
+ * Implements hook_imager_modify().
  */
 function imager_example_imager_modify($fid) {
   $view = views_get_view('imager_test');
