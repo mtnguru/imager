@@ -178,7 +178,7 @@ function imager_page_alter(array &$page) {
  *   Form state.
  *
  * @return array $form
- *   Return the form render array. 
+ *   Return the form render array.
  */
 function imager_file_entity_edit(array $form, array &$form_state) {
   $form['#attributes']['class'][] = 'file-form';
@@ -210,7 +210,6 @@ function imager_file_entity_edit(array $form, array &$form_state) {
   // File destination information for administrators.
   $form['destination'] = array(
     '#type' => 'fieldset',
-    // '#access' => user_access('administer files') && file_entity_file_is_writeable($file),
     '#title' => t('Destination'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
