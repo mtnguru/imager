@@ -160,9 +160,6 @@ function imager_theme() {
  *
  * If some other hook has enabled the Imager module, build the wrapper DIV
  * that will contain the Imager HTML.
- *
- * @param array $page
- *   Page render array.
  */
 function imager_page_alter(array &$page) {
   global $_imager_enable;
@@ -310,7 +307,7 @@ function imager_entity_info_alter(array &$entity_info) {
 }
 
 /**
- * Implements hook_file_view_alter.
+ * Implements hook_file_view_alter().
  *
  * Add filename, owner, filesize, fid and image geometry to the file view.
  */
@@ -428,7 +425,7 @@ function imager_file_view_alter(array &$build, $type) {
  * @param string $variant
  *   Variant name.
  *
- * @return boolean
+ * @return bool
  *   TRUE if the variant exists, FALSE otherwise.
  */
 function imager_library_detect_variant(array $library, $variant) {

@@ -14,7 +14,7 @@ function imager_install() {
 }
 
 /**
- * Implement hook_uninstall().
+ * Implements hook_uninstall().
  */
 function imager_uninstall() {
   variable_del('imager_dude');
