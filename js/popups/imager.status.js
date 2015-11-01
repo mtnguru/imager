@@ -31,6 +31,7 @@
    *   not used by jQuery dialog but needed for other purposes.
    *
    * @return {dialog}
+   *   The Status dialog.
    */
   Drupal.imager.popups.statusC = function statusC(spec) {
     var Popups = Drupal.imager.popups;

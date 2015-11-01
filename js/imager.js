@@ -22,7 +22,7 @@
  * @param $
  */
 (function ($) {
-  "use strict"
+  "use strict";
 
   Drupal.imager.start = function imager() {
 

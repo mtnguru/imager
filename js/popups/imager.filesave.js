@@ -27,6 +27,7 @@
    *   not used by jQuery dialog but needed for other purposes.
    *
    * @return {popup}
+   *   The filesave dialog.
    */
   Drupal.imager.popups.filesaveC = function filesaveC(spec) {
     var Popups = Drupal.imager.popups;
@@ -222,7 +223,7 @@
               'Overwrite': function () {
                 database(true);
               },
-              Cancel: popup.dialogClose
+              'Cancel': popup.dialogClose
             }
           });
           break;
@@ -232,7 +233,7 @@
             title: 'Send image to Email',
             buttons: {
               'Send in Email': email,
-              Cancel: popup.dialogClose
+              'Cancel': popup.dialogClose
             }
           });
           break;
@@ -242,7 +243,7 @@
             title: 'Download Image',
             buttons: {
               'Download Image': download,
-              Cancel: popup.dialogClose
+              'Cancel': popup.dialogClose
             }
           });
           break;
@@ -251,8 +252,8 @@
           popup.spec.$elem.dialog({
             title: 'Send image to Clipboard',
             buttons: {
-              'Clipboard': clipboard,
-              'Cancel': popup.dialogClose
+              Clipboard: clipboard,
+              Cancel: popup.dialogClose
             }
           });
           break;

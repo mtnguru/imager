@@ -147,8 +147,6 @@
     /**
      * Process AJAX requests.
      *
-     * @TODO Drupal probably has an API for this.
-     *
      * @param {Object} $callingElement
      *   Element from which this ajax call was initiated.
      * @param {path} url
@@ -156,7 +154,9 @@
      * @param {Object} postData
      *   Data needed by the php ajax function.
      * @param {function} processFunc
-     *   Function to call after receiving data. 
+     *   Function to call after receiving data.
+     *
+     * @TODO Drupal probably has an API for this.
      */
     var ajaxProcess = function ajaxProcess($callingElement, url, postData, processFunc) {
       postData['filePath'] = Drupal.imager.settings.filePath;
@@ -200,7 +200,6 @@
         },
         error: function (evt) {
           Popups.$busy.hide();
-          var response = JSON.parse(response_json);
           clearTimeout(messageTimeout);
           Popups.messages.dialogOpen();
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +
