@@ -200,6 +200,7 @@
         },
         error: function (evt) {
           Popups.$busy.hide();
+          var response = JSON.parse(response_json);
           clearTimeout(messageTimeout);
           Popups.messages.dialogOpen();
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +

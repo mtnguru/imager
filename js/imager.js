@@ -16,7 +16,6 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
-
 /**
  * Wrap file in JQuery();.
  *
