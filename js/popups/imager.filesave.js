@@ -105,7 +105,7 @@
       var dataurl = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), true);
       window.location.href = dataurl;
       window.location.download = "downloadit.jpg";
-//    window.open(dataurl, 'Download image smiley image');
+    //window.open(dataurl, 'Download image smiley image');
 
       Popups.$busy.hide();
       popup.dialogClose();

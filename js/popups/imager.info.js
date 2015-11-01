@@ -22,7 +22,6 @@
   if (localStorage.getItem('imagerShowInfo') === null) {
     localStorage.setItem('imagerShowInfo', false);
   }
-  /**
 
   /**
    * Define the Information dialog class.

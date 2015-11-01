@@ -279,7 +279,7 @@ function imager_email_file() {
   $uri = urldecode(check_plain($_POST['uri']));
   // $out['debug'][] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
   $ps = _imager_get_paths($uri);
-  $ps['filename'] = substr($ps['filename'],0,12);
+  $ps['filename'] = substr($ps['filename'], 0, 12);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
   $dir = variable_get('imager_email_local_path');
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
@@ -321,7 +321,7 @@ function imager_email_file() {
   $out['debug'][] = 'Email subject: ' . $out['data']['subject'];
   $out['debug'][] = 'Email body: ' . $html;
   $out['debug'][] = 'Email attachPath: ' . $out['data']['attachPath'];
-  
+
   print json_encode($out);
 }
 
@@ -394,10 +394,9 @@ function imager_print_image() {
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
-  // Send file to printer
+  // Send file to printer.
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
 //$file = file_load(_imager_get_fid($ps['puri']));
-
   $dir = DRUPAL_ROOT . '/tmp';
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
 

@@ -37,41 +37,41 @@
         var basepath = Drupal.settings.basePath;
         imager = Drupal.imager.start();
         imager.init({
-          'modulePath': Drupal.settings.imager.modulePath,
-          'cssContainer': Drupal.settings.imager.cssContainer,
-          'cssImage': Drupal.settings.imager.cssImage,
-          'basePath': basepath,
-          'filePath': Drupal.settings.filePath,
-          'attachBehaviors': Drupal.attachBehaviors,
-          'actions': {
-            'displayEntity': {
+          modulePath: Drupal.settings.imager.modulePath,
+          cssContainer: Drupal.settings.imager.cssContainer,
+          cssImage: Drupal.settings.imager.cssImage,
+          basePath: basepath,
+          filePath: Drupal.settings.filePath,
+          attachBehaviors: Drupal.attachBehaviors,
+          actions: {
+            displayEntity: {
               'url': basepath + '?q=imager/ajax/display_entity'
             },
-            'displayMap': {
+            displayMap: {
               'url': basepath + '?q=imager/ajax/display_map'
             },
-            'editFormFieldLoad': {
+            editFormFieldLoad: {
               'url': basepath + '?q=imager/ajax/edit_form_field_load'
             },
-            'saveFileEntityField': {
+            saveFileEntityField: {
               'url': basepath + '?q=imager/ajax/save_file_entity_field'
             },
-            'saveFile': {
+            saveFile: {
               'url': basepath + '?q=imager/ajax/save_image'
             },
-            'viewBrowser': {
+            viewBrowser: {
               'url': basepath + '?q=imager/ajax/view_browser'
             },
-            'emailFile': {
+            emailFile: {
               'url': basepath + '?q=imager/ajax/email_file'
             },
-            'deleteFile': {
+            deleteFile: {
               'url': basepath + '?q=imager/ajax/delete_file'
             },
-            'printImage': {
+            printImage: {
               'url': basepath + '?q=imager/ajax/print_image'
             },
-            'renderDialog': {
+            renderDialog: {
               'url': basepath + '?q=imager/ajax/render_dialog'
             }
           }

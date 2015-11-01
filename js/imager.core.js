@@ -9,8 +9,8 @@
 
   // Create the Drupal.imager namespace and subspaces.
   Drupal.imager = {
-    'popups': {},
-    'viewer': {}
+    popups: {},
+    viewer: {}
   };
 
 
@@ -34,7 +34,6 @@
       var pt_canvas_ul = Viewer.pt_canvas_ul;
       var pt_canvas_lr = Viewer.pt_canvas_lr;
       var status = Viewer.getStatus();
-      var image = Viewer.getImage();
       var img = Viewer.getImg();
       var dataurl;
 
@@ -57,13 +56,13 @@
           var nch;
           var pt = pointC('tmp');
           if (status.rotation === 0 || status.rotation === 180) {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-              nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-              Viewer.$canvas2.attr({
-                width: ncw,
-                // Set canvas to same size as image.
-                height: nch
-              });
+            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
+            nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
+            Viewer.$canvas2.attr({
+              width: ncw,
+              // Set canvas to same size as image.
+              height: nch
+            });
             if (status.rotation === 0) {
               // Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
               pt.setPt(0, 0, Viewer.ctx);
@@ -75,26 +74,23 @@
               Viewer.ctx2.translate(ncw, nch);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(status.cw, status.ch, Viewer.ctx);
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
             }
           }
           else {
             ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-              nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-              Viewer.$canvas2.attr({
-                width: ncw,
-                // Set canvas to same size as image.
-                height: nch
-              });
+            nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
+            Viewer.$canvas2.attr({
+              width: ncw,
+              height: nch
+            });
             if (status.rotation === 90) {
               Viewer.ctx2.translate(ncw, 0);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(status.cw, 0, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                // parseInt(pt1.x),
-                - pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
+              // parseInt(pt1.x),
               // parseInt(pt2.y),
             }
             else {
@@ -102,8 +98,7 @@
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(0, status.ch, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
             }
           }
           dataurl = Viewer.$canvas2[0].toDataURL(mimeType);
@@ -169,7 +164,7 @@
         data: postData,
         success: function (response_json) {
           clearTimeout(messageTimeout);
-//        Popups.$busy.hide();
+          // Popups.$busy.hide();
           var response = JSON.parse(response_json);
           var display = false;
           var out;

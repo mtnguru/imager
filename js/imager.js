@@ -50,6 +50,8 @@
      * Build list of thumbnails and attach event handlers.
      *
      *
+     * @return
+     *   Pareview wants something here, so I wrote this.
      */
     function _attach() {
       images = [];
@@ -62,7 +64,10 @@
       $thumbnails.each(function (index, value) {
         // Add image to images array.
         var $thumb = $(this).find(Drupal.imager.settings.cssImage);
-        if (!$thumb.attr('src')) return;
+        if (!$thumb.attr('src')) {
+          return;
+        }
+
         images.push(Drupal.imager.imageC({
           '$container': $(this),
           '$thumb': $thumb,
@@ -84,11 +89,11 @@
             Popups.viewer.dialogOpen({'image': image});
           }
           evt.stopPropagation();
-//        evt.preventDefault();
+        //evt.preventDefault();
           return false;
         });
       });
-      // thumbnails.each()
+      return;
     }
 
     /**
@@ -118,7 +123,7 @@
           return images[i];
         }
       }
-      return undefined;
+      return; // undefined;
     };
 
     function findImageFromThumbSrc(srcThumb) {
@@ -128,7 +133,7 @@
           return images[i];
         }
       }
-      return undefined;
+      return; // undefined;
     }
 
     return {

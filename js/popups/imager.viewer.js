@@ -39,7 +39,7 @@
       cssId: 'imager-viewer',
       height: 'auto',
       resizable: true,
-//    position: {'fixed'},
+  //  position: {'fixed'},
       position: {
         my: 'left top',
         at: 'left top'
@@ -51,10 +51,10 @@
     }, spec);
 
     var popup = Popups.baseC(dspec); // Initialize viewerC from baseC.
-    var image;               // Current image of imageC.
+    var image;                       // Current image of imageC.
     var img = document.createElement('IMG'); // Storage for current image.
-    var $imgOverlay;          // Image that overlays the canvas.
-    var clearOverlay = false; // Clear the overlay with transparent image.
+    var $imgOverlay;                 // Image that overlays the canvas.
+    var clearOverlay = false;        // Clear the overlay with transparent image.
     var $canvas, $canvas2;    // Primary and Secondary canvas's
     var ctx, ctx2;            // Related contexts for canvas's
     var ias;                  // Image area select object.
@@ -172,10 +172,10 @@
       $imgOverlay.width(cw).height(ch);
       $('#imager-canvas-wrapper').width(cw).height(ch);
       setEditMode('view');
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
       // Set transform matrix to identity matrix.
-      ctx.clearRect(0, 0, cw, ch);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       // Clear the canvas.
+      ctx.clearRect(0, 0, cw, ch);
 
       pt_down.setPt(cw / 2, ch / 2, ctx);
       // Initialize last mouse down event to center.
@@ -191,7 +191,7 @@
     var redraw = Drupal.imager.viewer.redraw = function redraw() {
       pt_canvas_ul.setPt(0, 0, ctx);
       pt_canvas_lr.setPt($canvas[0].width, $canvas[0].height, ctx);
-      // Calculate the scale based on actual
+      // Calculate the scale based on actual.
       if ((rotation === 0) || (rotation === 180)) {
         cscale = cw / Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
       }
@@ -279,7 +279,7 @@
       // Set transform matrix to identity matrix.
       // The original img is kept unrotated.
       ctx2.drawImage($canvas[0], 0, 0);   // Grabs the canvas which may be partial.
-//    ctx2.drawImage(img, 0, 0);   // Grabs the canvas which may be partial.
+   // ctx2.drawImage(img, 0, 0);   // Grabs the canvas which may be partial.
     };
 
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
@@ -306,7 +306,6 @@
       setEditMode('view');
       Popups.$busy.hide();
     }
-
 
     /**
      * Rotate the image.
@@ -531,7 +530,9 @@
       if (evt.which !== 1) return;
       evt.preventDefault();
       setEditMode('view');
-      document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+      document.body.style.mozUserSelect = 'none';
+      document.body.style.webkitUserSelect = 'none';
+      document.body.style.userSelect = 'none';
       var y;
       var x = evt.offsetX || (evt.pageX - $canvas[0].offsetLeft);
       // @todo - pageY works intermittently
@@ -680,8 +681,8 @@
      */
     function enablePanZoom() {
       // canvas#image-canvas event handlers.
-//    $imgOverlay[0].addEventListener('contextmenu', contextMenu, false);
-//    $imgOverlay[0].addEventListener('click', click, false);
+    //$imgOverlay[0].addEventListener('contextmenu', contextMenu, false);
+    //$imgOverlay[0].addEventListener('click', click, false);
       $imgOverlay[0].addEventListener('mousedown', mouseDown, false);
       $imgOverlay[0].addEventListener('mousemove', mouseMove, false);
       $imgOverlay[0].addEventListener('mouseup', mouseUp, false);
@@ -1065,23 +1066,23 @@
       $imgOverlay = $('#imager-image');
       $imgOverlay.on("contextmenu", fillOverlayImg);
 
-//    $imgOverlay.click(vun);
-//    $imgOverlay.mousedown(function (evt) { $canvas.mousedown(); return false; });
-//    $imgOverlay.mousemove(function (evt) { $canvas.mousemove(); return false; });
-///   $imgOverlay.mouseup(  function (evt) { $canvas.mouseup(); return false; });
-//    $imgOverlay[0].addEventListener('DOMMouseScroll', function (evt) { $canvas.DOMMouseScroll(evt); }, false);
-//    $imgOverlay[0].addEventListener('mousewheel', function (evt) { $canvas.mousewheel(); }, false);
+    //$imgOverlay.click(vun);
+    //$imgOverlay.mousedown(function (evt) { $canvas.mousedown(); return false; });
+    //$imgOverlay.mousemove(function (evt) { $canvas.mousemove(); return false; });
+    //$imgOverlay.mouseup(  function (evt) { $canvas.mouseup(); return false; });
+    //$imgOverlay[0].addEventListener('DOMMouseScroll', function (evt) { $canvas.DOMMouseScroll(evt); }, false);
+    //$imgOverlay[0].addEventListener('mousewheel', function (evt) { $canvas.mousewheel(); }, false);
 
-//    Popups.initDialog('image', '#file-image', function () {
-//      var dataurl = Drupal.imager.core.getImage('image-cropped', false);
-//      Popups.image.dialogToggle({
-//        'attr': {
-//          'src': Drupal.imager.core.getImage('image-cropped', false),
-//          'width': cw,
-//          'height': ch
-//        }
-//      });
-//    });
+    //Popups.initDialog('image', '#file-image', function () {
+    //  var dataurl = Drupal.imager.core.getImage('image-cropped', false);
+    //  Popups.image.dialogToggle({
+    //    'attr': {
+    //      'src': Drupal.imager.core.getImage('image-cropped', false),
+    //      'width': cw,
+    //      'height': ch
+    //    }
+    //  });
+    //});
 
       // Edit Buttons.
       $('#mode-crop').click(function () {
