@@ -18,6 +18,7 @@
  */
 (function ($) {
   "use strict";
+
   /**
    * Declare Filesave Dialog class.
    *
@@ -25,7 +26,7 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {popup}
+   * @return {popup}
    */
   Drupal.imager.popups.filesaveC = function filesaveC(spec) {
     var Popups = Drupal.imager.popups;
@@ -67,26 +68,27 @@
           uri: Viewer.getImage().src,
           imgBase64: img
         }, function (response) {
+          var $row;
           if (response['file_new']) {
             Viewer.getImage().$container.after(response['file_new']);
             // @TODO The two unwrap are hardcoded to remove two extra divs.
             // Can this be done in PHP when it is rendered.
             // Maybe a Views tpl.php file.
-            var $row = Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
+            $row = Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
             $row.unwrap().unwrap();
           }
           if (response['file_old']) {
             Viewer.getImage().$container.html(response['file_old']);
+
             /* @TODO - The following code is ugly,
                Views wraps a couple extra divs around the output.
                The following code removes those divs so just
                .views-row remains and everything below it remains.
-                        var $row =Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
+                        $row =Viewer.getImage().$container.next().find(Drupal.imager.settings.cssContainer);
                         $row.unwrap().unwrap(); */
-            var $child = Viewer.getImage().$container.children()[0];
-            var $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer);
-            // Var $row =$child.find(Drupal.imager.settings.cssContainer);
-            // var $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer).child();
+
+            $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer);
+            // $row = Viewer.getImage().$container.find(Drupal.imager.settings.cssContainer).child();
             while (Viewer.getImage().$container[0] !== $row.parent()[0]) {
               $row.unwrap();
             }
@@ -106,7 +108,7 @@
       window.location.href = dataurl;
       window.location.download = "downloadit.jpg";
       // window.open(dataurl, 'Download image smiley image');
-
+      //
       Popups.$busy.hide();
       popup.dialogClose();
 
@@ -123,7 +125,7 @@
        //    w.document.title = 'Export Image';
        //    w.document.body.innerHTML = 'Left-click on the image to save it.';
        //    w.document.body.appendChild(a); */
-    }
+    };
 
     var email = function email() {
       // displayMessage('Extracting Image...');
@@ -143,7 +145,6 @@
         }, function (response) {
           var address = '';
           var path = response['data']['attachPath'];
-          var body = response['data']['body'];
           var subject = response['data']['subject'];
           var mailto_link = 'mailto:' + address +
             '?subject=' + encodeURIComponent(subject) +
@@ -164,7 +165,7 @@
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.clipboard.url,
         {
-          overwrite: overwrite,
+          // overwrite: overwrite,
           action: 'clipboard',
           saveMode: popup.settings.saveMode,
           uri: Viewer.getImage().src,
@@ -204,7 +205,6 @@
     };
 
     popup.dialogOnOpen = function dialogOnOpen() {
-      var status = Viewer.getStatus();
       Viewer.setEditMode(popup.settings.saveMode);
       var src = Viewer.getImage().src;
       var filename = decodeURIComponent(src.substring(src.lastIndexOf('/') + 1));
@@ -214,43 +214,43 @@
       switch (popup.settings.saveMode) {
         case 'database':
           popup.spec.$elem.dialog({
-            'title': 'Save image to Database',
-            'buttons': {
+            title: 'Save image to Database',
+            buttons: {
               'New Image': function () {
-                database(false)
+                database(false);
               },
               'Overwrite': function () {
-                database(true)
+                database(true);
               },
-              'Cancel': popup.dialogClose
+              Cancel: popup.dialogClose
             }
           });
           break;
 
         case 'email':
           popup.spec.$elem.dialog({
-            'title': 'Send image to Email',
-            'buttons': {
+            title: 'Send image to Email',
+            buttons: {
               'Send in Email': email,
-              'Cancel': popup.dialogClose
+              Cancel: popup.dialogClose
             }
           });
           break;
 
         case 'download':
           popup.spec.$elem.dialog({
-            'title': 'Download Image',
-            'buttons': {
-              'Download Image': download,
-              'Cancel': popup.dialogClose
+            title: 'Download Image',
+            buttons: {
+              Download Image: download,
+              Cancel: popup.dialogClose
             }
           });
           break;
 
         case 'clipboard':
           popup.spec.$elem.dialog({
-            'title': 'Send image to Clipboard',
-            'buttons': {
+            title: 'Send image to Clipboard',
+            buttons: {
               'Clipboard': clipboard,
               'Cancel': popup.dialogClose
             }
@@ -271,13 +271,13 @@
     };
 
     var deleteFile = function deleteFile() {
-      displayMessage('Deleting Image...');
+      // displayMessage('Deleting Image...');
       Core.ajaxProcess(
         this,
         Drupal.imager.settings.actions.deleteFile.url,
         {
           action: 'delete-file',
-          uri: Viewer.getImage().src,
+          uri: Viewer.getImage().src
         }
       );
     };

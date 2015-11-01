@@ -396,11 +396,11 @@ function imager_print_image() {
 
   // Send file to printer.
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
-//$file = file_load(_imager_get_fid($ps['puri']));
+  // $file = file_load(_imager_get_fid($ps['puri']));
   $dir = DRUPAL_ROOT . '/tmp';
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
 
-  // Write image to file system
+  // Write image to file system.
   $tmp_path = '/tmp/' . $ps['filename'] . '.' . $ps['suffix'];
   _imager_write_image($tmp_path);
 

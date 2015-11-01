@@ -13,6 +13,7 @@
 
 (function ($) {
   "use strict";
+
   /**
    * Define Brightness/Contrast Dialog class - Drupal.imager.popups.brightnessC.
    *
@@ -20,7 +21,7 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {object}
+   * @return {object}
    *   Popup dialog reference.
    */
   Drupal.imager.popups.brightnessC = function brightnessC(spec) {
@@ -113,7 +114,9 @@
         mul = multiplier;
         add = 0;
       }
-      var r, g, b;
+      var r;
+      var g;
+      var b;
       while (p--) {
         if ((r = data[pix -= 4] * mul + add) > 255) {
           data[pix] = 255;
@@ -172,8 +175,8 @@
 
     popup.updateStatus = function updateStatus() {
       Popups.status.dialogUpdate({
-        'brightness': brightness,
-        'contrast': contrast
+        brightness: brightness,
+        contrast: contrast
       });
     };
 

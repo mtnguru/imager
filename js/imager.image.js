@@ -13,12 +13,12 @@
 
   Drupal.imager.imageC = function imageC(settings) {
     return {
-      'src': settings.src || '',
-      'srcThumb': settings.srcThumb || '',
-      '$container': settings.$container || undefined,
-      '$thumb': settings.$thumb || undefined,
-      'iw': settings.iw || 0,
-      'ih': settings.ih || 0
+      src: settings.src || '',
+      srcThumb: settings.srcThumb || '',
+      $container: settings.$container || undefined,
+      $thumb: settings.$thumb || undefined,
+      iw: settings.iw || 0,
+      ih: settings.ih || 0
     };
   };
 

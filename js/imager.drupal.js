@@ -20,6 +20,8 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
+"use strict";
+
 /**
  * Wrap file in JQuery().
  *
@@ -45,34 +47,34 @@
           attachBehaviors: Drupal.attachBehaviors,
           actions: {
             displayEntity: {
-              'url': basepath + '?q=imager/ajax/display_entity'
+              url: basepath + '?q=imager/ajax/display_entity'
             },
             displayMap: {
-              'url': basepath + '?q=imager/ajax/display_map'
+              url: basepath + '?q=imager/ajax/display_map'
             },
             editFormFieldLoad: {
-              'url': basepath + '?q=imager/ajax/edit_form_field_load'
+              url: basepath + '?q=imager/ajax/edit_form_field_load'
             },
             saveFileEntityField: {
-              'url': basepath + '?q=imager/ajax/save_file_entity_field'
+              url: basepath + '?q=imager/ajax/save_file_entity_field'
             },
             saveFile: {
-              'url': basepath + '?q=imager/ajax/save_image'
+              url: basepath + '?q=imager/ajax/save_image'
             },
             viewBrowser: {
-              'url': basepath + '?q=imager/ajax/view_browser'
+              url: basepath + '?q=imager/ajax/view_browser'
             },
             emailFile: {
-              'url': basepath + '?q=imager/ajax/email_file'
+              url: basepath + '?q=imager/ajax/email_file'
             },
             deleteFile: {
-              'url': basepath + '?q=imager/ajax/delete_file'
+              url: basepath + '?q=imager/ajax/delete_file'
             },
             printImage: {
-              'url': basepath + '?q=imager/ajax/print_image'
+              url: basepath + '?q=imager/ajax/print_image'
             },
             renderDialog: {
-              'url': basepath + '?q=imager/ajax/render_dialog'
+              url: basepath + '?q=imager/ajax/render_dialog'
             }
           }
         });

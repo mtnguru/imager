@@ -26,11 +26,10 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
    */
   Drupal.imager.popups.configC = function (spec) {
     var Popups = Drupal.imager.popups;
-    var Viewer = Drupal.imager.viewer;
     var popup;
 
     var dspec = $.extend({
@@ -54,11 +53,11 @@
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
-    }
+    };
 
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogInit();
-    }
+    };
 
     popup.dialogOnClose = function dialogOnClose() {
     };
@@ -107,7 +106,6 @@
         localStorage.imagerBoundsEnable = "false";
       }
 
-      var name = $("#imager-printer-select option:selected").text();
       localStorage.imagerPrinter = $("#imager-printer-select option:selected").text();
 
       popup.dialogClose();

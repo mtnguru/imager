@@ -27,11 +27,10 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
    */
   Drupal.imager.popups.imageC = function imageC(spec) {
     var Popups = Drupal.imager.popups;
-    var Viewer = Drupal.imager.viewer;
     var $img;
     var popup;
 
@@ -49,7 +48,7 @@
         my: "left top",
         at: "left top"
       },
-      open: function(){
+      open: function () {
         var closeBtn = $('.ui-dialog-titlebar-close');
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
@@ -65,7 +64,7 @@
     // Initialize the popup.
     popup = Popups.baseC(dspec);
 
-    var handleRightClick = function handleRightClick () {
+    var handleRightClick = function handleRightClick() {
       var dataurl = Drupal.imager.core.getImage('image-cropped', false);
       $img[0].src = dataurl;
       alert('right click');
@@ -92,9 +91,7 @@
 
     popup.dialogUpdate = function dialogUpdate() {
       Popups.$busy.show();
-      var attr = popup.settings.attr;
       $img.attr(popup.settings.attr);
-      // convertCanvas to image and display
       Popups.$busy.hide();
     };
 

@@ -45,7 +45,7 @@
         at: 'left top'
       },
       // Keep the dialog position fixed and in upper left corner.
-      open: function(event, ui) {
+      open: function (event, ui) {
         $(this).parent().css('position', 'fixed');
       }
     }, spec);
@@ -75,13 +75,13 @@
 
     // Points of interest
     // Location of last mouse down event.
-    var pt_down = Core.pointC({'name': 'down'});           // Last mouse down event.
-    var pt_last = Core.pointC({'name': 'down'});           // Last mouse move event.
-    var pt_now = Core.pointC({'name': 'now'});             // Mouse currently.
-    var pt_crop_ul = Core.pointC({'name': 'crop-ul'});     // Upper left crop point.
-    var pt_crop_lr = Core.pointC({'name': 'crop-lr'});     // Lower right crop point.
-    var pt_canvas_ul = Core.pointC({'name': 'canvas-ul'}); // Upper left corner of image.
-    var pt_canvas_lr = Core.pointC({'name': 'canvas-lr'}); // Lower right corner of image.
+    var pt_down = Core.pointC({name: 'down'});           // Last mouse down event.
+    var pt_last = Core.pointC({name: 'down'});           // Last mouse move event.
+    var pt_now = Core.pointC({name: 'now'});             // Mouse currently.
+    var pt_crop_ul = Core.pointC({name: 'crop-ul'});     // Upper left crop point.
+    var pt_crop_lr = Core.pointC({name: 'crop-lr'});     // Lower right crop point.
+    var pt_canvas_ul = Core.pointC({name: 'canvas-ul'}); // Upper left corner of image.
+    var pt_canvas_lr = Core.pointC({name: 'canvas-lr'}); // Lower right corner of image.
 
     // Make these points accessible globally.
     Drupal.imager.viewer.pt_canvas_lr = pt_canvas_lr;
@@ -91,13 +91,14 @@
      * Get current status of imager Viewer
      *
      * @return {Object}
+     *   Current popup size, cscale and rotation.
      */
     Drupal.imager.viewer.getStatus = function getStatus() {
       return {
-        'cw': cw,
-        'ch': ch,
-        'cscale': cscale,
-        'rotation': rotation
+        cw: cw,
+        ch: ch,
+        cscale: cscale,
+        rotation: rotation
       };
     };
 
@@ -118,7 +119,8 @@
       ctx.clearRect(0, 0, cw, ch);
       image = newImage;
       doInit = true;
-      img.src = image.src;  // Starts the loading, caught by 'load' listener.
+      // Starts the loading, caught by 'load' listener.
+      img.src = image.src;
     };
 
     /**
@@ -143,7 +145,8 @@
      * accounted for.  Currently these are constants that look good with my theme.
      */
     var initializeImage = function initializeImage() {
-      var hscale, vscale;
+      var hscale;
+      var vscale;
       rotation = 0;
       image.iw = img.width;
       image.ih = img.height;
@@ -168,7 +171,7 @@
       }
       initScale = cscale;
       // Save scaling where image fits canvas.
-      $canvas.attr({ width: cw, height: ch });
+      $canvas.attr({width: cw, height: ch});
       $imgOverlay.width(cw).height(ch);
       $('#imager-canvas-wrapper').width(cw).height(ch);
       setEditMode('view');
@@ -255,13 +258,13 @@
       Drupal.imager.core.ajaxProcess(
         $('#file-print'),
         Drupal.imager.settings.actions.printImage.url,
-        { action: 'file-print',
-          uri: image.src,
-          printer: localStorage.imagerPrinter,
-          imgBase64: img
+        {action: 'file-print',
+         uri: image.src,
+         printer: localStorage.imagerPrinter,
+         imgBase64: img
         }, function (response) {
           var path = response['data']['uri'];
-          window.open(path,'_blank');
+          window.open(path, '_blank');
         }
       );
       setEditMode('view');
@@ -285,19 +288,12 @@
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
       Popups.$busy.show();
       var $canvas3 = $(document.createElement('CANVAS'));
-      var ctx3 = $canvas3[0].getContext('2d');
 
-      $canvas2.attr({
-        width:  image.iw,
-        height: image.ih
-      });
+      $canvas2.attr({width:  image.iw, height: image.ih});
       ctx2.setTransform(1, 0, 0, 1, 0, 0);
       ctx2.drawImage(img, 0, 0);
 
-      $canvas3.attr({
-        width:  image.iw,
-        height: image.ih
-      });
+      $canvas3.attr({width:  image.iw, height: image.ih});
       // Colorize while transferring from canvas2 to canvas3.
       filterFunction($canvas2, $canvas3);
       img.src = $canvas3[0].toDataURL();
@@ -305,7 +301,7 @@
       redraw();
       setEditMode('view');
       Popups.$busy.hide();
-    }
+    };
 
     /**
      * Rotate the image.
@@ -328,10 +324,10 @@
           rotation = (rotation === 0) ? 270 : rotation -= 90;
         }
       }
-      Popups.status.dialogUpdate({'rotation': rotation});
+      Popups.status.dialogUpdate({rotation: rotation});
       if (rotation === 0 || rotation === 180) {
         calcCanvasDims(image.iw, image.ih);
-        $canvas.attr({ width: cw, height: ch });
+        $canvas.attr({width: cw, height: ch});
         $imgOverlay.width(cw).height(ch);
         $('#imager-canvas-wrapper').width(cw).height(ch);
         cscale = cw / image.iw;
@@ -351,7 +347,7 @@
         calcCanvasDims(image.ih, image.iw);
         $imgOverlay.width(cw).height(ch);
         $('#imager-canvas-wrapper').width(cw).height(ch);
-        $canvas.attr({ width: cw, height: ch });
+        $canvas.attr({width: cw, height: ch});
         cscale = cw / image.ih;
         pt_now.setPt(cw / 2, cw / 2, ctx);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -397,7 +393,7 @@
       // Copy canvas image back into img.
       calcCanvasDims(niw, nih);
       // Calculate maximum size of canvas.
-      $canvas.attr({ width: cw, height: ch });
+      $canvas.attr({width: cw, height: ch});
       $imgOverlay.width(cw).height(ch);
       $('#imager-canvas-wrapper').width(cw).height(ch);
       ctx.scale(cw / niw, ch / nih);
@@ -423,7 +419,9 @@
      * Scale the image larger or smaller.
      *
      * @param {number} factor
+     *   Scaling factor.
      * @param {boolean} checkScale
+     *   Limit scaling to the not be smaller than the viewing area.
      */
     var scale = function scale(factor, checkScale) {
       // Check to see scaling will shrink image smaller than canvas.
@@ -445,6 +443,7 @@
 
     /**
      * Check if panning or zooming is causing image to leave a margin at edges.
+     *
      * If so calculate the translation necessary to move image back to the edge.
      *
      * @return {Object}
@@ -452,11 +451,11 @@
      */
     var outOfBounds = function outOfBounds() {
       var npt = {
-        'x': 0,
-        'y': 0
+        x: 0,
+        y: 0
       };
       if (localStorage.imagerBoundsEnable === 'false') {
-        return undefined;
+        return;
       }
       var pw;
       var ph;
@@ -518,16 +517,17 @@
       if (npt.x || npt.y) {
         return npt;
       }
-      return undefined;
+      return;
     };
 
     /**
      * Mouse Down event handler.
      *
      * @param {Event} evt
+     *  The event.
      */
     function mouseDown(evt) {
-      if (evt.which !== 1) { return; }
+      if (evt.which !== 1) return;
       evt.preventDefault();
       setEditMode('view');
       document.body.style.mozUserSelect = 'none';
@@ -553,13 +553,14 @@
         moveMode = 'dragging';
       }
       distance = 0;
-      Popups.status.dialogUpdate({'distance': parseInt(distance)});
+      Popups.status.dialogUpdate({distance: parseInt(distance)});
     }
 
     /**
      * Mouse Move event handler
      *
      * @param {Event} evt
+     *  The event.
      */
     function mouseMove(evt) {
       if (evt.which !== 1 || moveMode === 'none') {
@@ -587,7 +588,7 @@
         case 'dragging':
           distance = Math.sqrt((Math.pow(pt_down.getPt().x - pt_now.getPt().x, 2)) +
           (Math.pow(pt_down.getPt().y - pt_now.getPt().y, 2)));
-          Popups.status.dialogUpdate({'distance': parseInt(distance)});
+          Popups.status.dialogUpdate({distance: parseInt(distance)});
           ctx.save();
           ctx.translate(pt_now.getTxPt().x - pt_down.getTxPt().x,
             pt_now.getTxPt().y - pt_down.getTxPt().y);
@@ -614,14 +615,15 @@
      * Mouse Up event handler
      *
      * @param {Event} evt
+     *  The event.
      */
     function mouseUp(evt) {
-      if (evt.which !== 1) { return; }
+      if (evt.which !== 1) return;
       evt.preventDefault();
       moveMode = 'none';
       var now = new Date();
       elapsed = now - lastup;
-      Popups.status.dialogUpdate({'elapsed': elapsed * 1000 / 1000000});
+      Popups.status.dialogUpdate({elapsed: elapsed * 1000 / 1000000});
       lastup = now;
       if (distance < 20) {
         // If mouse didn't move between clicks.
@@ -641,6 +643,7 @@
           }
           else {
             if (editMode === 0) {
+              ;
             }
           }
         }
@@ -651,8 +654,10 @@
      * Mouse Wheel event handler
      *
      * @param {type} evt
+     *   The event.
      *
-     * @return {Boolean} - stops event propagation
+     * @return {Boolean}
+     *   Stops event propagation.
      */
     function mouseWheel(evt) {
       setEditMode('view');
@@ -728,8 +733,8 @@
      */
     var updateStatusFilters = function updateStatusFilters() {
       Popups.status.dialogUpdate({
-        'rotation': rotation,
-        'zoom': parseInt((cscale * 100000) / 1000) / 100
+        rotation: rotation,
+        zoom: parseInt((cscale * 100000) / 1000) / 100
       });
     };
 
@@ -762,7 +767,9 @@
      * Set the Edit mode
      *
      * @param {string} newMode
+     *   The desired new mode.
      * @param {string} toggle
+     *   Toggle the mode or set it.
      */
     var setEditMode = Drupal.imager.viewer.setEditMode = function setEditMode(newMode, toggle) {
       var oldMode = editMode;
@@ -848,12 +855,12 @@
           break;
 
         case 'database':
-          Popups.filesave.dialogOpen({'saveMode': 'database'});
+          Popups.filesave.dialogOpen({saveMode: 'database'});
           $('#file-database').addClass('checked');
           break;
 
         case 'email':
-          Popups.filesave.dialogOpen({'saveMode': 'email'});
+          Popups.filesave.dialogOpen({saveMode: 'email'});
           $('#file-email').addClass('checked');
           break;
 
@@ -863,23 +870,25 @@
           break;
 
         case 'download':
-          Popups.filesave.dialogOpen({'saveMode': 'download'});
+          Popups.filesave.dialogOpen({saveMode: 'download'});
           $('#file-download').addClass('checked');
           break;
 
         case 'clipboard':
-          Popups.filesave.dialogOpen({'saveMode': 'clipboard'});
+          Popups.filesave.dialogOpen({saveMode: 'clipboard'});
           $('#file-clipboard').addClass('checked');
           break;
       }
-      Popups.status.dialogUpdate({'edit-mode': editMode});
+      Popups.status.dialogUpdate({edit-mode: editMode});
     };
 
     /**
      * Track history of transforms done to this image.
      *
      * @param {Object} ctx
+     *  I'm not sure, I didn't write it.
      */
+
     function trackTransforms(ctx) {
       var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
       var xform = svg.createSVGMatrix();
@@ -918,6 +927,7 @@
         xform = xform.rotate(radians * 180 / Math.PI);
         return rotate.call(ctx, radians);
       };
+
       /* Var transform = ctx.transform;
          ctx.transform = function(a, b, c, d, e, f){
          var m2 = svg.createSVGMatrix();
@@ -925,7 +935,7 @@
             xform = xform.multiply(m2);
             return transform.call(ctx, a, b, c, d, e, f);
           }; */
-      var clearHistory = ctx.clearHistory;
+
       ctx.clearHistory = function () {
         savedTransforms = [];
       };
@@ -988,7 +998,7 @@
     };
 
     var clearOverlayImg = function clearOverlayImg() {
-      if (!clearOverlay) { return; }
+      if (!clearOverlay) return;
       $imgOverlay[0].src = "/" + Drupal.imager.settings.modulePath + "/icons/transparent.png";
       clearOverlay = false;
     };
@@ -1043,20 +1053,24 @@
         setEditMode('database', true);
         Popups.filesave.setSelectButton($(this));
       });
-      /* 
+
+      /*
         $('#file-email').click(function () {
         setEditMode('email', true);
         Popups.filesave.setSelectButton($(this));
       }); */
+
       $('#file-download').click(function () {
         setEditMode('download', true);
         Popups.filesave.setSelectButton($(this));
       });
-      /* 
+
+      /*
       $('#file-clipboard').click(function () {
         setEditMode('clipboard', true);
         Popups.filesave.setSelectButton($(this));
       }); */
+
       $('#file-print').click(function () {
         setEditMode('print');
       });
@@ -1074,7 +1088,7 @@
          $imgOverlay.mouseup(  function (evt) { $canvas.mouseup(); return false; });
          $imgOverlay[0].addEventListener('DOMMouseScroll', function (evt) { $canvas.DOMMouseScroll(evt); }, false);
          $imgOverlay[0].addEventListener('mousewheel', function (evt) { $canvas.mousewheel(); }, false);
-    
+
          Popups.initDialog('image', '#file-image', function () {
            var dataurl = Drupal.imager.core.getImage('image-cropped', false);
            Popups.image.dialogToggle({
@@ -1084,8 +1098,7 @@
                'height': ch
              }
            });
-         });
-      */
+         }); */
 
       // Edit Buttons.
       $('#mode-crop').click(function () {
@@ -1150,9 +1163,9 @@
         Drupal.imager.core.ajaxProcess(
           this,
           Drupal.imager.settings.actions.viewBrowser.url,
-          {action: 'view-browser',
-           uri: image.src,
-           imgBase64: img
+          { action: 'view-browser',
+            uri: image.src,
+            imgBase64: img
           }, function (response) {
             var path = response['data']['uri'];
             window.open(path, '_blank');

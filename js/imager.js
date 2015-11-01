@@ -16,6 +16,8 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
+"use strict"
+
 /**
  * Wrap file in JQuery();.
  *
@@ -49,7 +51,6 @@
     /**
      * Build list of thumbnails and attach event handlers.
      *
-     *
      * @return
      *   Pareview wants something here, so I wrote this.
      */
@@ -69,10 +70,10 @@
         }
 
         images.push(Drupal.imager.imageC({
-          '$container': $(this),
-          '$thumb': $thumb,
-          'srcThumb': $thumb.attr('src'),
-          'src': Drupal.imager.core.getFullPath($thumb.attr('src'))
+          $container: $(this),
+          $thumb: $thumb,
+          srcThumb: $thumb.attr('src'),
+          src: Drupal.imager.core.getFullPath($thumb.attr('src'))
         }));
 
         // Unbind any current event handlers on thumbnails.
@@ -83,10 +84,10 @@
         $thumb.click(function (evt) {
           var image = findImageFromThumbSrc($thumb.attr('src'));
           if (Popups.viewer.dialogIsOpen()) {
-            Popups.viewer.dialogUpdate({'image': image});
+            Popups.viewer.dialogUpdate({image: image});
           }
           else {
-            Popups.viewer.dialogOpen({'image': image});
+            Popups.viewer.dialogOpen({image: image});
           }
           evt.stopPropagation();
           // evt.preventDefault();
@@ -104,7 +105,8 @@
      * @param {int} offset
      *   Number of images.
      *
-     * @returns {imageC}
+     * @return {imageC}
+     *   Return the next image.
      */
     Drupal.imager.findNextImage = function findNextImage(current, offset) {
       var i;

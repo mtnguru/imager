@@ -77,8 +77,8 @@
             }
           }
           else {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-            nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
+            ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
+            nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
             Viewer.$canvas2.attr({
               width: ncw,
               height: nch
@@ -148,12 +148,16 @@
     /**
      * Process AJAX requests.
      *
-     * @todo Drupal probably has an API for this.
+     * @TODO Drupal probably has an API for this.
      *
      * @param {Object} $callingElement
+     *   Element from which this ajax call was initiated.
      * @param {path} url
+     *   URL of the AJAX handler - registered with hook_menu().
      * @param {Object} postData
+     *   Data needed by the php ajax function.
      * @param {function} processFunc
+     *   Function to call after receiving data. 
      */
     var ajaxProcess = function ajaxProcess($callingElement, url, postData, processFunc) {
       postData['filePath'] = Drupal.imager.settings.filePath;
@@ -197,6 +201,7 @@
         },
         error: function (evt) {
           Popups.$busy.hide();
+          var response = JSON.parse(response_json);
           clearTimeout(messageTimeout);
           Popups.messages.dialogOpen();
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +
@@ -217,13 +222,15 @@
       var namex = spec.name + '-x';
       var namey = spec.name + '-y';
       var point = {
-        'v': {'x': 0, 'y': 0},
-        't': {'x': 0, 'y': 0}
+        v: {x: 0, y: 0},
+        t: {x: 0, y: 0}
       };
       var doTransform = spec.transform || true;
+      var namext;
+      var nameyt;
       if (doTransform) {
-        var namext = namex + '-tx';
-        var nameyt = namey + '-tx';
+        namext = namex + '-tx';
+        nameyt = namey + '-tx';
       }
 
       point.setPt = function setPt(x, y, ctx) {
@@ -258,7 +265,7 @@
      *
      * @param {type} tsrc
      *
-     * @returns string
+     * @return string
      *   Full file path of original image.
      */
     var getFullPath = function getFullPath(tsrc) {
@@ -290,9 +297,10 @@
     /**
      * Given an angle degrees, calculate it in radians.
      *
-     * @param deg
+     * @param {number} deg
+     *   Angle in degrees
      *
-     * @returns {number}
+     * @return {number}
      *   Angle in radians
      */
     var angleInRadians = function angleInRadians(deg) {
@@ -300,12 +308,12 @@
     };
 
     return {
-      'ajaxProcess': ajaxProcess,
-      'getImage': getImage,
-      'angleInRadians': angleInRadians,
-      'displayMessage': displayMessage,
-      'getFullPath': getFullPath,
-      'pointC': pointC
+      ajaxProcess: ajaxProcess,
+      getImage: getImage,
+      angleInRadians: angleInRadians,
+      displayMessage: displayMessage,
+      getFullPath: getFullPath,
+      pointC: pointC
     };
   };
 })(jQuery);
