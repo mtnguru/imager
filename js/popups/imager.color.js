@@ -13,6 +13,7 @@
 
 (function ($) {
   "use strict";
+
   /**
    * Define the color dialog - Hue/Saturation/Lightness.
    *
@@ -20,7 +21,8 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
+   *   Return the color dialog.
    */
   Drupal.imager.popups.colorC = function colorC(spec) {
     var Popups = Drupal.imager.popups;
@@ -120,7 +122,9 @@
       var lightm1 = 1 - lightness;
 
       var p = w * h;
-      var pix = p * 4, pix1 = pix + 1, pix2 = pix + 2;
+      var pix = p * 4;
+      var pix1 = pix + 1;
+      var pix2 = pix + 2;
 
       while (p--) {
 
@@ -128,7 +132,7 @@
         var g = data[pix1 = pix + 1];
         var b = data[pix2 = pix + 2];
 
-        var h;
+        var h_;
         var s;
         var v;
 
@@ -170,46 +174,46 @@
               }
               if (r === vs) {
                 if (g === ms) {
-                  h = 5 + ((vs - b) / vm) + hue6;
+                  h_ = 5 + ((vs - b) / vm) + hue6;
                 }
                 else {
-                  h = 1 - ((vs - g) / vm) + hue6;
+                  h_ = 1 - ((vs - g) / vm) + hue6;
                 }
               }
               else {
                 if (g === vs) {
                   if (b === ms) {
-                    h = 1 + ((vs - r) / vm) + hue6;
+                    h_ = 1 + ((vs - r) / vm) + hue6;
                   }
                   else {
-                    h = 3 - ((vs - b) / vm) + hue6;
+                    h_ = 3 - ((vs - b) / vm) + hue6;
                   }
                 }
                 else {
                   if (r === ms) {
-                    h = 3 + ((vs - g) / vm) + hue6;
+                    h_ = 3 + ((vs - g) / vm) + hue6;
                   }
                   else {
-                    h = 5 - ((vs - r) / vm) + hue6;
+                    h_ = 5 - ((vs - r) / vm) + hue6;
                   }
                 }
               }
-              if (h < 0) {
-                h += 6;
+              if (h_ < 0) {
+                h_ += 6;
               }
-              if (h >= 6) {
-                h -= 6;
+              if (h_ >= 6) {
+                h_ -= 6;
               }
               var m = (l + l - v);
-              var sextant = h >> 0;
+              var sextant = h_ >> 0;
               if (sextant === 0) {
                 r = v * 255;
-                g = (m + ((v - m) * (h - sextant))) * 255;
+                g = (m + ((v - m) * (h_ - sextant))) * 255;
                 b = m * 255;
               }
               else {
                 if (sextant === 1) {
-                  r = (v - ((v - m) * (h - sextant))) * 255;
+                  r = (v - ((v - m) * (h_ - sextant))) * 255;
                   g = v * 255;
                   b = m * 255;
                 }
@@ -217,17 +221,17 @@
                   if (sextant === 2) {
                     r = m * 255;
                     g = v * 255;
-                    b = (m + ((v - m) * (h - sextant))) * 255;
+                    b = (m + ((v - m) * (h_ - sextant))) * 255;
                   }
                   else {
                     if (sextant === 3) {
                       r = m * 255;
-                      g = (v - ((v - m) * (h - sextant))) * 255;
+                      g = (v - ((v - m) * (h_ - sextant))) * 255;
                       b = v * 255;
                     }
                     else {
                       if (sextant === 4) {
-                        r = (m + ((v - m) * (h - sextant))) * 255;
+                        r = (m + ((v - m) * (h_ - sextant))) * 255;
                         g = m * 255;
                         b = v * 255;
                       }
@@ -235,7 +239,7 @@
                         if (sextant === 5) {
                           r = v * 255;
                           g = m * 255;
-                          b = (v - ((v - m) * (h - sextant))) * 255;
+                          b = (v - ((v - m) * (h_ - sextant))) * 255;
                         }
                       }
                     }
@@ -318,9 +322,9 @@
 
     popup.updateStatus = function updateStatus() {
       Popups.status.dialogUpdate({
-        'hue': parseInt(hue * 100) / 100,
-        'saturation': parseInt(saturation * 100) / 100,
-        'lightness': parseInt(lightness * 100) / 100
+        hue: parseInt(hue * 100) / 100,
+        saturation: parseInt(saturation * 100) / 100,
+        lightness: parseInt(lightness * 100) / 100
       });
     };
 

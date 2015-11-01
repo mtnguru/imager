@@ -16,12 +16,15 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
+
 /**
  * Wrap file in JQuery();.
  *
  * @param $
  */
 (function ($) {
+  "use strict"
+
   Drupal.imager.start = function imager() {
 
     var $thumbnails;
@@ -49,7 +52,8 @@
     /**
      * Build list of thumbnails and attach event handlers.
      *
-     *
+     * @return
+     *   Pareview wants something here, so I wrote this.
      */
     function _attach() {
       images = [];
@@ -62,12 +66,15 @@
       $thumbnails.each(function (index, value) {
         // Add image to images array.
         var $thumb = $(this).find(Drupal.imager.settings.cssImage);
-        if (!$thumb.attr('src')) return;
+        if (!$thumb.attr('src')) {
+          return;
+        }
+
         images.push(Drupal.imager.imageC({
-          '$container': $(this),
-          '$thumb': $thumb,
-          'srcThumb': $thumb.attr('src'),
-          'src': Drupal.imager.core.getFullPath($thumb.attr('src'))
+          $container: $(this),
+          $thumb: $thumb,
+          srcThumb: $thumb.attr('src'),
+          src: Drupal.imager.core.getFullPath($thumb.attr('src'))
         }));
 
         // Unbind any current event handlers on thumbnails.
@@ -78,17 +85,17 @@
         $thumb.click(function (evt) {
           var image = findImageFromThumbSrc($thumb.attr('src'));
           if (Popups.viewer.dialogIsOpen()) {
-            Popups.viewer.dialogUpdate({'image': image});
+            Popups.viewer.dialogUpdate({image: image});
           }
           else {
-            Popups.viewer.dialogOpen({'image': image});
+            Popups.viewer.dialogOpen({image: image});
           }
           evt.stopPropagation();
-//        evt.preventDefault();
+          // evt.preventDefault();
           return false;
         });
       });
-      // thumbnails.each()
+      return;
     }
 
     /**
@@ -99,7 +106,8 @@
      * @param {int} offset
      *   Number of images.
      *
-     * @returns {imageC}
+     * @return {imageC}
+     *   Return the next image.
      */
     Drupal.imager.findNextImage = function findNextImage(current, offset) {
       var i;
@@ -118,7 +126,7 @@
           return images[i];
         }
       }
-      return undefined;
+      return;
     };
 
     function findImageFromThumbSrc(srcThumb) {
@@ -128,7 +136,7 @@
           return images[i];
         }
       }
-      return undefined;
+      return;
     }
 
     return {

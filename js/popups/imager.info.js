@@ -19,10 +19,10 @@
  */
 (function ($) {
   "use strict";
+
   if (localStorage.getItem('imagerShowInfo') === null) {
     localStorage.setItem('imagerShowInfo', false);
   }
-  /**
 
   /**
    * Define the Information dialog class.
@@ -31,17 +31,14 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
+   *  Return the information dialog.
    */
   Drupal.imager.popups.infoC = function infoC(spec) {
     var Popups = Drupal.imager.popups;
     var Viewer = Drupal.imager.viewer;
-    var hue = 0;
-    var saturation = 0;
-    var lightness = 0;
     var popup;
     var editField;
-    var editFieldType;
 
     var dspec = $.extend({
       name: 'Info',
@@ -58,7 +55,7 @@
         at: "right",
         of: spec.$selectButton
       },
-      open: function(){
+      open: function () {
         var closeBtn = $('.ui-dialog-titlebar-close');
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
@@ -76,12 +73,12 @@
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
-    }
+    };
 
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
       localStorage.imagerShowInfo = "true";
-    }
+    };
 
     popup.dialogOnClose = function dialogOnClose() {
       localStorage.imagerShowInfo = "false";
@@ -101,8 +98,6 @@
           action: 'display-entity',
           uri: Viewer.getImage().src
         }, function (response) {
-          var status = response['status'];
-          var txt = "";
           Popups.$busy.hide();
           popup.spec.$elem.removeClass('error').show();
           if (response['data']) {
@@ -110,8 +105,8 @@
             $('.imager-info-edit').click(function (evt) {
               editField = this.id.replace('imager-', '');
               Popups.edit.dialogSelect({
-                'editField': editField,
-                '$selectButton': $(this)
+                editField: editField,
+                $selectButton: $(this)
               });
             });
           }

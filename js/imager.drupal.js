@@ -20,12 +20,15 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
+
 /**
  * Wrap file in JQuery().
  *
  * @param $
  */
 (function ($) {
+  "use strict";
+
   var imager;
   Drupal.behaviors.imager = {
     // Attach functions are executed by Drupal upon page load or ajax loads.
@@ -37,42 +40,42 @@
         var basepath = Drupal.settings.basePath;
         imager = Drupal.imager.start();
         imager.init({
-          'modulePath': Drupal.settings.imager.modulePath,
-          'cssContainer': Drupal.settings.imager.cssContainer,
-          'cssImage': Drupal.settings.imager.cssImage,
-          'basePath': basepath,
-          'filePath': Drupal.settings.filePath,
-          'attachBehaviors': Drupal.attachBehaviors,
-          'actions': {
-            'displayEntity': {
-              'url': basepath + '?q=imager/ajax/display_entity'
+          modulePath: Drupal.settings.imager.modulePath,
+          cssContainer: Drupal.settings.imager.cssContainer,
+          cssImage: Drupal.settings.imager.cssImage,
+          basePath: basepath,
+          filePath: Drupal.settings.filePath,
+          attachBehaviors: Drupal.attachBehaviors,
+          actions: {
+            displayEntity: {
+              url: basepath + '?q=imager/ajax/display_entity'
             },
-            'displayMap': {
-              'url': basepath + '?q=imager/ajax/display_map'
+            displayMap: {
+              url: basepath + '?q=imager/ajax/display_map'
             },
-            'editFormFieldLoad': {
-              'url': basepath + '?q=imager/ajax/edit_form_field_load'
+            editFormFieldLoad: {
+              url: basepath + '?q=imager/ajax/edit_form_field_load'
             },
-            'saveFileEntityField': {
-              'url': basepath + '?q=imager/ajax/save_file_entity_field'
+            saveFileEntityField: {
+              url: basepath + '?q=imager/ajax/save_file_entity_field'
             },
-            'saveFile': {
-              'url': basepath + '?q=imager/ajax/save_image'
+            saveFile: {
+              url: basepath + '?q=imager/ajax/save_image'
             },
-            'viewBrowser': {
-              'url': basepath + '?q=imager/ajax/view_browser'
+            viewBrowser: {
+              url: basepath + '?q=imager/ajax/view_browser'
             },
-            'emailFile': {
-              'url': basepath + '?q=imager/ajax/email_file'
+            emailFile: {
+              url: basepath + '?q=imager/ajax/email_file'
             },
-            'deleteFile': {
-              'url': basepath + '?q=imager/ajax/delete_file'
+            deleteFile: {
+              url: basepath + '?q=imager/ajax/delete_file'
             },
-            'printImage': {
-              'url': basepath + '?q=imager/ajax/print_image'
+            printImage: {
+              url: basepath + '?q=imager/ajax/print_image'
             },
-            'renderDialog': {
-              'url': basepath + '?q=imager/ajax/render_dialog'
+            renderDialog: {
+              url: basepath + '?q=imager/ajax/render_dialog'
             }
           }
         });

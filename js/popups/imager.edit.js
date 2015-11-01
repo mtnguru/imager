@@ -19,6 +19,7 @@
  */
 (function ($) {
   "use strict";
+
   /**
    * Declare the file_entity edit dialog.
    *
@@ -26,7 +27,8 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
+   *   Return the edit dialog.
    */
   Drupal.imager.popups.editC = function editC(spec) {
     var Popups = Drupal.imager.popups;
@@ -90,7 +92,7 @@
       Popups.$busy.show();
       // Display edit popup - render current field from default edit form.
       popup.spec.$elem.dialog({
-        'position': {
+        position: {
           my: "left",
           at: "right",
           of: popup.settings.$selectButton
@@ -104,9 +106,7 @@
           field: popup.settings.editField
         }, function (response) {
           Viewer.setEditMode('view');
-          var status = response['status'];
           popup.settings.editFieldType = response['data']['type'];
-          var txt = "";
           if (response['data']) {
             $('#imager-edit-content').html(response['data']['rendered']);
             popup.settings.editFieldType = response['data']['type'];
@@ -122,9 +122,10 @@
       var out = '';
       var value = '';
       var format = '';
+      var $elems;
       switch (popup.settings.editFieldType) {
         case 'radios':
-          var $elems = $('#imager-edit-content input');
+          $elems = $('#imager-edit-content input');
           $elems.each(function (index, elem) {
             if (elem.checked) {
               value = elem.value;
@@ -134,13 +135,13 @@
           break;
 
         case 'textfield':
-          var $elems = $('#imager-edit-content input');
+          $elems = $('#imager-edit-content input');
           value = $elems[0].value;
           break;
 
         case 'textarea':
           // Find which editor is in use.
-          var $elems = $('#imager-edit-content select');
+          $elems = $('#imager-edit-content select');
           var editor = $elems[0].value;
           format = editor;
           if (editor === "panopoly_wysiwyg_text") {
@@ -149,7 +150,7 @@
           }
           else {
             if (editor === 'full_html') {
-              var $elems = $('#imager-edit-content textarea.form-textarea');
+              $elems = $('#imager-edit-content textarea.form-textarea');
               $elems.each(function (index, elem) {
                 value = $(elem).val();
                 // Last one wins - this is what we want.
@@ -157,7 +158,7 @@
             }
             else {
               if (editor === 'plain_text') {
-                var $elems = $('#imager-edit-content textarea.form-textarea');
+                $elems = $('#imager-edit-content textarea.form-textarea');
                 $elems.each(function (index, elem) {
                   value = $(elem).val();
                   // Last one wins - this is what we want.
@@ -168,7 +169,7 @@
           break;
 
         case 'date_combo':
-          var $elems = $('#imager-edit-content input');
+          $elems = $('#imager-edit-content input');
           var date;
           var time;
           $elems.each(function (index, elem) {
@@ -185,7 +186,7 @@
           break;
 
         case 'hierarchical_select':
-          var $elems = $('#imager-edit-content select');
+          $elems = $('#imager-edit-content select');
           $elems.each(function (index, elem) {
             value = $(elem).val();
             // Last one wins - this is what we want.
@@ -193,7 +194,7 @@
           break;
 
         case 'checkbox_tree':
-          var $elems = $('#imager-edit-content input:checked');
+          $elems = $('#imager-edit-content input:checked');
           $elems.each(function (index, elem) {
             value = $(elem).val();
             // Last one wins - this is what we want.
@@ -216,7 +217,6 @@
           format: format,
           uri: Viewer.getImage().src
         }, function (response) {
-          var status = response['status'];
           Popups.info.dialogUpdate();
         }
       );

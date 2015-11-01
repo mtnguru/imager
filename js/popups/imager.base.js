@@ -62,7 +62,7 @@
    *   Function to execute when button is clicked.
    *   If not specified it defaults to dialogToggle().
    *
-   * @returns {baseC} popup
+   * @return {baseC} popup
    */
   Drupal.imager.popups.initDialog = function initDialog(name, buttonId, processFunc) {
     var Popups = Drupal.imager.popups;
@@ -71,7 +71,7 @@
       var $button = $(buttonId);
       if ($button) {
         // Execute dialogs constructor.
-        popup = Popups[name + 'C']({'$selectButton': $button});
+        popup = Popups[name + 'C']({$selectButton: $button});
         if (processFunc) {
           $button.click(processFunc);
         }
@@ -82,7 +82,7 @@
     }
     else {
       // Execute dialogs constructor.
-      popup = Popups[name + 'C']({'$selectButton': undefined});
+      popup = Popups[name + 'C']({$selectButton: undefined});
     }
     Popups[name] = popup;
     return popup;
@@ -118,7 +118,6 @@
 
     // Load the popup using AJAX.
     popup.dialogCreate = function dialogCreate(response, $callingElement) {
-      var status = response['status'];
       Drupal.imager.$wrapper.append(response['data']);
       popup.spec.$elem = $('#' + popup.spec.cssId);
       if (popup.spec.cssIdFinal) {

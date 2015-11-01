@@ -4,15 +4,13 @@
  */
 
 (function ($) {
-
   "use strict";
 
   // Create the Drupal.imager namespace and subspaces.
   Drupal.imager = {
-    'popups': {},
-    'viewer': {}
+    popups: {},
+    viewer: {}
   };
-
 
   Drupal.imager.coreM = function () {
     var Popups = Drupal.imager.popups;
@@ -34,7 +32,6 @@
       var pt_canvas_ul = Viewer.pt_canvas_ul;
       var pt_canvas_lr = Viewer.pt_canvas_lr;
       var status = Viewer.getStatus();
-      var image = Viewer.getImage();
       var img = Viewer.getImg();
       var dataurl;
 
@@ -57,13 +54,13 @@
           var nch;
           var pt = pointC('tmp');
           if (status.rotation === 0 || status.rotation === 180) {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-              nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-              Viewer.$canvas2.attr({
-                width: ncw,
-                // Set canvas to same size as image.
-                height: nch
-              });
+            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
+            nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
+            Viewer.$canvas2.attr({
+              width: ncw,
+              // Set canvas to same size as image.
+              height: nch
+            });
             if (status.rotation === 0) {
               // Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
               pt.setPt(0, 0, Viewer.ctx);
@@ -75,26 +72,23 @@
               Viewer.ctx2.translate(ncw, nch);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(status.cw, status.ch, Viewer.ctx);
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
             }
           }
           else {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-              nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-              Viewer.$canvas2.attr({
-                width: ncw,
-                // Set canvas to same size as image.
-                height: nch
-              });
+            ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
+            nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
+            Viewer.$canvas2.attr({
+              width: ncw,
+              height: nch
+            });
             if (status.rotation === 90) {
               Viewer.ctx2.translate(ncw, 0);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(status.cw, 0, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                // parseInt(pt1.x),
-                - pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
+              // parseInt(pt1.x),
               // parseInt(pt2.y),
             }
             else {
@@ -102,8 +96,7 @@
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(0, status.ch, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
             }
           }
           dataurl = Viewer.$canvas2[0].toDataURL(mimeType);
@@ -154,12 +147,16 @@
     /**
      * Process AJAX requests.
      *
-     * @todo Drupal probably has an API for this.
+     * @TODO Drupal probably has an API for this.
      *
      * @param {Object} $callingElement
+     *   Element from which this ajax call was initiated.
      * @param {path} url
+     *   URL of the AJAX handler - registered with hook_menu().
      * @param {Object} postData
+     *   Data needed by the php ajax function.
      * @param {function} processFunc
+     *   Function to call after receiving data. 
      */
     var ajaxProcess = function ajaxProcess($callingElement, url, postData, processFunc) {
       postData['filePath'] = Drupal.imager.settings.filePath;
@@ -169,7 +166,7 @@
         data: postData,
         success: function (response_json) {
           clearTimeout(messageTimeout);
-//        Popups.$busy.hide();
+          // Popups.$busy.hide();
           var response = JSON.parse(response_json);
           var display = false;
           var out;
@@ -208,7 +205,7 @@
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +
           '<br>Action: ' + postData.action + '</p>');
           if (processFunc) {
-            processFunc(response, evt);
+            processFunc('error', evt);
           }   // Execute users error function
           if (localStorage['imagerDebugMessages'] === "false") {
             setTimeout(function () {
@@ -223,13 +220,15 @@
       var namex = spec.name + '-x';
       var namey = spec.name + '-y';
       var point = {
-        'v': {'x': 0, 'y': 0},
-        't': {'x': 0, 'y': 0}
+        v: {x: 0, y: 0},
+        t: {x: 0, y: 0}
       };
       var doTransform = spec.transform || true;
+      var namext;
+      var nameyt;
       if (doTransform) {
-        var namext = namex + '-tx';
-        var nameyt = namey + '-tx';
+        namext = namex + '-tx';
+        nameyt = namey + '-tx';
       }
 
       point.setPt = function setPt(x, y, ctx) {
@@ -264,7 +263,7 @@
      *
      * @param {type} tsrc
      *
-     * @returns string
+     * @return string
      *   Full file path of original image.
      */
     var getFullPath = function getFullPath(tsrc) {
@@ -296,9 +295,10 @@
     /**
      * Given an angle degrees, calculate it in radians.
      *
-     * @param deg
+     * @param {number} deg
+     *   Angle in degrees
      *
-     * @returns {number}
+     * @return {number}
      *   Angle in radians
      */
     var angleInRadians = function angleInRadians(deg) {
@@ -306,12 +306,12 @@
     };
 
     return {
-      'ajaxProcess': ajaxProcess,
-      'getImage': getImage,
-      'angleInRadians': angleInRadians,
-      'displayMessage': displayMessage,
-      'getFullPath': getFullPath,
-      'pointC': pointC
+      ajaxProcess: ajaxProcess,
+      getImage: getImage,
+      angleInRadians: angleInRadians,
+      displayMessage: displayMessage,
+      getFullPath: getFullPath,
+      pointC: pointC
     };
   };
 })(jQuery);

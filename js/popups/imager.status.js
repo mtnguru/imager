@@ -30,7 +30,7 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
    */
   Drupal.imager.popups.statusC = function statusC(spec) {
     var Popups = Drupal.imager.popups;
@@ -48,7 +48,7 @@
       height: 'auto',
       resize: 'auto',
       resizable: true,
-      open: function(){
+      open: function () {
         var closeBtn = $('.ui-dialog-titlebar-close');
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
@@ -63,14 +63,14 @@
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
-    }
+    };
 
     popup.dialogOnOpen = function dialogOnOpen() {
       localStorage.imagerDebugStatus = 'true';
       Viewer.updateStatus();
       Popups.brightness.updateStatus();
       Popups.color.updateStatus();
-    }
+    };
 
     popup.dialogOnClose = function dialogOnClose() {
       localStorage.imagerDebugStatus = 'false';
@@ -84,9 +84,10 @@
       if (popup.dialogIsOpen()) {
         var key;
         for (key in status) {
+          // @TODO Pareview wants an if here, it should check for properties.
           $('#imager-status-' + key).html(status[key]);
-        };
-      };
+        }
+      }
     };
 
     return popup;

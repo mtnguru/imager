@@ -18,6 +18,7 @@
  */
 (function ($) {
   "use strict";
+
   /**
    * Declare Confirmation Dialog class.
    *
@@ -25,11 +26,10 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {Object}
+   * @return {Object}
    *   Reference to the popup.
    */
   Drupal.imager.popups.confirmC = function confirmC(spec) {
-    var Popups = Drupal.imager.popups;
     var Core = Drupal.imager.core;
     var Viewer = Drupal.imager.viewer;
 
@@ -72,7 +72,7 @@
         Drupal.imager.settings.actions.deleteFile.url,
         {
           action: 'delete-file',
-          uri: Viewer.getImage().src,
+          uri: Viewer.getImage().src
         }
       );
     };

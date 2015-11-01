@@ -17,6 +17,7 @@
   if (localStorage.getItem('imagerDebugMessages') === null) {
     localStorage.setItem('imagerDebugMessages', false);
   }
+
   /**
    * Define messages dialog class - Drupal.imager.popups.messagesC.
    *
@@ -24,11 +25,11 @@
    *   Specifications for opening dialog, can also have ad-hoc properties
    *   not used by jQuery dialog but needed for other purposes.
    *
-   * @returns {dialog}
+   * @return {dialog}
+   *   The message dialog.
    */
   Drupal.imager.popups.messagesC = function messagesC(spec) {
     var Popups = Drupal.imager.popups;
-    var Viewer = Drupal.imager.viewer;
     var popup;
 
     var dspec = $.extend({
@@ -41,7 +42,7 @@
       cssId: 'imager-messages',
       height: 'auto',
       resizable: false,
-      open: function(){
+      open: function () {
         var closeBtn = $('.ui-dialog-titlebar-close');
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
@@ -56,12 +57,12 @@
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
-    }
+    };
 
     popup.dialogOnOpen = function dialogOnOpen() {
       localStorage.imagerDebugMessages = 'true';
       popup.dialogInit();
-    }
+    };
 
     popup.dialogOnClose = function dialogOnClose() {
       localStorage.imagerDebugMessages = 'false';
