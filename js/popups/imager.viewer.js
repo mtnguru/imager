@@ -258,7 +258,7 @@
       Drupal.imager.core.ajaxProcess(
         $('#file-print'),
         Drupal.imager.settings.actions.printImage.url,
-        { 
+        {
           action: 'file-print',
           uri: image.src,
           printer: localStorage.imagerPrinter,
@@ -290,11 +290,11 @@
       Popups.$busy.show();
       var $canvas3 = $(document.createElement('CANVAS'));
 
-      $canvas2.attr({width:  image.iw, height: image.ih});
+      $canvas2.attr({width: image.iw, height: image.ih});
       ctx2.setTransform(1, 0, 0, 1, 0, 0);
       ctx2.drawImage(img, 0, 0);
 
-      $canvas3.attr({width:  image.iw, height: image.ih});
+      $canvas3.attr({width: image.iw, height: image.ih});
       // Colorize while transferring from canvas2 to canvas3.
       filterFunction($canvas2, $canvas3);
       img.src = $canvas3[0].toDataURL();
@@ -998,7 +998,9 @@
     };
 
     var clearOverlayImg = function clearOverlayImg() {
-      if (!clearOverlay) return;
+      if (!clearOverlay) {
+        return;
+      }
       $imgOverlay[0].src = "/" + Drupal.imager.settings.modulePath + "/icons/transparent.png";
       clearOverlay = false;
     };
@@ -1163,7 +1165,8 @@
         Drupal.imager.core.ajaxProcess(
           this,
           Drupal.imager.settings.actions.viewBrowser.url,
-          { action: 'view-browser',
+          {
+            action: 'view-browser',
             uri: image.src,
             imgBase64: img
           }, function (response) {

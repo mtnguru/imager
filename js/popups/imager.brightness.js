@@ -102,7 +102,9 @@
       var data = dataDesc.data;
 
       var p = w * h;
-      var pix = p * 4, pix1, pix2;
+      var pix = p * 4;
+      var pix1;
+      var pix2;
 
       var mul;
       var add;

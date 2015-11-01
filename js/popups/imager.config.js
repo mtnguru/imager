@@ -27,6 +27,7 @@
    *   not used by jQuery dialog but needed for other purposes.
    *
    * @return {dialog}
+   *   The configuration dialog.
    */
   Drupal.imager.popups.configC = function (spec) {
     var Popups = Drupal.imager.popups;

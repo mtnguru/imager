@@ -60,13 +60,15 @@ function imager_uninstall() {
 function imager_requirements($phase) {
   $requirements = array();
   if ($phase == 'runtime') {
-    // $requirements['imager_screenfull'] = array(
-    //   'title' => 'Screenfull',
-    //   'value' => t('Not installed'),
-    //   'description' => t('The %name plugin could not be detected.', array('%name' => 'Screenfull')),
-    //   'severity' => REQUIREMENT_ERROR,
-    // );  
-    //
+  
+    /* $requirements['imager_screenfull'] = array(
+         'title' => 'Screenfull',
+         'value' => t('Not installed'),
+         'description' => t('The %name plugin could not be detected.', 
+           array('%name' => 'Screenfull')),
+         'severity' => REQUIREMENT_ERROR,
+       ); */
+      
     $requirements['imager_jquery_imgareaselect'] = array(
       'title' => 'jQuery imageAreaSelect',
       'value' => 'Not installed',
