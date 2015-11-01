@@ -48,4 +48,3 @@ Configuration
 
 Using Imager module
 -------------------
-

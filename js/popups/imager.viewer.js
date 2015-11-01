@@ -22,7 +22,7 @@
    *
    * @param {type} spec - settings to override defaults
    *
-   * @returns {viewerC} popup
+   * @return {viewerC} popup
    */
   Drupal.imager.popups.viewerC = function viewerC(spec) {
     var Popups = Drupal.imager.popups;
@@ -39,7 +39,7 @@
       cssId: 'imager-viewer',
       height: 'auto',
       resizable: true,
-  //  position: {'fixed'},
+      // position: {'fixed'},
       position: {
         my: 'left top',
         at: 'left top'
@@ -75,11 +75,11 @@
 
     // Points of interest
     // Location of last mouse down event.
-    var pt_down = Core.pointC({'name': 'down'});       // Last mouse down event.
-    var pt_last = Core.pointC({'name': 'down'});       // Last mouse move event.
-    var pt_now = Core.pointC({'name': 'now'});         // Mouse currently.
-    var pt_crop_ul = Core.pointC({'name': 'crop-ul'}); // Upper left crop point.
-    var pt_crop_lr = Core.pointC({'name': 'crop-lr'}); // Lower right crop point.
+    var pt_down = Core.pointC({'name': 'down'});           // Last mouse down event.
+    var pt_last = Core.pointC({'name': 'down'});           // Last mouse move event.
+    var pt_now = Core.pointC({'name': 'now'});             // Mouse currently.
+    var pt_crop_ul = Core.pointC({'name': 'crop-ul'});     // Upper left crop point.
+    var pt_crop_lr = Core.pointC({'name': 'crop-lr'});     // Lower right crop point.
     var pt_canvas_ul = Core.pointC({'name': 'canvas-ul'}); // Upper left corner of image.
     var pt_canvas_lr = Core.pointC({'name': 'canvas-lr'}); // Lower right corner of image.
 
@@ -90,7 +90,7 @@
     /**
      * Get current status of imager Viewer
      *
-     * @returns {Object}
+     * @return {Object}
      */
     Drupal.imager.viewer.getStatus = function getStatus() {
       return {
@@ -278,8 +278,8 @@
       ctx2.setTransform(1, 0, 0, 1, 0, 0);
       // Set transform matrix to identity matrix.
       // The original img is kept unrotated.
-      ctx2.drawImage($canvas[0], 0, 0);   // Grabs the canvas which may be partial.
-   // ctx2.drawImage(img, 0, 0);   // Grabs the canvas which may be partial.
+      ctx2.drawImage($canvas[0], 0, 0);
+      // ctx2.drawImage(img, 0, 0);
     };
 
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
@@ -292,7 +292,7 @@
         height: image.ih
       });
       ctx2.setTransform(1, 0, 0, 1, 0, 0);
-      ctx2.drawImage(img, 0, 0);   // Grabs the canvas which may be partial.
+      ctx2.drawImage(img, 0, 0);
 
       $canvas3.attr({
         width:  image.iw,
@@ -447,7 +447,7 @@
      * Check if panning or zooming is causing image to leave a margin at edges.
      * If so calculate the translation necessary to move image back to the edge.
      *
-     * @returns {Object}
+     * @return {Object}
      *   Return a point with offsets to move the image back on screen.
      */
     var outOfBounds = function outOfBounds() {
@@ -527,7 +527,7 @@
      * @param {Event} evt
      */
     function mouseDown(evt) {
-      if (evt.which !== 1) return;
+      if (evt.which !== 1) { return; }
       evt.preventDefault();
       setEditMode('view');
       document.body.style.mozUserSelect = 'none';
@@ -616,7 +616,7 @@
      * @param {Event} evt
      */
     function mouseUp(evt) {
-      if (evt.which !== 1) return;
+      if (evt.which !== 1) { return; }
       evt.preventDefault();
       moveMode = 'none';
       var now = new Date();
@@ -652,7 +652,7 @@
      *
      * @param {type} evt
      *
-     * @returns {Boolean} - stops event propagation
+     * @return {Boolean} - stops event propagation
      */
     function mouseWheel(evt) {
       setEditMode('view');
@@ -681,8 +681,8 @@
      */
     function enablePanZoom() {
       // canvas#image-canvas event handlers.
-    //$imgOverlay[0].addEventListener('contextmenu', contextMenu, false);
-    //$imgOverlay[0].addEventListener('click', click, false);
+      // $imgOverlay[0].addEventListener('contextmenu', contextMenu, false);
+      // $imgOverlay[0].addEventListener('click', click, false);
       $imgOverlay[0].addEventListener('mousedown', mouseDown, false);
       $imgOverlay[0].addEventListener('mousemove', mouseMove, false);
       $imgOverlay[0].addEventListener('mouseup', mouseUp, false);
@@ -695,8 +695,8 @@
      * Enable event handlers for cropping - disable handlers for panning and zooming.
      */
     function enableCrop() {
-//    $imgOverlay[0].removeEventListener('contextmenu', contextMenu);
-//    $imgOverlay[0].removeEventListener('click', click);
+      // $imgOverlay[0].removeEventListener('contextmenu', contextMenu);
+      // $imgOverlay[0].removeEventListener('click', click);
       $imgOverlay[0].removeEventListener('mousedown', mouseDown);
       $imgOverlay[0].removeEventListener('mousemove', mouseMove);
       $imgOverlay[0].removeEventListener('mouseup', mouseUp);
@@ -980,7 +980,7 @@
       var start = new Date().getTime();
       var milliseconds = 250;
       for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
+        if ((new Date().getTime() - start) > milliseconds) {
           break;
         }
       }
@@ -988,7 +988,7 @@
     };
 
     var clearOverlayImg = function clearOverlayImg() {
-      if (!clearOverlay) return;
+      if (!clearOverlay) { return; }
       $imgOverlay[0].src = "/" + Drupal.imager.settings.modulePath + "/icons/transparent.png";
       clearOverlay = false;
     };
@@ -1043,7 +1043,8 @@
         setEditMode('database', true);
         Popups.filesave.setSelectButton($(this));
       });
-/*    $('#file-email').click(function () {
+      /* 
+        $('#file-email').click(function () {
         setEditMode('email', true);
         Popups.filesave.setSelectButton($(this));
       }); */
@@ -1051,7 +1052,8 @@
         setEditMode('download', true);
         Popups.filesave.setSelectButton($(this));
       });
-/*    $('#file-clipboard').click(function () {
+      /* 
+      $('#file-clipboard').click(function () {
         setEditMode('clipboard', true);
         Popups.filesave.setSelectButton($(this));
       }); */
@@ -1066,23 +1068,24 @@
       $imgOverlay = $('#imager-image');
       $imgOverlay.on("contextmenu", fillOverlayImg);
 
-    //$imgOverlay.click(vun);
-    //$imgOverlay.mousedown(function (evt) { $canvas.mousedown(); return false; });
-    //$imgOverlay.mousemove(function (evt) { $canvas.mousemove(); return false; });
-    //$imgOverlay.mouseup(  function (evt) { $canvas.mouseup(); return false; });
-    //$imgOverlay[0].addEventListener('DOMMouseScroll', function (evt) { $canvas.DOMMouseScroll(evt); }, false);
-    //$imgOverlay[0].addEventListener('mousewheel', function (evt) { $canvas.mousewheel(); }, false);
-
-    //Popups.initDialog('image', '#file-image', function () {
-    //  var dataurl = Drupal.imager.core.getImage('image-cropped', false);
-    //  Popups.image.dialogToggle({
-    //    'attr': {
-    //      'src': Drupal.imager.core.getImage('image-cropped', false),
-    //      'width': cw,
-    //      'height': ch
-    //    }
-    //  });
-    //});
+      /* $imgOverlay.click(vun);
+         $imgOverlay.mousedown(function (evt) { $canvas.mousedown(); return false; });
+         $imgOverlay.mousemove(function (evt) { $canvas.mousemove(); return false; });
+         $imgOverlay.mouseup(  function (evt) { $canvas.mouseup(); return false; });
+         $imgOverlay[0].addEventListener('DOMMouseScroll', function (evt) { $canvas.DOMMouseScroll(evt); }, false);
+         $imgOverlay[0].addEventListener('mousewheel', function (evt) { $canvas.mousewheel(); }, false);
+    
+         Popups.initDialog('image', '#file-image', function () {
+           var dataurl = Drupal.imager.core.getImage('image-cropped', false);
+           Popups.image.dialogToggle({
+             'attr': {
+               'src': Drupal.imager.core.getImage('image-cropped', false),
+               'width': cw,
+               'height': ch
+             }
+           });
+         });
+      */
 
       // Edit Buttons.
       $('#mode-crop').click(function () {
@@ -1147,12 +1150,12 @@
         Drupal.imager.core.ajaxProcess(
           this,
           Drupal.imager.settings.actions.viewBrowser.url,
-          { action: 'view-browser',
-            uri: image.src,
-            imgBase64: img
+          {action: 'view-browser',
+           uri: image.src,
+           imgBase64: img
           }, function (response) {
             var path = response['data']['uri'];
-            window.open(path,'_blank');
+            window.open(path, '_blank');
           }
         );
       });
@@ -1183,7 +1186,7 @@
     /**
      * Copy the canvas into the current IMG
      *
-     * @returns {viewerC} popup
+     * @return {viewerC} popup
      */
     Drupal.imager.viewer.copyCanvasToImg = function copyCanvasToImg() {
       img.src = $canvas[0].toDataURL();
@@ -1191,17 +1194,8 @@
     };
 
     /**
-     * Return the current image of imageC
-     *
-     * @returns {imageC} image - current image
-     */
-    var getImage = Drupal.imager.viewer.getImage = function getImage() {
-      return image;
-    };
-
-    /**
      * Return the <IMG> element containing the current image.
-     * @returns {Object} img
+     * @return {Object} img
      */
     Drupal.imager.viewer.getImg = function getImg() {
       return img;
@@ -1210,7 +1204,7 @@
     /**
      * Viewer dialog has finished opening
      *
-     * @returns {viewerC} popup
+     * @return {viewerC} popup
      */
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
@@ -1220,7 +1214,7 @@
     /**
      * Viewer dialog has closed - do nothing
      *
-     * @returns {viewerC} popup
+     * @return {viewerC} popup
      */
     popup.dialogOnClose = function dialogOnClose() {
       return popup;
@@ -1230,8 +1224,9 @@
      * Request to update the Viewer dialog.
      *
      * @param {object} settings
+     *   These are the settings.
      *
-     * @returns {viewerC} popup
+     * @return {viewerC} popup
      */
     popup.dialogUpdate = function dialogUpdate(settings) {
       $.extend(popup.settings, settings);

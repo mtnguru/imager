@@ -64,26 +64,26 @@ function _imager_build_wrapper(array &$page) {
       ),
     ),
 
-// Render arrays are not loaded until needed.  Then they are loaded with AJAX.
-// To load a render array before that uncomment it here.
-// 'viewer'     => _imager_build_viewer(),
-// 'brightness' => _imager_build_brightness(),
-// 'color'      => _imager_build_color(),
-// 'filesave'   => _imager_build_filesave(),
-// 'status'     => _imager_build_status(),
-// 'info'       => _imager_build_info(),
-// 'image'      => _imager_build_image(),
-// 'edit'       => _imager_build_edit(),
-// 'messages'   => _imager_build_messages(),
-// 'canvasorg'  => _imager_build_canvas(),
-   'busy' => _imager_build_busy(),
-// 'map'        => _imager_build_map(),
-   'form'       => _imager_build_form(),
-// 'confirm'    => _imager_build_confirm(),
-// 'config'     => _imager_build_configuration()
+    // Render arrays are not loaded until needed.  Then they are loaded with AJAX.
+    // To load a render array before that uncomment it here.
+    // 'viewer'     => _imager_build_viewer(),
+    // 'brightness' => _imager_build_brightness(),
+    // 'color'      => _imager_build_color(),
+    // 'filesave'   => _imager_build_filesave(),
+    // 'status'     => _imager_build_status(),
+    // 'info'       => _imager_build_info(),
+    // 'image'      => _imager_build_image(),
+    // 'edit'       => _imager_build_edit(),
+    // 'messages'   => _imager_build_messages(),
+    // 'canvasorg'  => _imager_build_canvas(),
+    'busy' => _imager_build_busy(),
+    // 'map'        => _imager_build_map(),
+    'form'       => _imager_build_form(),
+    // 'confirm'    => _imager_build_confirm(),
+    // 'config'     => _imager_build_configuration()
   );
-  //$page['content']['imager_wrapper']['#attached']['imager_library_load'][] = array('jquery.imgareaselect');
-  //$page['content']['imager_wrapper']['#attached'][] = array('screenfull');
+  // $page['content']['imager_wrapper']['#attached']['imager_library_load'][] = array('jquery.imgareaselect');
+  // $page['content']['imager_wrapper']['#attached'][] = array('screenfull');
 }
 
 /**
@@ -207,7 +207,7 @@ function _imager_build_viewer() {
         ),
         'view_browser' => _imager_build_button(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
         'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')),
-  //    'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+     // 'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
         'view_zoom_in' => _imager_build_button(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
         'view_zoom_out' => _imager_build_button(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
       ),
@@ -952,7 +952,7 @@ function _imager_build_confirm() {
  *    Render array for configuration dialog.
  */
 function _imager_build_configuration() {
-  // lpstat -t | grep "^printer" | grep -v fax | cut -f 2 -d " "
+  // Pareview requires a capital letter-fuck pareview -  lpstat -t | grep "^printer" | grep -v fax | cut -f 2 -d " "
   $printers = array();
   $handle = popen(variable_get('imager_printer_search'), 'r');
   while (($line = fgets($handle)) !== FALSE) {

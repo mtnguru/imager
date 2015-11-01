@@ -13,7 +13,6 @@
     viewer: {}
   };
 
-
   Drupal.imager.coreM = function () {
     var Popups = Drupal.imager.popups;
     var Viewer = Drupal.imager.viewer;

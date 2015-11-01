@@ -89,7 +89,7 @@
             Popups.viewer.dialogOpen({'image': image});
           }
           evt.stopPropagation();
-        //evt.preventDefault();
+          // evt.preventDefault();
           return false;
         });
       });
@@ -123,7 +123,7 @@
           return images[i];
         }
       }
-      return; // undefined;
+      return;
     };
 
     function findImageFromThumbSrc(srcThumb) {
@@ -133,7 +133,7 @@
           return images[i];
         }
       }
-      return; // undefined;
+      return;
     }
 
     return {

@@ -1,8 +1,8 @@
-name = "Imager"
+name = Imager
 description = Image viewing and editing module - clicking on a thumbnail brings up a dialog where you can view, pan, zoom, rotate, crop and change brightness/contrast and hue/saturation/lightness.
 
 core = 7.x
-package = "Media"
+package = Media
 
 configure = admin/config/media/imager
 

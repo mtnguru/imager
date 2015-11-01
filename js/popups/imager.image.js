@@ -94,7 +94,7 @@
       Popups.$busy.show();
       var attr = popup.settings.attr;
       $img.attr(popup.settings.attr);
-    //convertCanvas to image and display
+      // convertCanvas to image and display
       Popups.$busy.hide();
     };
 
