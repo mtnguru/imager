@@ -3,7 +3,7 @@
  */
 /* line 16, ../scss/imager.scss */
 #imager-wrapper {
-  color: black;
+  color: #000;
   background-color: #e0e0e0;
 }
 /* line 19, ../scss/imager.scss */
@@ -21,105 +21,124 @@
 /* line 28, ../scss/imager.scss */
 #imager-wrapper table th {
   color: #cacaca;
-  background-color: #666666;
+  background-color: #666;
 }
 
 /* line 35, ../scss/imager.scss */
+#imager-hidden-form {
+  display: none;
+}
+
+/* line 39, ../scss/imager.scss */
 #imager-viewer.fullscreen {
   width: 100%;
 }
 
-/* line 39, ../scss/imager.scss */
+/* line 43, ../scss/imager.scss */
 .imager-viewer-dialog {
+  position: fixed;
   z-index: 1010 !important;
 }
-/* line 41, ../scss/imager.scss */
+/* line 46, ../scss/imager.scss */
 .imager-viewer-dialog .ui-dialog-titlebar {
   display: none;
 }
 
-/* line 46, ../scss/imager.scss */
+/* line 51, ../scss/imager.scss */
 #imager-viewer {
   overflow: auto;
   padding: 2px;
-  background-color: #aaaaaa;
+  background-color: #aaa;
 }
-/* line 50, ../scss/imager.scss */
+/* line 55, ../scss/imager.scss */
 #imager-viewer button {
   background-color: #cacaca;
 }
-/* line 53, ../scss/imager.scss */
+/* line 58, ../scss/imager.scss */
 #imager-viewer #imager-canvas-wrapper {
+  margin: 0;
   float: left;
+  position: relative;
 }
-/* line 59, ../scss/imager.scss */
+/* line 62, ../scss/imager.scss */
+#imager-viewer #imager-canvas-wrapper #imager-canvas {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+/* line 70, ../scss/imager.scss */
+#imager-viewer #imager-canvas-wrapper #imager-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+/* line 76, ../scss/imager.scss */
 #imager-viewer #button-wrapper {
   float: left;
 }
-/* line 61, ../scss/imager.scss */
+/* line 78, ../scss/imager.scss */
 #imager-viewer #button-wrapper div {
   text-align: center;
 }
-/* line 64, ../scss/imager.scss */
+/* line 81, ../scss/imager.scss */
 #imager-viewer #button-wrapper .buttons {
   background-color: #e0e0e0;
   padding: 2px 1px;
   margin: 0 2px 2px 0;
   text-align: center;
-  font-size: 60%;
+  font-size: 65%;
 }
-/* line 70, ../scss/imager.scss */
+/* line 87, ../scss/imager.scss */
 #imager-viewer #button-wrapper .buttons img {
-  border-radius: 4px;
+  border-radius: 0px;
   display: block;
   padding: 2px;
   margin: 0 auto;
 }
-/* line 76, ../scss/imager.scss */
+/* line 93, ../scss/imager.scss */
 #imager-viewer #button-wrapper .buttons .checked {
-  background-color: #aaaaaa;
+  background-color: #aaa;
 }
-/* line 79, ../scss/imager.scss */
+/* line 96, ../scss/imager.scss */
 #imager-viewer #button-wrapper .buttons .disabled {
-  background-color: #aaaaaa;
+  background-color: #aaa;
 }
-/* line 82, ../scss/imager.scss */
+/* line 99, ../scss/imager.scss */
 #imager-viewer #button-wrapper .buttons .specific {
-  background-color: #666666;
+  background-color: #666;
 }
 
-/* line 89, ../scss/imager.scss */
+/* line 106, ../scss/imager.scss */
 .imager-buttons {
   position: absolute;
   bottom: 5px;
   right: 5px;
   background-color: #f0f0f0;
 }
-/* line 94, ../scss/imager.scss */
+/* line 111, ../scss/imager.scss */
 .imager-buttons img {
   padding: 4px;
 }
 
-/* line 99, ../scss/imager.scss */
+/* line 116, ../scss/imager.scss */
 #imager-info {
   padding: 5px;
-  background-color: #e0e0e0;
 }
-/* line 102, ../scss/imager.scss */
+/* line 118, ../scss/imager.scss */
 #imager-info .title {
   text-align: center;
   word-wrap: break-word;
 }
-/* line 106, ../scss/imager.scss */
+/* line 122, ../scss/imager.scss */
 #imager-info .filename {
   text-align: center;
 }
-/* line 109, ../scss/imager.scss */
+/* line 125, ../scss/imager.scss */
 #imager-info .error {
-  background-color: #cc0000;
-  color: white;
+  background-color: #c00;
+  color: #fff;
 }
-/* line 116, ../scss/imager.scss */
+/* line 129, ../scss/imager.scss */
 #imager-info .field-name-sfield-owner,
 #imager-info .field-name-sfield-filename,
 #imager-info .field-name-sfield-filesize,
@@ -127,79 +146,77 @@
   float: none;
   clear: both;
 }
-/* line 120, ../scss/imager.scss */
+/* line 136, ../scss/imager.scss */
 #imager-info #imager-info-geometry {
   clear: both;
 }
-/* line 124, ../scss/imager.scss */
+/* line 140, ../scss/imager.scss */
 #imager-info #imager-info-content img.imager-info-edit {
   float: left;
   clear: both;
 }
-/* line 128, ../scss/imager.scss */
+/* line 144, ../scss/imager.scss */
 #imager-info #imager-info-content section {
   float: left;
 }
 
-/* line 134, ../scss/imager.scss */
+/* line 150, ../scss/imager.scss */
 #imager-edit {
   padding: 10px;
-  background-color: #cacaca;
 }
-/* line 137, ../scss/imager.scss */
+/* line 152, ../scss/imager.scss */
 #imager-edit .form-item {
   margin: 0;
 }
-/* line 140, ../scss/imager.scss */
+/* line 155, ../scss/imager.scss */
 #imager-edit .description {
   font-style: italic;
   margin-top: 10px;
   max-width: 500px;
 }
-/* line 145, ../scss/imager.scss */
+/* line 160, ../scss/imager.scss */
 #imager-edit .form-text {
   width: 500px;
 }
-/* line 148, ../scss/imager.scss */
+/* line 163, ../scss/imager.scss */
 #imager-edit table.cke_editor {
   background-color: #ccc;
   border-radius: 0;
 }
-/* line 151, ../scss/imager.scss */
+/* line 166, ../scss/imager.scss */
 #imager-edit table.cke_editor body {
   background-image: none;
 }
-/* line 156, ../scss/imager.scss */
+/* line 171, ../scss/imager.scss */
 #imager-edit .field-widget-text-textarea .fieldset-wrapper {
   margin: 0;
 }
-/* line 160, ../scss/imager.scss */
+/* line 175, ../scss/imager.scss */
 #imager-edit .field-widget-text-textarea fieldset .form-wrapper {
   display: none;
 }
 
-/* line 168, ../scss/imager.scss */
+/* line 183, ../scss/imager.scss */
 .imager-confirm-dialog .ui-dialog-titlebar {
   display: none;
 }
 
-/* line 173, ../scss/imager.scss */
+/* line 188, ../scss/imager.scss */
 #imager-confirm {
   max-width: 700px;
   z-index: 1020;
-  background-color: #cacaca;
   padding: 1.2em 10px 0;
 }
-/* line 178, ../scss/imager.scss */
+/* line 192, ../scss/imager.scss */
 #imager-confirm .imager-content {
   margin: 0;
 }
-/* line 181, ../scss/imager.scss */
+/* line 195, ../scss/imager.scss */
 #imager-confirm #imager-confirm-content {
   font-size: 140%;
   padding: 0 2em;
 }
-/* line 185, ../scss/imager.scss */
+/* line 199, ../scss/imager.scss */
 #imager-confirm #imager-confirm-buttons {
   position: static;
   margin: 0 auto;
@@ -207,119 +224,106 @@
   float: none;
 }
 
-/* line 193, ../scss/imager.scss */
+/* line 207, ../scss/imager.scss */
 #imager-map {
   max-width: 800px;
   padding: 5px;
   position: fixed;
-  background-color: #888888;
   z-index: 1013;
 }
-/* line 199, ../scss/imager.scss */
+/* line 212, ../scss/imager.scss */
 #imager-map .description {
   max-width: 300px;
 }
 
-/* line 204, ../scss/imager.scss */
+/* line 217, ../scss/imager.scss */
 #imager-messages.error {
-  background: #cc0000 none;
+  background: #c00 none;
 }
 
-/* line 208, ../scss/imager.scss */
+/* line 221, ../scss/imager.scss */
 #imager-messages {
-  background-color: #aaaaaa;
   padding: 10px;
   font-size: 80%;
 }
-/* line 216, ../scss/imager.scss */
+/* line 228, ../scss/imager.scss */
 #imager-messages .error {
   padding: 0.5em;
-  background-color: #cc0000;
+  background-color: #c00;
   color: white;
   font-size: 130%;
 }
 
-/* line 224, ../scss/imager.scss */
-#imager-filesave {
-  padding: 5px;
-  background-color: #aaaaaa;
-}
-/* line 227, ../scss/imager.scss */
+/* line 237, ../scss/imager.scss */
 #imager-filesave #imager-filesave-filename {
   width: 15em;
   font-size: 90%;
 }
-/* line 231, ../scss/imager.scss */
+/* line 241, ../scss/imager.scss */
 #imager-filesave #resolution {
   margin: 0 auto 10px;
   width: auto;
 }
 
-/* line 238, ../scss/imager.scss */
-#imager-brightness,
-#imager-color {
-  background-color: #aaaaaa;
-}
-/* line 240, ../scss/imager.scss */
+/* line 249, ../scss/imager.scss */
 #imager-brightness .error,
 #imager-color .error {
-  background-color: #cc0000;
+  background-color: #c00;
 }
-/* line 243, ../scss/imager.scss */
+/* line 252, ../scss/imager.scss */
 #imager-brightness .slider,
 #imager-color .slider {
   -webkit-appearance: none;
   z-index: 1060;
 }
-/* line 247, ../scss/imager.scss */
+/* line 256, ../scss/imager.scss */
 #imager-brightness #slider-hue,
 #imager-color #slider-hue {
-  background: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #00ffff, #0000ff, #800080);
+  background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, purple);
 }
-/* line 250, ../scss/imager.scss */
+/* line 259, ../scss/imager.scss */
 #imager-brightness #slider-saturation,
 #imager-color #slider-saturation {
-  background-image: linear-gradient(to right, #c8c8c8, rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(#ff0000, #ffff00, #008888);
+  background-image: linear-gradient(to right, #c8c8c8, rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(red, yellow, #008888);
 }
-/* line 254, ../scss/imager.scss */
+/* line 262, ../scss/imager.scss */
 #imager-brightness #slider-lightness,
 #imager-brightness #slider-brightness,
 #imager-color #slider-lightness,
 #imager-color #slider-brightness {
-  background: linear-gradient(to right, #000000, #ffffff);
+  background: linear-gradient(to right, #000, #fff);
 }
-/* line 257, ../scss/imager.scss */
+/* line 266, ../scss/imager.scss */
 #imager-brightness #slider-contrast,
 #imager-color #slider-contrast {
-  background-image: linear-gradient(to right, #888888, #666666, #222222, #000000), linear-gradient(to right, #888888, #aaaaaa, #dddddd, #ffffff);
+  background-image: linear-gradient(to right, #888, #666, #222, #000), linear-gradient(to right, #888, #aaa, #ddd, #fff);
   background-size: 100% 50%, 100% 50%;
   background-position: 0 0, 0 100%;
   background-repeat: no-repeat;
 }
 
-/* line 265, ../scss/imager.scss */
+/* line 274, ../scss/imager.scss */
 #imager-email {
   position: fixed;
   z-index: 1050;
   padding: 10px;
-  background-color: #aaaaaa;
 }
-/* line 266, ../scss/imager.scss */
+/* line 275, ../scss/imager.scss */
 #imager-email table {
   margin: 0 auto;
   width: auto;
 }
-/* line 272, ../scss/imager.scss */
+/* line 281, ../scss/imager.scss */
 #imager-email input {
   width: 97%;
 }
-/* line 277, ../scss/imager.scss */
+/* line 285, ../scss/imager.scss */
 #imager-email #resolution {
   margin: 0 auto 10px;
   width: auto;
 }
 
-/* line 283, ../scss/imager.scss */
+/* line 291, ../scss/imager.scss */
 #imager-busy {
   position: fixed;
   top: 400px;
@@ -327,7 +331,7 @@
   z-index: 1110;
 }
 
-/* line 293, ../scss/imager.scss */
+/* line 301, ../scss/imager.scss */
 .imager .views-row {
   line-height: 1.1;
   font-size: 90%;
@@ -337,100 +341,116 @@
   height: 200px;
 }
 
-/* line 303, ../scss/imager.scss */
+/* line 311, ../scss/imager.scss */
 div#main {
   width: auto;
 }
 
-/* line 308, ../scss/imager.scss */
+/* line 316, ../scss/imager.scss */
 .imager-noclose .ui-dialog-titlebar-close {
   display: none;
 }
 
-/* line 313, ../scss/imager.scss */
+/* line 321, ../scss/imager.scss */
 .dialogStatus {
   position: fixed;
   z-index: 1014;
-  background-color: #aaaaaa;
+  background-color: #aaa;
 }
 
-/* line 319, ../scss/imager.scss */
+/* line 327, ../scss/imager.scss */
 .imager-dialog {
+  padding: 0;
   position: fixed;
-  background: #f0f0f0;
 }
-/* line 322, ../scss/imager.scss */
+/* line 330, ../scss/imager.scss */
+.imager-dialog .ui-dialog-content {
+  background-color: #aaa;
+}
+/* line 333, ../scss/imager.scss */
+.imager-dialog .ui-dialog-title {
+  margin: 0 1em 0 0;
+  color: #eee;
+}
+/* line 337, ../scss/imager.scss */
+.imager-dialog .ui-dialog-titlebar {
+  border: none;
+  background-color: #666;
+  padding: 0 0 0 1em;
+}
+/* line 342, ../scss/imager.scss */
+.imager-dialog .ui-dialog-buttonpane {
+  margin: 0;
+  background-color: #666;
+  padding: 0 .5em 0 0.4em;
+}
+/* line 347, ../scss/imager.scss */
+.imager-dialog .ui-button-text {
+  padding: 0.2em 0.5em;
+}
+/* line 350, ../scss/imager.scss */
+.imager-dialog legend {
+  line-height: 1.5;
+  margin: 10px 0 0;
+  border-color: -moz-use-text-color -moz-use-text-color #aaa;
+  font-size: 140%;
+}
+/* line 356, ../scss/imager.scss */
 .imager-dialog .imager-content {
   margin: 0;
   padding: .25em .5em;
 }
-/* line 326, ../scss/imager.scss */
+/* line 360, ../scss/imager.scss */
 .imager-dialog table {
   margin: 0;
 }
-/* line 330, ../scss/imager.scss */
+/* line 363, ../scss/imager.scss */
 .imager-dialog tr td,
 .imager-dialog tr th {
   padding: 2px 8px;
 }
-/* line 333, ../scss/imager.scss */
-.imager-dialog .ui-dialog-titlebar {
-  padding: 0.3em 0 0.3em 0.5em;
-}
-/* line 336, ../scss/imager.scss */
-.imager-dialog .ui-dialog-title {
-  margin: 0 1em 0 0;
-}
-/* line 339, ../scss/imager.scss */
-.imager-dialog .ui-dialog-buttonpane {
-  padding: 0 .5em 0 0.4em;
-}
-/* line 342, ../scss/imager.scss */
-.imager-dialog .ui-button-text {
-  padding: 0.2em 0.5em;
-}
-/* line 346, ../scss/imager.scss */
+/* line 368, ../scss/imager.scss */
 .imager-dialog .form-item input {
   font-size: 100%;
 }
-/* line 349, ../scss/imager.scss */
+/* line 371, ../scss/imager.scss */
 .imager-dialog .form-item .option {
   font-size: 100%;
   padding-left: 0.5em;
 }
-/* line 353, ../scss/imager.scss */
+/* line 375, ../scss/imager.scss */
 .imager-dialog .form-item .description {
-  color: #e0e0e0;
+  color: #666;
 }
-/* line 357, ../scss/imager.scss */
+/* line 380, ../scss/imager.scss */
 .imager-dialog #imager-status-content {
   text-align: center;
 }
-/* line 359, ../scss/imager.scss */
+/* line 382, ../scss/imager.scss */
 .imager-dialog #imager-status-content .imager-status-col {
   float: left;
   margin: 3px 3px 25px;
 }
-/* line 364, ../scss/imager.scss */
+/* line 387, ../scss/imager.scss */
 .imager-dialog #imager-status-content .imager-text-right {
   text-align: right;
 }
-/* line 369, ../scss/imager.scss */
+/* line 392, ../scss/imager.scss */
 .imager-dialog #imager-status-content table {
   border-spacing: 0;
   margin-bottom: 6px;
 }
-/* line 372, ../scss/imager.scss */
+/* line 395, ../scss/imager.scss */
 .imager-dialog #imager-status-content table th {
   padding: 2px 4px;
 }
-/* line 375, ../scss/imager.scss */
+/* line 398, ../scss/imager.scss */
 .imager-dialog #imager-status-content table td {
   min-width: 3em;
   padding: 3px;
 }
 
-/* line 383, ../scss/imager.scss */
+/* line 406, ../scss/imager.scss */
 .imgareaselect-outer {
   z-index: 1011 !important;
 }

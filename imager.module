@@ -116,6 +116,16 @@ function imager_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  // AJAX - Print image.
+  $items['imager/ajax/print_image'] = array(
+    'title' => 'Print image to local printer',
+    'description' => 'Print image to local printer',
+    'page callback' => 'imager_print_image',
+    'file' => 'imager.ajax.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   // AJAX - Load Dialog.
   $items['imager/ajax/render_dialog'] = array(
     'title' => 'Load dialog',
@@ -163,9 +173,16 @@ function imager_theme() {
  */
 function imager_page_alter(array &$page) {
   global $_imager_enable;
+  // If the imager module has been enabled elsewhere, load and initialize it.
   if (isset($_imager_enable)) {
     module_load_include('inc', 'imager', 'imager.popups');
     _imager_build_wrapper($page);
+  }
+  // If this is the Imager config page, load a little extra CSS.
+  if ($_GET['q'] == 'admin/config/media/imager') {
+    $page['content']['#attached']['css'] = array(
+      drupal_get_path('module', 'imager') . '/css/imager_admin.css',
+    );
   }
 }
 

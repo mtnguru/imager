@@ -67,13 +67,13 @@
      * Initialize checkboxes from localStorage.
      */
     popup.dialogInit = function dialogInit() {
-      if (localStorage.imagerBoundsEnable === "TRUE") {
+      if (localStorage.imagerBoundsEnable === "true") {
         $('#imager-bounds-enable').attr('checked', 'checked');
       }
-      if (localStorage.imagerDebugStatus === "TRUE") {
+      if (localStorage.imagerDebugStatus === "true") {
         $('#imager-debug-status').attr('checked', 'checked');
       }
-      if (localStorage.imagerDebugMessages === "TRUE") {
+      if (localStorage.imagerDebugMessages === "true") {
         $('#imager-debug-messages').attr('checked', 'checked');
       }
     };
@@ -83,27 +83,33 @@
      */
     popup.dialogSave = function dialogSave() {
       if ($('#imager-debug-status').attr('checked')) {
-        localStorage.imagerDebugStatus = "TRUE";
+        localStorage.imagerDebugStatus = "true";
         Popups.status.dialogOpen();
       }
       else {
-        localStorage.imagerDebugStatus = "FALSE";
+        localStorage.imagerDebugStatus = "false";
         Popups.status.dialogClose();
       }
+
       if ($('#imager-debug-messages').attr('checked')) {
-        localStorage.imagerDebugMessages = "TRUE";
+        localStorage.imagerDebugMessages = "true";
         Popups.messages.dialogOpen();
       }
       else {
-        localStorage.imagerDebugMessages = "FALSE";
+        localStorage.imagerDebugMessages = "false";
         Popups.messages.dialogClose();
       }
+
       if ($('#imager-bounds-enable').attr('checked')) {
-        localStorage.imagerBoundsEnable = "TRUE";
+        localStorage.imagerBoundsEnable = "true";
       }
       else {
-        localStorage.imagerBoundsEnable = "FALSE";
+        localStorage.imagerBoundsEnable = "false";
       }
+
+      var name = $("#imager-printer-select option:selected").text();
+      localStorage.imagerPrinter = $("#imager-printer-select option:selected").text();
+
       popup.dialogClose();
     };
 

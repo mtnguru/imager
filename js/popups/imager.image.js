@@ -1,6 +1,6 @@
 /**
  * @file
- * Declare Imager module Status dialog - Drupal.imager.popups.statusC.
+ * Create the image dialog - popup image for printing, emailing, etc.
  */
 
 /*
@@ -11,6 +11,7 @@
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
+
 /**
  * Wrap file in JQuery();.
  *
@@ -18,13 +19,10 @@
  */
 (function ($) {
   "use strict";
-
-  if (localStorage.getItem('imagerDebugStatus') === null) {
-    localStorage.setItem('imagerDebugStatus', false);
-  }
+  /**
 
   /**
-   * Declare Status dialog class.
+   * Define the Information dialog class.
    *
    * @param {object} spec
    *   Specifications for opening dialog, can also have ad-hoc properties
@@ -32,61 +30,73 @@
    *
    * @returns {dialog}
    */
-  Drupal.imager.popups.statusC = function statusC(spec) {
+  Drupal.imager.popups.imageC = function imageC(spec) {
     var Popups = Drupal.imager.popups;
     var Viewer = Drupal.imager.viewer;
+    var $img;
     var popup;
 
     var dspec = $.extend({
-      name: 'Status',
+      name: 'Image',
       autoOpen: false,
-      title: 'Imager Status',
+      title: 'Display image for printing, emailing, etc',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog',
-      cssId: 'imager-status',
       height: 'auto',
-      resize: 'auto',
+      dialogClass: 'imager-dialog',
+      cssId: 'imager-image',
       resizable: true,
+      position: {
+        my: "left top",
+        at: "left top"
+      },
       open: function(){
         var closeBtn = $('.ui-dialog-titlebar-close');
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
-      position: {
-        my: "right bottom",
-        at: "right bottom",
-        of: spec.$selectButton
+      create: function () {
+        $(this).closest('div.ui-dialog')
+          .find('.ui-dialog-titlebar-close')
+          .click(function (e) {
+            popup.dialogClose();
+            e.preventDefault();
+          });
       }
     }, spec);
     // Initialize the popup.
     popup = Popups.baseC(dspec);
 
+    var handleRightClick = function handleRightClick () {
+      var dataurl = Drupal.imager.core.getImage('image-cropped', false);
+      $img[0].src = dataurl;
+      alert('right click');
+    };
+
     popup.dialogOnCreate = function dialogOnCreate() {
+      $img = $('#imager-image-img');
+      $img.on("contextmenu", handleRightClick);
       popup.dialogOpen();
-    }
+    };
 
     popup.dialogOnOpen = function dialogOnOpen() {
-      localStorage.imagerDebugStatus = 'true';
-      Viewer.updateStatus();
-      Popups.brightness.updateStatus();
-      Popups.color.updateStatus();
-    }
+      popup.dialogUpdate();
+    };
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerDebugStatus = 'false';
     };
 
+    /**
+     * Initialize checkboxes from localStorage
+     */
     popup.dialogInit = function dialogInit() {
-      // Query all other dialogs for their status.
     };
 
-    popup.dialogUpdate = function dialogUpdate(status) {
-      if (popup.dialogIsOpen()) {
-        var key;
-        for (key in status) {
-          $('#imager-status-' + key).html(status[key]);
-        };
-      };
+    popup.dialogUpdate = function dialogUpdate() {
+      Popups.$busy.show();
+      var attr = popup.settings.attr;
+      $img.attr(popup.settings.attr);
+//    convertCanvas to image and display
+      Popups.$busy.hide();
     };
 
     return popup;

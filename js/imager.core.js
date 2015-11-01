@@ -13,20 +13,142 @@
     'viewer': {}
   };
 
-  var Popups = Drupal.imager.popups;
 
   Drupal.imager.coreM = function () {
-
+    var Popups = Drupal.imager.popups;
+    var Viewer = Drupal.imager.viewer;
     var messageTimeout;
 
     var displayMessage = function displayMessage(msg) {
       // $imagerMessages.show();
       $('#imager-messages-content').html(msg);
-      if (localStorage['imagerDebugMessages'] === "FALSE") {
+      if (localStorage['imagerDebugMessages'] === "false") {
         messageTimeout = setTimeout(function () {
           // $imagerMessages.hide();
         }, 5000);
       }
+    };
+
+    var getImage = function getImage(resolution, stream) {
+      var mimeType = "";
+      var pt_canvas_ul = Viewer.pt_canvas_ul;
+      var pt_canvas_lr = Viewer.pt_canvas_lr;
+      var status = Viewer.getStatus();
+      var image = Viewer.getImage();
+      var img = Viewer.getImg();
+      var dataurl;
+
+      mimeType = "image/png";
+      if (img.src.match(/\.png$/i)) {
+        mimeType = "image/png";
+      }
+      else if (img.src.match(/\.jpe*g$/i)) {
+        mimeType = "image/jpeg";
+      }
+
+      switch (resolution) {
+        case 'screen':
+          dataurl = Viewer.$canvas[0].toDataURL(mimeType);
+          break;
+
+        case 'image-cropped':
+          Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
+          var ncw;
+          var nch;
+          var pt = pointC('tmp');
+          if (status.rotation === 0 || status.rotation === 180) {
+            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
+              nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
+              Viewer.$canvas2.attr({
+                width: ncw,
+                // Set canvas to same size as image.
+                height: nch
+              });
+            if (status.rotation === 0) {
+              // Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
+              pt.setPt(0, 0, Viewer.ctx);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+                -pt.getTxPt().y);
+            }
+            else {
+              // status.rotation === 180
+              Viewer.ctx2.translate(ncw, nch);
+              Viewer.ctx2.rotate(angleInRadians(status.rotation));
+              pt.setPt(status.cw, status.ch, Viewer.ctx);
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+                -pt.getTxPt().y);
+            }
+          }
+          else {
+            ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
+              nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
+              Viewer.$canvas2.attr({
+                width: ncw,
+                // Set canvas to same size as image.
+                height: nch
+              });
+            if (status.rotation === 90) {
+              Viewer.ctx2.translate(ncw, 0);
+              Viewer.ctx2.rotate(angleInRadians(status.rotation));
+              pt.setPt(status.cw, 0, Viewer.ctx);
+              // Find Upper left corner of canvas in original image.
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+                // parseInt(pt1.x),
+                - pt.getTxPt().y);
+              // parseInt(pt2.y),
+            }
+            else {
+              Viewer.ctx2.translate(0, nch);
+              Viewer.ctx2.rotate(angleInRadians(status.rotation));
+              pt.setPt(0, status.ch, Viewer.ctx);
+              // Find Upper left corner of canvas in original image.
+              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
+                -pt.getTxPt().y);
+            }
+          }
+          dataurl = Viewer.$canvas2[0].toDataURL(mimeType);
+          break;
+
+        case 'image-full':
+          var tcw;
+          var tch;
+          Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
+          if (status.rotation === 0 || status.rotation === 180) {
+            tcw = Viewer.image().iw;
+            Viewer.$canvas2.attr({
+              width: tcw,
+              // Set canvas to same size as image.
+              height: tch
+            });
+            if (status.rotation === 180) {
+              Viewer.ctx2.translate(Viewer.image().iw, Viewer.image().ih);
+            }
+          }
+          else {
+            tcw = Viewer.image().ih;
+            tch = Viewer.image().iw;
+            Viewer.$canvas2.attr({
+              width: tcw,
+              // Set canvas to same size as image.
+              height: tch
+            });
+            if (status.rotation === 90) {
+              Viewer.ctx2.translate(Viewer.image().ih, 0);
+            }
+            else {
+              Viewer.ctx2.translate(0, Viewer.image().iw);
+            }
+          }
+          Viewer.ctx2.rotate(angleInRadians(status.rotation));
+          Viewer.ctx2.drawImage(img, 0, 0);
+          // Copy full image into canvas.
+          dataurl = Viewer.$canvas2[0].toDataURL(mimeType);
+          break;
+      }
+      if (stream) {
+        dataurl = dataurl.replace(mimeType, "image/octet-stream");
+      }
+      return dataurl;
     };
 
     /**
@@ -47,18 +169,21 @@
         data: postData,
         success: function (response_json) {
           clearTimeout(messageTimeout);
-          Popups.$busy.hide();
+//        Popups.$busy.hide();
           var response = JSON.parse(response_json);
           var display = false;
           var out;
+          var i;
           out = "<h2>" + response['action'] + ':' + response['status'] + "</h2>";
           if (response['info']) {
             out += "<div class='info'>" + response['info'] + "</div>";
             display = true;
           }
           if (response['status'] === 'catch' ||
-            (response['debug'] && localStorage['imagerDebugMessages'] === "TRUE")) {
-            out += "<div class='debug'>" + response['debug'] + "</div>";
+              (response['debug'] && localStorage['imagerDebugMessages'] === "true")) {
+            for (i = 0; i < response['debug'].length; i++) {
+              out += "<div class='debug'>" + response['debug'][i] + "</div>";
+            }
             display = true;
           }
 
@@ -69,11 +194,12 @@
           if (processFunc) {
             processFunc.call($callingElement, response);
           }
-          if (localStorage['imagerDebugMessages'] === "FALSE") {
-            // setTimeout(function () {
-            // --popups.messages.dialogClose();
-            // }, 3000);
+          if (localStorage['imagerDebugMessages'] === "false") {
+            setTimeout(function () {
+              Popups.messages.dialogClose();
+            }, 3000);
           }
+          Popups.$busy.hide();
         },
         error: function (evt) {
           Popups.$busy.hide();
@@ -84,7 +210,7 @@
           if (processFunc) {
             processFunc(response, evt);
           }   // Execute users error function
-          if (localStorage['imagerDebugMessages'] === "FALSE") {
+          if (localStorage['imagerDebugMessages'] === "false") {
             setTimeout(function () {
               Popups.messages.dialogClose();
             }, 10000);
@@ -100,7 +226,7 @@
         'v': {'x': 0, 'y': 0},
         't': {'x': 0, 'y': 0}
       };
-      var doTransform = spec.transform || false;
+      var doTransform = spec.transform || true;
       if (doTransform) {
         var namext = namex + '-tx';
         var nameyt = namey + '-tx';
@@ -181,6 +307,7 @@
 
     return {
       'ajaxProcess': ajaxProcess,
+      'getImage': getImage,
       'angleInRadians': angleInRadians,
       'displayMessage': displayMessage,
       'getFullPath': getFullPath,

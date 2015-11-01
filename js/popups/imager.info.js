@@ -19,6 +19,10 @@
  */
 (function ($) {
   "use strict";
+  if (localStorage.getItem('imagerShowInfo') === null) {
+    localStorage.setItem('imagerShowInfo', false);
+  }
+  /**
 
   /**
    * Define the Information dialog class.
@@ -54,6 +58,10 @@
         at: "right",
         of: spec.$selectButton
       },
+      open: function(){
+        var closeBtn = $('.ui-dialog-titlebar-close');
+        closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
+      },
       create: function () {
         $(this).closest('div.ui-dialog')
           .find('.ui-dialog-titlebar-close')
@@ -72,11 +80,11 @@
 
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
-      localStorage.imagerShowInfo = "TRUE";
+      localStorage.imagerShowInfo = "true";
     }
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerShowInfo = "FALSE";
+      localStorage.imagerShowInfo = "false";
     };
 
     /**

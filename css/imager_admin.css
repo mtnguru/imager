@@ -1,0 +1,8 @@
+/* @file
+ * imager_admin.sass
+ */
+/* line 17, ../scss/imager_admin.scss */
+#imager-admin-form input {
+  width: 100%;
+  max-width: 400px;
+}

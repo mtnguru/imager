@@ -36,8 +36,8 @@
 /*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
- *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
- *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.inc.
+ *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.js
+ *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.js.
  */
 
 /**
@@ -117,7 +117,7 @@
     };
 
     // Load the popup using AJAX.
-    popup.dialogCreate = function dialogCreate(response) {
+    popup.dialogCreate = function dialogCreate(response, $callingElement) {
       var status = response['status'];
       Drupal.imager.$wrapper.append(response['data']);
       popup.spec.$elem = $('#' + popup.spec.cssId);
@@ -171,7 +171,7 @@
           popup.dialogClose();
         }
         else {
-          popup.dialogOpen();
+          popup.dialogOpen(settings);
         }
       }
       else {

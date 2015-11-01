@@ -79,6 +79,26 @@ function imager_admin_form() {
     '#options' => $viewmodes,
   );
 
+  // Printer.
+  $form['printer'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Printer',
+  );
+  $form['printer']['imager_printer_search'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Search Command'),
+    '#default_value' => variable_get('imager_printer_search'),
+    '#description' => t('Command to search for printers on the web server'),
+    '#size' => 40,
+  );
+  $form['printer']['imager_printer_command'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Print command'),
+    '#default_value' => variable_get('imager_printer_command'),
+    '#description' => t('Command to print an image.'),
+    '#size' => 40,
+  );
+
   // Browser window.
   $form['browser'] = array(
     '#type' => 'fieldset',

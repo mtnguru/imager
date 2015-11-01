@@ -6,8 +6,8 @@
 /*
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
- *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.inc
- *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.inc
+ *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.js
+ *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.js
  * Variables starting with $ are only used for jQuery 'wrapped sets' of objects.
  */
 
@@ -55,9 +55,10 @@
     var database = function database(overwrite) {
       // displayMessage('Extracting Image...');
       Popups.$busy.show();
-      var img = getImage($('input[name="resolution"]:checked').val(), false);
+      var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
       // displayMessage('Saving Image...');
-      Core.ajaxProcess(this,
+      Core.ajaxProcess(
+        this,
         Drupal.imager.settings.actions.saveFile.url,
         {
           overwrite: overwrite,
@@ -101,16 +102,10 @@
     var download = function download() {
       // displayMessage('Extracting Image...');
       Popups.$busy.show();
-      var dataurl = getImage($('input[name="resolution"]:checked').val(), false);
-      /* displayMessage('Saving Image...');
-         $('#file-download-link').attr({ 'href': dataurl,
-                                               'download': $('#imager-filesave-filename').val()
-                                      });
-         window.open(dataurl,'Download');
-         window.location.assign(dataurl);
-         var uriContent = "data:application/octet-stream," + encodeURIComponent(dataurl);
-         window.open(uriContent, 'Download image smiley image'); */
-      window.open(dataurl, 'Download image smiley image');
+      var dataurl = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), true);
+      window.location.href = dataurl;
+      window.location.download = "downloadit.jpg";
+//    window.open(dataurl, 'Download image smiley image');
 
       Popups.$busy.hide();
       popup.dialogClose();
@@ -133,11 +128,12 @@
     var email = function email() {
       // displayMessage('Extracting Image...');
       Popups.$busy.show();
-      var img = getImage($('input[name="resolution"]:checked').val(), false);
+      var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
       // displayMessage('Saving Image...');
       Popups.$busy.hide();
       popup.dialogClose();
-      Core.ajaxProcess(this,
+      Core.ajaxProcess(
+        this,
         Drupal.imager.settings.actions.emailFile.url,
         {
           action: 'email',
@@ -151,18 +147,19 @@
           var subject = response['data']['subject'];
           var mailto_link = 'mailto:' + address +
             '?subject=' + encodeURIComponent(subject) +
-            '&body=' + body +
-            '&attachment=' + path;
+            '&body=' + 'simple' +
+            '&attachment=' + path + '';
 
+          alert('mailit dude:' + mailto_link);
           window.location.href = mailto_link;
         }
       );
     };
 
-    var clipboard = function email() {
+    var clipboard = function clipboard() {
       // displayMessage('Extracting Image...');
       Popups.$busy.show();
-      var img = getImage($('input[name="resolution"]:checked').val(), false);
+      var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
       // displayMessage('Saving Image...');
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.clipboard.url,
@@ -210,7 +207,7 @@
       var status = Viewer.getStatus();
       Viewer.setEditMode(popup.settings.saveMode);
       var src = Viewer.getImage().src;
-      var filename = src.substring(src.lastIndexOf('/') + 1);
+      var filename = decodeURIComponent(src.substring(src.lastIndexOf('/') + 1));
       $('#imager-filesave #imager-filesave-filename').show().val(filename);
       $('#imager-filesave #imager-filesave-messages').hide();
       initTable();
@@ -262,130 +259,6 @@
       }
     };
 
-    var getImage = function getImage(stream) {
-      var mimeType = "";
-      var pt_canvas_ul = Viewer.pt_canvas_ul;
-      var pt_canvas_lr = Viewer.pt_canvas_lr;
-      var status = Viewer.getStatus();
-      var image = Viewer.getImage();
-      var img = Viewer.getImg();
-
-      if (img.src.match(/\.png$/i)) {
-        mimeType = "image/png";
-      }
-      else {
-        if (img.src.match(/\.jpe*g$/i)) {
-          mimeType = "image/jpeg";
-        }
-      }
-      var imageResMode = $('input[name="resolution"]:checked').val();
-      switch (imageResMode) {
-        case 'screen':
-          img = Viewer.$canvas[0].toDataURL(mimeType);
-          break;
-
-        case 'image-cropped':
-          Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
-          var ncw;
-          var nch;
-          var pt = Core.pointC('tmp');
-          if (status.rotation === 0 || status.rotation === 180) {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-              nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-              Viewer.$canvas2.attr({
-                width: ncw,
-                // Set canvas to same size as image.
-                height: nch
-              });
-              if (status.rotation === 0) {
-                // Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-                pt.setPt(0, 0);
-                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
-
-              }
-              else {
-
-                // status.rotation === 180
-                Viewer.ctx2.translate(ncw, nch);
-                Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-                pt.setPt(status.cw, status.ch);
-                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
-              }
-          }
-          else {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
-              nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-              Viewer.$canvas2.attr({
-                width: ncw,
-                // Set canvas to same size as image.
-                height: nch
-              });
-              if (status.rotation === 90) {
-                Viewer.ctx2.translate(ncw, 0);
-                Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-                pt.setPt(status.cw, 0);
-                // Find Upper left corner of canvas in original image.
-                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                // parseInt(pt1.x),
-                - pt.getTxPt().y);
-                // parseInt(pt2.y),
-              }
-              else {
-                Viewer.ctx2.translate(0, nch);
-                Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-                pt.setPt(0, status.ch);
-                // Find Upper left corner of canvas in original image.
-                Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
-              }
-          }
-          img = Viewer.$canvas2[0].toDataURL(mimeType);
-          break;
-
-        case 'image-full':
-          var tcw;
-          var tch;
-          Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
-          if (status.rotation === 0 || status.rotation === 180) {
-            tcw = Viewer.image().iw;
-            Viewer.$canvas2.attr({
-              width: tcw,
-              // Set canvas to same size as image.
-              height: tch
-            });
-            if (status.rotation === 180) {
-              Viewer.ctx2.translate(Viewer.image().iw, Viewer.image().ih);
-            }
-          }
-          else {
-            tcw = Viewer.image().ih;
-            tch = Viewer.image().iw;
-            Viewer.$canvas2.attr({
-              width: tcw,
-              // Set canvas to same size as image.
-              height: tch
-            });
-            if (status.rotation === 90) {
-              Viewer.ctx2.translate(Viewer.image().ih, 0);
-            }
-            else {
-              Viewer.ctx2.translate(0, Viewer.image().iw);
-            }
-          }
-          Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
-          Viewer.ctx2.drawImage(img, 0, 0);
-          // Copy full image into canvas.
-          img = Viewer.$canvas2[0].toDataURL(mimeType);
-          break;
-      }
-      if (stream) {
-        img.replace(mimeType, "image/octet-stream");
-      }
-      return img;
-    };
-
     var initTable = function initTable() {
       var status = Viewer.getStatus();
       var image = Viewer.getImage();
@@ -399,7 +272,8 @@
 
     var deleteFile = function deleteFile() {
       displayMessage('Deleting Image...');
-      Core.ajaxProcess(this,
+      Core.ajaxProcess(
+        this,
         Drupal.imager.settings.actions.deleteFile.url,
         {
           action: 'delete-file',

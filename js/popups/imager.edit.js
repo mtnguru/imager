@@ -110,8 +110,8 @@
           if (response['data']) {
             $('#imager-edit-content').html(response['data']['rendered']);
             popup.settings.editFieldType = response['data']['type'];
-            if (Drupal.imager.settings.attachBehaviors) {
-              Drupal.imager.settings.attachBehaviors('#imager-edit-content div');
+            if (Drupal.attachBehaviors) {
+              Drupal.attachBehaviors('#imager-edit-content div');
             }
           }
           Popups.$busy.hide();

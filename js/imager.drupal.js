@@ -68,6 +68,9 @@
             'deleteFile': {
               'url': basepath + '?q=imager/ajax/delete_file'
             },
+            'printImage': {
+              'url': basepath + '?q=imager/ajax/print_image'
+            },
             'renderDialog': {
               'url': basepath + '?q=imager/ajax/render_dialog'
             }

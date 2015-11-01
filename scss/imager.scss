@@ -32,11 +32,16 @@ $black: #000;
   }
 }
 
+#imager-hidden-form {
+  display: none;
+}
+
 #imager-viewer.fullscreen {
   width: 100%;
 }
 
 .imager-viewer-dialog {
+  position: fixed;
   z-index: 1010 !important;
   .ui-dialog-titlebar {
     display: none;
@@ -51,9 +56,21 @@ $black: #000;
     background-color: $lightgrey;
   }
   #imager-canvas-wrapper {
+    margin: 0;
     float: left;
+    position: relative;
+    #imager-canvas {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
     #imager-canvas-org {
 //    display: hidden;
+    }
+    #imager-image {
+      position: absolute;
+      top: 0;
+      right: 0;
     }
   }
   #button-wrapper {
@@ -66,9 +83,9 @@ $black: #000;
       padding: 2px 1px;
       margin: 0 2px 2px 0;
       text-align: center;
-      font-size: 60%;
+      font-size: 65%;
       img {
-        border-radius: 4px;
+        border-radius: 0px;
         display: block;
         padding: 2px;
         margin: 0 auto;
@@ -98,7 +115,6 @@ $black: #000;
 
 #imager-info {
   padding: 5px;
-  background-color: $lightergrey;
   .title {
     text-align: center;
     word-wrap: break-word;
@@ -133,7 +149,6 @@ $black: #000;
 
 #imager-edit {
   padding: 10px;
-  background-color: $lightgrey;
   .form-item {
     margin: 0;
   }
@@ -173,7 +188,6 @@ $black: #000;
 #imager-confirm {
   max-width: 700px;
   z-index: 1020;
-  background-color: $lightgrey;
   padding: 1.2em 10px 0;
   .imager-content {
     margin: 0;
@@ -194,7 +208,6 @@ $black: #000;
   max-width: 800px;
   padding: 5px;
   position: fixed;
-  background-color: $greyer;
   z-index: 1013;
   .description {
     max-width: 300px;
@@ -206,7 +219,6 @@ $black: #000;
 }
 
 #imager-messages {
-  background-color: $grey;
   padding: 10px;
   font-size: 80%;
   .info {
@@ -222,8 +234,6 @@ $black: #000;
 }
 
 #imager-filesave {
-  padding: 5px;
-  background-color: $grey;
   #imager-filesave-filename {
     width: 15em;
     font-size: 90%;
@@ -236,7 +246,6 @@ $black: #000;
 
 #imager-brightness,
 #imager-color {
-  background-color: $grey;
   .error {
     background-color: $red;
   }
@@ -273,7 +282,6 @@ $black: #000;
     width: 97%;
   }
   padding: 10px;
-  background-color: $grey;
   #resolution {
     margin: 0 auto 10px;
     width: auto;
@@ -317,8 +325,34 @@ div#main {
 }
 
 .imager-dialog {
+  padding: 0;
   position: fixed;
-  background: $lightestgrey;
+  .ui-dialog-content {
+    background-color: $grey;
+  }
+  .ui-dialog-title {
+    margin: 0 1em 0 0;
+    color: #eee;
+  }
+  .ui-dialog-titlebar {
+    border: none;
+    background-color: $darkgrey;
+    padding: 0 0 0 1em;
+  }
+  .ui-dialog-buttonpane {
+    margin: 0;
+    background-color: $darkgrey;
+    padding: 0 .5em 0 0.4em;
+  }
+  .ui-button-text {
+    padding: 0.2em 0.5em;
+  }
+  legend {
+    line-height: 1.5;
+    margin: 10px 0 0;
+    border-color: -moz-use-text-color -moz-use-text-color $grey;
+    font-size: 140%;
+  }
   .imager-content {
     margin: 0;
     padding: .25em .5em;
@@ -330,18 +364,6 @@ div#main {
   tr th {
     padding: 2px 8px;
   }
-  .ui-dialog-titlebar {
-    padding: 0.3em 0 0.3em 0.5em;
-  }
-  .ui-dialog-title {
-    margin: 0 1em 0 0;
-  }
-  .ui-dialog-buttonpane {
-    padding: 0 .5em 0 0.4em;
-  }
-  .ui-button-text {
-    padding: 0.2em 0.5em;
-  }
   .form-item {
     input {
       font-size: 100%;
@@ -351,9 +373,10 @@ div#main {
       padding-left: 0.5em;
     }
     .description {
-      color: $lightergrey;
+      color: $darkgrey;
     }
   }
+
   #imager-status-content {
     text-align: center;
     .imager-status-col {

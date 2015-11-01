@@ -67,8 +67,8 @@ function imager_edit_form_load() {
   $cmp = _imager_extract_path_components($uri);
   $puri = "public://$cmp[dir]$cmp[filename].$cmp[suffix]";
 
-  // $out['debug'] .= "uri: " . $uri . "<br>\n";
-  // $out['debug'] .= "public uri: " . $puri . "<br>\n";
+  // $out['debug'][] .= "uri: " . $uri . "<br>\n";
+  // $out['debug'][] .= "public uri: " . $puri . "<br>\n";
   $fid = _imager_get_fid($puri);
   $file = file_load($fid);
   $form_id = 'file_entity_edit';
@@ -149,7 +149,7 @@ function imager_edit_form_field_load() {
   $field = $form[$field_name];
   $out['data']['rendered'] = drupal_render($field);
   $out['data']['type'] = _imager_get_field_type($field[LANGUAGE_NONE][0], 1);
-  // $out['debug'] .= '#type: ' . $out['data']['type'];
+  // $out['debug'][] .= '#type: ' . $out['data']['type'];
   print json_encode($out);
 }
 
@@ -182,11 +182,11 @@ function _imager_convert_image($spath, $dpath, $type = NULL) {
     case 'browser':
       $geometry = variable_get('imager_browser_width', 1200) . 'x' .
         variable_get('imager_browser_height', 1200);
-      $cmd = "/usr/bin/convert -quality 70 -scale $geometry \"$spath\" \"$dpath\"";
+      $cmd = "/usr/bin/convert -quality 70 -scale $geometry \"$spath\" \"$dpath\" > /tmp/convert.log 2>&1";
       break;
 
     default:
-      $cmd = "/usr/bin/convert -quality 70 \"$spath\" \"$dpath\"";
+      $cmd = "/usr/bin/convert -quality 70 \"$spath\" \"$dpath\" > /tmp/convert.log 2>&1";
       break;
   }
   system($cmd);
@@ -277,12 +277,14 @@ function imager_email_file() {
   $out['status'] = 'pass';
 
   $uri = urldecode(check_plain($_POST['uri']));
-  // $out['debug'] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
+  // $out['debug'][] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
   $ps = _imager_get_paths($uri);
+  $ps['filename'] = substr($ps['filename'],0,12);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
   $dir = variable_get('imager_email_local_path');
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
   $image_path = $dir . '/' . $ps['filename'] . '.' . $ps['suffix'];
+  $image_path = preg_replace('/[:]/', '_', $image_path);
   _imager_write_image($tmp_path);
   _imager_convert_image($tmp_path, $image_path);
 
@@ -291,18 +293,19 @@ function imager_email_file() {
 
   if (strstr($_SERVER['HTTP_USER_AGENT'], 'inux')) {
     $out['data']['attachPath'] = variable_get('imager_email_attach_linux') . '/' .
-      $ps['filename'] . '.' . $ps['suffix'];
+      preg_replace('/:/', '_', $ps['filename'] . '.' . $ps['suffix']);
   }
   else {
     // Assume Windows.
     $out['data']['attachPath'] = variable_get('imager_email_attach_windows') . '\\' .
-      $ps['filename'] . '.' . $ps['suffix'];
+      preg_replace('/:/', '_', $ps['filename'] . '.' . $ps['suffix']);
   }
   $view = file_view($file, variable_get('imager_email_view_mode'));
   unset($view['links']);
   unset($view['#contextual_links']);
   unset($view['#pre_render']);
   unset($view['file']);
+
   // $out['data']['body'] = drupal_html_to_text(drupal_render($view));
   $html = drupal_render($view);
   $html = preg_replace('/<\/div>/i', "\n", $html);
@@ -312,8 +315,13 @@ function imager_email_file() {
   // $html = preg_replace('/<\/p>/i',"\n",$html);
   $html = preg_replace('/\&nbsp;/', ' ', $html);
   $html = preg_replace('/<[^>]+>/i', '', $html);
+
   $out['data']['body'] = $html;
   $out['data']['subject'] = "Dairy Specialists - photo - $ps[filename]";
+  $out['debug'][] = 'Email subject: ' . $out['data']['subject'];
+  $out['debug'][] = 'Email body: ' . $html;
+  $out['debug'][] = 'Email attachPath: ' . $out['data']['attachPath'];
+  
   print json_encode($out);
 }
 
@@ -376,6 +384,34 @@ function imager_delete_file() {
   file_delete($file, $force);
 
   $out['status'] = 'pass';
+  print json_encode($out);
+}
+
+/**
+ * Print image to a printer on the Web Server.
+ */
+function imager_print_image() {
+  $out['action'] = check_plain($_POST['action']);
+  $out['status'] = 'pass';
+
+  // Send file to printer
+  $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
+//$file = file_load(_imager_get_fid($ps['puri']));
+
+  $dir = DRUPAL_ROOT . '/tmp';
+  file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+
+  // Write image to file system
+  $tmp_path = '/tmp/' . $ps['filename'] . '.' . $ps['suffix'];
+  _imager_write_image($tmp_path);
+
+  $cmd = preg_replace('/IMAGEPATH/', $tmp_path,
+           preg_replace('/NAME/', $_POST['printer'],
+             variable_get('imager_printer_command')
+           )
+         );
+  system($cmd);
+  $out['debug'][] = 'Print Cmd: ' . $cmd;
   print json_encode($out);
 }
 

@@ -40,6 +40,7 @@ function _imager_build_wrapper(array &$page) {
         $_imager_path . '/js/popups/imager.config.js',
         $_imager_path . '/js/popups/imager.filesave.js',
         $_imager_path . '/js/popups/imager.info.js',
+        $_imager_path . '/js/popups/imager.image.js',
         $_imager_path . '/js/popups/imager.edit.js',
         $_imager_path . '/js/popups/imager.color.js',
         $_imager_path . '/js/popups/imager.brightness.js',
@@ -71,12 +72,13 @@ function _imager_build_wrapper(array &$page) {
   // 'filesave'   => _imager_build_filesave(),
   // 'status'     => _imager_build_status(),
   // 'info'       => _imager_build_info(),
+  // 'image'      => _imager_build_image(),
   // 'edit'       => _imager_build_edit(),
   // 'messages'   => _imager_build_messages(),
   // 'canvasorg'  => _imager_build_canvas(),
     'busy' => _imager_build_busy(),
   // 'map'        => _imager_build_map(),
-  // 'form'       => _imager_build_form(),
+     'form'       => _imager_build_form(),
   // 'confirm'    => _imager_build_confirm(),
   // 'config'     => _imager_build_configuration()
   );
@@ -152,6 +154,7 @@ function theme_imager_add_button(array $variables) {
  *    Render array for Viewer dialog
  */
 function _imager_build_viewer() {
+  global $_imager_path;
   return array(
     '#prefix' => '<div id="imager-viewer">',
     '#suffix' => '</div>',
@@ -170,11 +173,13 @@ function _imager_build_viewer() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'image_left' => _imager_build_button(1, 'image-left', 'left_arrow.png', t('View image to the left')),
-        'image_right' => _imager_build_button(2, 'image-right', 'right_arrow.png', t('View image to the right')),
-        'image_exit' => _imager_build_button(4, 'image-exit', 'redx.png', t('Exit image popup')),
+        'image_exit' => _imager_build_button(1, 'image-exit', 'redx.png', t('Exit image popup')),
+        'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
+        'image_left' => _imager_build_button(3, 'image-left', 'left_arrow.png', t('View image to the left')),
+        'image_right' => _imager_build_button(4, 'image-right', 'right_arrow.png', t('View image to the right')),
+        'mode_configure' => _imager_build_button(5, 'mode-configure', 'configure.png', t('Configure settings')),
       ),
-      'mode_buttons' => array(
+/*    'mode_buttons' => array(
         '#prefix' => '<div id="mode-buttons" class="buttons">',
         '#suffix' => '</div>',
         '#weight' => 2,
@@ -185,10 +190,10 @@ function _imager_build_viewer() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-        'mode_view' => _imager_build_button(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
+//      'mode_view' => _imager_build_button(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
         'mode_fullscreen' => _imager_build_button(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
         'mode_configure' => _imager_build_button(4, 'mode-configure', 'configure.png', t('Configure settings')),
-      ),
+      ), */
       'view_buttons' => array(
         '#prefix' => '<div id="view-buttons" class="buttons">',
         '#suffix' => '</div>',
@@ -202,7 +207,7 @@ function _imager_build_viewer() {
         ),
         'view_browser' => _imager_build_button(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
         'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')),
-        'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+//      'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
         'view_zoom_in' => _imager_build_button(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
         'view_zoom_out' => _imager_build_button(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
       ),
@@ -219,7 +224,7 @@ function _imager_build_viewer() {
         'mode_crop' => _imager_build_button(1, 'mode-crop', 'frame.png', t('Start crop - select area to crop')),
         'edit_crop' => _imager_build_button(2, 'edit-crop', 'scissors.png', t('Crop selected area')),
         'edit_brightness' => _imager_build_button(3, 'edit-brightness', 'contrast.png', t('Edit brightness and contrast')),
-        'edit_color' => _imager_build_button(4, 'edit-color', 'color_wheel.png', t('Edit Hue, Saturation and Lightness')),
+        'edit_color' => _imager_build_button(4, 'edit-color', 'color_wheel.png', t('Edit hue, saturation and lightness')),
         'edit_ccw' => _imager_build_button(5, 'edit-ccw', 'rotate-left.png', t('Rotate image 90 degrees counter-clockwise')),
         'edit_cw' => _imager_build_button(6, 'edit-cw', 'rotate-right.png', t('Rotate image 90 degrees clockwise')),
         // 'edit-reset' does not work.  It must be used by another program.
@@ -235,17 +240,28 @@ function _imager_build_viewer() {
           '#prefix' => '<div>',
           '#suffix' => '</div>',
         ),
+        // @todo don't display if doesn't have permissions.
         'file_database' => _imager_build_button(1, 'file-database', 'database_go.png', t('Save edited image to database')),
+        // @todo don't display if doesn't have permissions.
         'file_delete' => _imager_build_button(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
         'file_download' => _imager_build_button(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
-        'file_email' => _imager_build_button(4, 'file-email', 'mail.png', t('E-mail image')),
+        // @todo Don't display if not at appropriate IP addresses
+        'file_print' => _imager_build_button(4, 'file-print', 'print.png', t('Print Image')),
       ),
     ),
     'imager_canvas_wrapper' => array(
       '#prefix' => '<div id="imager-canvas-wrapper">',
       '#suffix' => '</div>',
       '#weight' => 2,
+      'imager_image' => array(
+        '#type' => 'markup',
+        '#weight' => 2,
+        '#markup' => '<img id="imager-image" src="' .
+          $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/transparent.png' .
+          '" alt="" title="" />',
+      ),
       'imager_canvas' => array(
+        '#weight' => 1,
         '#prefix' => '<canvas id="imager-canvas">',
         '#suffix' => '</canvas>',
       ),
@@ -744,6 +760,26 @@ function _imager_build_info() {
 }
 
 /**
+ * Build render array for image dialog - displays image for emailing, printing.
+ *
+ * @return array
+ *   Render array for Information dialog.
+ */
+function _imager_build_image() {
+  return array(
+    '#prefix' => '<div id="imager-image">',
+    '#suffix' => '</div>',
+    'content' => array(
+      '#prefix' => '<div id="imager-image-content" class="imager-content">',
+      '#suffix' => '</div>',
+      '#weight' => 1,
+      '#type' => 'markup',
+      '#markup' => t('<img id="imager-image-img" src="#"></img>'),
+    ),
+  );
+}
+
+/**
  * Build render array for file_entity field editing popup.
  *
  * @return array
@@ -879,7 +915,7 @@ function _imager_build_form() {
   drupal_set_title($title1);
 
   $div = array(
-    '#prefix' => '<div id="imager-form">',
+    '#prefix' => '<div id="imager-hidden-form">',
     '#suffix' => '</div>',
     'editform' => $form,
   );
@@ -916,6 +952,15 @@ function _imager_build_confirm() {
  *    Render array for configuration dialog.
  */
 function _imager_build_configuration() {
+  // lpstat -t | grep "^printer" | grep -v fax | cut -f 2 -d " "
+
+  $printers = array();
+  $handle = popen(variable_get('imager_printer_search'), 'r');
+  while (($line = fgets($handle)) !== false) {
+    $printers[] = chop($line,"\n");
+  }
+  pclose($handle);
+
   return array(
     '#prefix' => '<div id="imager-config">',
     '#suffix' => '</div>',
@@ -925,7 +970,7 @@ function _imager_build_configuration() {
       '#weight' => 1,
       'description' => array(
         '#type' => 'markup',
-        '#markup' => '<p><em>All values are stored specific to the browser you are using.</em></p>',
+        '#markup' => '<p><em>All settings are stored specific to each browser you use.</em></p>',
       ),
       'viewer' => array(
         '#type' => 'fieldset',
@@ -933,8 +978,19 @@ function _imager_build_configuration() {
         'imager_bounds_enable' => array(
           '#type' => 'checkbox',
           '#title' => t('Enable Bounds limiting'),
-          '#description' => t('Prevents image from zooming smaller than the viewing area.  Also prevents image from being panned (dragged) offscreen.'),
+          '#description' => t('Prevents image from zooming smaller than the viewing area and from being panned (dragged) offscreen.'),
           '#attributes' => array('id' => 'imager-bounds-enable'),
+        ),
+      ),
+      'printer' => array(
+        '#type' => 'fieldset',
+        '#title' => 'Printer',
+        'imager_printer_select' => array(
+          '#type' => 'select',
+          '#title' => t('Select a printer'),
+          '#default_value' => localStorage.imagerPrinter,
+          '#options' => $printers,
+          '#attributes' => array('id' => 'imager-printer-select'),
         ),
       ),
       'debug' => array(

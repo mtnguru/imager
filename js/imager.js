@@ -62,6 +62,7 @@
       $thumbnails.each(function (index, value) {
         // Add image to images array.
         var $thumb = $(this).find(Drupal.imager.settings.cssImage);
+        if (!$thumb.attr('src')) return;
         images.push(Drupal.imager.imageC({
           '$container': $(this),
           '$thumb': $thumb,
@@ -70,6 +71,7 @@
         }));
 
         // Unbind any current event handlers on thumbnails.
+        $thumb.unbind('click');
         $thumb.parent().unbind('click');
 
         // User clicks in thumbnail image.
@@ -82,6 +84,7 @@
             Popups.viewer.dialogOpen({'image': image});
           }
           evt.stopPropagation();
+//        evt.preventDefault();
           return false;
         });
       });

@@ -14,6 +14,9 @@
 (function ($) {
   "use strict";
 
+  if (localStorage.getItem('imagerDebugMessages') === null) {
+    localStorage.setItem('imagerDebugMessages', false);
+  }
   /**
    * Define messages dialog class - Drupal.imager.popups.messagesC.
    *
@@ -31,13 +34,17 @@
     var dspec = $.extend({
       name: 'Messages',
       autoOpen: false,
-      title: 'System messages',
+      title: 'System messages  ',
       zIndex: 1015,
       width: 'auto',
       dialogClass: 'imager-dialog',
       cssId: 'imager-messages',
       height: 'auto',
       resizable: false,
+      open: function(){
+        var closeBtn = $('.ui-dialog-titlebar-close');
+        closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
+      },
       position: {
         my: "left",
         at: "right",
@@ -52,12 +59,12 @@
     }
 
     popup.dialogOnOpen = function dialogOnOpen() {
-      localStorage.imagerDebugMessages = 'TRUE';
+      localStorage.imagerDebugMessages = 'true';
       popup.dialogInit();
     }
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerDebugMessages = 'FALSE';
+      localStorage.imagerDebugMessages = 'false';
     };
 
     popup.dialogInit = function dialogInit() {
