@@ -190,7 +190,7 @@ function _imager_build_viewer() {
           '#suffix' => '</div>',
           '#weight' => 0,
         ),
-//      'mode_view' => _imager_build_button(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
+        'mode_view' => _imager_build_button(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
         'mode_fullscreen' => _imager_build_button(3, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
         'mode_configure' => _imager_build_button(4, 'mode-configure', 'configure.png', t('Configure settings')),
       ), */
