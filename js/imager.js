@@ -30,7 +30,7 @@
     // List of thumbnails on source page.
     var Popups = Drupal.imager.popups;
     var images = [];
-    // Array of imageC - imager.image.js
+    // Array of imageC - imager.image.js .
     /**
      * Initialize Imager JavaScript library.
      *

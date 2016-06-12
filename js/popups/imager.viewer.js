@@ -251,10 +251,8 @@
      * Print image to web server.
      */
     var printImage = function printImage() {
-      // displayMessage('Extracting Image...');
       Popups.$busy.hide();
       var img = Drupal.imager.core.getImage('image-cropped', false);
-      // displayMessage('Saving Image...');
       Drupal.imager.core.ajaxProcess(
         $('#file-print'),
         Drupal.imager.settings.actions.printImage.url,
@@ -283,10 +281,10 @@
       // Set transform matrix to identity matrix.
       // The original img is kept unrotated.
       ctx2.drawImage($canvas[0], 0, 0);
-      // ctx2.drawImage(img, 0, 0);
+      /* ctx2.drawImage(img, 0, 0); */
     };
 
-    Drupal.imager.viewer.getImage = function() {
+    Drupal.imager.viewer.getImage = function () {
       return image;
     }
 
@@ -689,9 +687,6 @@
      * Enable event handlers for panning, zooming - disable cropping handlers.
      */
     function enablePanZoom() {
-      // canvas#image-canvas event handlers.
-      // $imgOverlay[0].addEventListener('contextmenu', contextMenu, false);
-      // $imgOverlay[0].addEventListener('click', click, false);
       $imgOverlay[0].addEventListener('mousedown', mouseDown, false);
       $imgOverlay[0].addEventListener('mousemove', mouseMove, false);
       $imgOverlay[0].addEventListener('mouseup', mouseUp, false);
@@ -704,8 +699,8 @@
      * Enable event handlers for cropping - disable handlers for panning and zooming.
      */
     function enableCrop() {
-      // $imgOverlay[0].removeEventListener('contextmenu', contextMenu);
-      // $imgOverlay[0].removeEventListener('click', click);
+      /* $imgOverlay[0].removeEventListener('contextmenu', contextMenu); */
+      /* $imgOverlay[0].removeEventListener('click', click); */
       $imgOverlay[0].removeEventListener('mousedown', mouseDown);
       $imgOverlay[0].removeEventListener('mousemove', mouseMove);
       $imgOverlay[0].removeEventListener('mouseup', mouseUp);
@@ -896,7 +891,6 @@
     function trackTransforms(ctx) {
       var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
       var xform = svg.createSVGMatrix();
-      // ctx.getTransform = function(){ return xform; };
       var savedTransforms = [];
       var save = ctx.save;
       ctx.save = function () {
@@ -933,7 +927,7 @@
       };
 
       /* Var transform = ctx.transform;
-         ctx.transform = function(a, b, c, d, e, f){
+         ctx.transform = function (a, b, c, d, e, f){
          var m2 = svg.createSVGMatrix();
            m2.a=a; m2.b=b; m2.c=c; m2.d=d; m2.e=e; m2.f=f;
             xform = xform.multiply(m2);
@@ -1162,10 +1156,8 @@
 
       // View Buttons.
       $('#view-browser').click(function () {
-        // displayMessage('Extracting Image...');
         Popups.$busy.hide();
         var img = Drupal.imager.core.getImage('image-cropped', false);
-        // displayMessage('Saving Image...');
         Drupal.imager.core.ajaxProcess(
           this,
           Drupal.imager.settings.actions.viewBrowser.url,
@@ -1196,35 +1188,34 @@
         zoom(-1);
       });
 
-      //div#debug-buttons event handlers
-      // toggle debug
-      $('#debug-status').click(function(evt) {
+      // div#debug-buttons event handlers.
+      $('#debug-status').click(function (evt) {
         if (localStorage.imagerShowStatus === "FALSE") {
           localStorage.imagerShowStatus = "TRUE";
           $(this).addClass('checked');
           Popups.status.dialogOpen();
-        } else {
+        }
+        else {
           localStorage.imagerShowStatus = "FALSE";
           $(this).removeClass('checked');
           Popups.status.dialogClose();
         }
-//      $('#imager-messages-content').append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>');
+     /* $('#imager-messages-content').append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>'); */
         updateStatus();
       });
 
-      $('#debug-messages').click(function(evt) {
+      $('#debug-messages').click(function (evt) {
         localStorage.imagerShowDebug = (localStorage.imagerShowDebug === "TRUE") ? "FALSE" : "TRUE";
         if (localStorage.imagerShowDebug === "TRUE") {
           $(this).addClass('checked');
           $imagerMessages.show();
           $('#imager-messages-content').empty();
-        } else {
+        }
+        else {
           $(this).removeClass('checked');
           $imagerMessages.hide();
         }
       });
-
-
 
       trackTransforms(ctx);
       setEditMode('view');
@@ -1243,18 +1234,18 @@
         fullScreen = true;
         $('#imager-canvas-wrapper').addClass('fullscreen');
         $('#mode-fullscreen').addClass('checked');
-      } else {
+      }
+      else {
         $('#imager-canvas-wrapper').removeClass('fullscreen');
         fullScreen = false;
         $('#mode-fullscreen').removeClass('checked');
       }
-      setTimeout(function() {
-//      setViewMode(1);
+      setTimeout(function () {
+     /* setViewMode(1); */
         initializeImage();
         redraw();
       },250);
     }
-
 
     /**
      * Copy the canvas into the current IMG

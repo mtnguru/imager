@@ -42,7 +42,6 @@
       width: 'auto',
       dialogClass: 'imager-dialog imager-filesave-dialog imager-noclose',
       cssId: 'imager-filesave',
-      // cssIdFinal:  'imager-filesave-database',
       height: 'auto',
       resizable: false,
       position: {
@@ -55,10 +54,8 @@
     var popup = Drupal.imager.popups.baseC(dspec);
 
     var database = function database(overwrite) {
-      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
-      // displayMessage('Saving Image...');
       Core.ajaxProcess(
         this,
         Drupal.imager.settings.actions.saveFile.url,
@@ -103,13 +100,10 @@
     };
 
     var download = function download() {
-      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var dataurl = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), true);
       window.location.href = dataurl;
       window.location.download = "downloadit.jpg";
-      // window.open(dataurl, 'Download image smiley image');
-      //
       Popups.$busy.hide();
       popup.dialogClose();
 
@@ -129,10 +123,8 @@
     };
 
     var email = function email() {
-      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
-      // displayMessage('Saving Image...');
       Popups.$busy.hide();
       popup.dialogClose();
       Core.ajaxProcess(
@@ -149,8 +141,7 @@
           var subject = response['data']['subject'];
           var mailto_link = 'mailto:' + address +
             '?subject=' + encodeURIComponent(subject) +
-            '&body=' + 'simple' +
-            '&attachment=' + path + '';
+            '&body=simple&attachment=' + path + '';
 
           alert('mailit dude:' + mailto_link);
           window.location.href = mailto_link;
@@ -159,14 +150,12 @@
     };
 
     var clipboard = function clipboard() {
-      // displayMessage('Extracting Image...');
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
-      // displayMessage('Saving Image...');
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.clipboard.url,
         {
-          // overwrite: overwrite,
+          /* overwrite: overwrite, */
           action: 'clipboard',
           saveMode: popup.settings.saveMode,
           uri: Viewer.getImage().src,
@@ -182,7 +171,6 @@
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-//    Viewer.setEditMode('view');
       switch (popup.settings.saveMode) {
         case 'database':
           $('#file-database').removeClass('checked');
@@ -272,7 +260,6 @@
     };
 
     var deleteFile = function deleteFile() {
-      // displayMessage('Deleting Image...');
       Core.ajaxProcess(
         this,
         Drupal.imager.settings.actions.deleteFile.url,

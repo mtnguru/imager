@@ -64,26 +64,26 @@ function _imager_build_wrapper(array &$page) {
       ),
     ),
 
-    // Render arrays are not loaded until needed.  Then they are loaded with AJAX.
-    // To load a render array before that uncomment it here.
-    // 'viewer'     => _imager_build_viewer(),
-    // 'brightness' => _imager_build_brightness(),
-    // 'color'      => _imager_build_color(),
-    // 'filesave'   => _imager_build_filesave(),
-    // 'status'     => _imager_build_status(),
-    // 'info'       => _imager_build_info(),
-    // 'image'      => _imager_build_image(),
-    // 'edit'       => _imager_build_edit(),
-    // 'messages'   => _imager_build_messages(),
-    // 'canvasorg'  => _imager_build_canvas(),
+    /* Render arrays are not loaded until needed.   */
+    /* To load a render array before that uncomment it here. */
+    /* 'viewer'     => _imager_build_viewer(), */
+    /* 'brightness' => _imager_build_brightness(), */
+    /* 'color'      => _imager_build_color(), */
+    /* 'filesave'   => _imager_build_filesave(), */
+    /* 'status'     => _imager_build_status(), */
+    /* 'info'       => _imager_build_info(), */
+    /* 'image'      => _imager_build_image(), */
+    /* 'edit'       => _imager_build_edit(), */
+    /* 'messages'   => _imager_build_messages(), */
+    /* 'canvasorg'  => _imager_build_canvas(), */
     'busy' => _imager_build_busy(),
-    // 'map'        => _imager_build_map(),
+    /* 'map'        => _imager_build_map(), */
     'form'       => _imager_build_form(),
-    // 'confirm'    => _imager_build_confirm(),
-    // 'config'     => _imager_build_configuration()
+    /* 'confirm'    => _imager_build_confirm(), */
+    /* 'config'     => _imager_build_configuration() */
   );
-  // $page['content']['imager_wrapper']['#attached']['imager_library_load'][] = array('jquery.imgareaselect');
-  // $page['content']['imager_wrapper']['#attached'][] = array('screenfull');
+  /* $page['content']['imager_wrapper']['#attached']['imager_library_load'][] = array('jquery.imgareaselect'); */
+  /* $page['content']['imager_wrapper']['#attached'][] = array('screenfull'); */
 }
 
 /**
@@ -174,7 +174,7 @@ function _imager_build_viewer() {
           '#weight' => 0,
         ),
         'image_exit' => _imager_build_button(1, 'image-exit', 'redx.png', t('Exit image popup')),
-//      'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
+     /* 'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')), */.
         'image_left' => _imager_build_button(3, 'image-left', 'left_arrow.png', t('View image to the left')),
         'image_right' => _imager_build_button(4, 'image-right', 'right_arrow.png', t('View image to the right')),
         'mode_configure' => _imager_build_button(5, 'mode-configure', 'configure.png', t('Configure settings')),
@@ -206,8 +206,8 @@ function _imager_build_viewer() {
           '#weight' => 0,
         ),
         'view_browser' => _imager_build_button(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
-//      'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')),
-//      'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+     /* 'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')), */
+     /* 'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')), */
         'view_zoom_in' => _imager_build_button(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
         'view_zoom_out' => _imager_build_button(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
       ),
@@ -240,12 +240,12 @@ function _imager_build_viewer() {
           '#prefix' => '<div>',
           '#suffix' => '</div>',
         ),
-        // @todo don't display if doesn't have permissions.
+        // @TODO don't display if doesn't have permissions.
         'file_database' => _imager_build_button(1, 'file-database', 'database_go.png', t('Save edited image to database')),
-        // @todo don't display if doesn't have permissions.
+        // @TODO Don't display if doesn't have permissions.
         'file_delete' => _imager_build_button(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
-//      'file_download' => _imager_build_button(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
-        // @todo Don't display if not at appropriate IP addresses
+        'file_download' => _imager_build_button(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
+        // @TODO Don't display if not at appropriate IP addresses.
         'file_print' => _imager_build_button(4, 'file-print', 'print.png', t('Print Image')),
       ),
       'debug_buttons' => array(
@@ -259,7 +259,7 @@ function _imager_build_viewer() {
           '#suffix' => '</div>',
         ),
         'debug_status' => _imager_build_button(1, 'debug-status', 'bug.png', t('Toggle status output')),
-//      'debug_messages' => _imager_build_button(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
+     /* 'debug_messages' => _imager_build_button(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')), */
       ),
     ),
     'imager_canvas_wrapper' => array(
@@ -269,9 +269,9 @@ function _imager_build_viewer() {
       'imager_image' => array(
         '#type' => 'markup',
         '#weight' => 2,
-        '#markup' => '<img id="imager-image" src="' .
-          $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/transparent.png' .
-          '" alt="" title="" />',
+        '#markup' => '<img id="imager-image" src="' 
+        .  $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/transparent.png' 
+        .  '" alt="" title="" />',
       ),
       'imager_canvas' => array(
         '#weight' => 1,
@@ -387,7 +387,7 @@ function _imager_build_filesave() {
         '#prefix' => '<div id="imager-filesave-filename-container">',
         '#suffix' => '</div>',
         '#type' => 'markup',
-        '#markup' => "<span>" . t('File name:') . " </span><input id='imager-filesave-filename' type='text' />",
+        '#markup' => "<span>" . t('File name: @link', array(" </span><input id='imager-filesave-filename' type='text' />")),
       ),
     ),
   );
@@ -957,7 +957,6 @@ function _imager_build_confirm() {
   );
 }
 
-
 /**
  * Build render array for configuration dialog.
  *
@@ -965,7 +964,6 @@ function _imager_build_confirm() {
  *    Render array for configuration dialog.
  */
 function _imager_build_configuration() {
-  // Pareview requires a capital letter-fuck pareview -  lpstat -t | grep "^printer" | grep -v fax | cut -f 2 -d " "
   $printers = array();
   $handle = popen(variable_get('imager_printer_search'), 'r');
   while (($line = fgets($handle)) !== FALSE) {

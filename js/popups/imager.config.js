@@ -42,7 +42,7 @@
       dialogClass: 'imager-dialog imager-config-dialog',
       cssId: 'imager-config',
       height: 'auto',
-      // resize: 'auto',
+      /* resize: 'auto', */
       position: {
         my: "left",
         at: "right",

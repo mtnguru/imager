@@ -182,7 +182,6 @@
             }
           });
           value = date + ' ' + time;
-          // alert('datetime  ' + date + '  ' + time);
           break;
 
         case 'hierarchical_select':
@@ -206,7 +205,6 @@
           break;
       }
       Drupal.imager.popups.$busy.show();
-      // displayMessage('Saving ...');
       Drupal.imager.core.ajaxProcess(this,
         Drupal.imager.settings.actions.saveFileEntityField.url,
         {

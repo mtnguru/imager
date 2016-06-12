@@ -77,4 +77,3 @@ Install using one of the following methods:
 # Panning
 
 # Saving
-

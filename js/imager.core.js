@@ -62,13 +62,13 @@
               height: nch
             });
             if (status.rotation === 0) {
-              // Viewer.ctx2.rotate(Core.angleInRadians(status.rotation));
+              /* Viewer.ctx2.rotate(Core.angleInRadians(status.rotation)); */
               pt.setPt(0, 0, Viewer.ctx);
               Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
                 -pt.getTxPt().y);
             }
             else {
-              // status.rotation === 180
+              /* status.rotation === 180 */
               Viewer.ctx2.translate(ncw, nch);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(status.cw, status.ch, Viewer.ctx);
@@ -88,8 +88,8 @@
               pt.setPt(status.cw, 0, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
               Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
-              // parseInt(pt1.x),
-              // parseInt(pt2.y),
+              /* parseInt(pt1.x), */
+              /* parseInt(pt2.y), */
             }
             else {
               Viewer.ctx2.translate(0, nch);

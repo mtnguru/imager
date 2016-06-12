@@ -69,6 +69,7 @@ function imager_requirements($phase) {
          'severity' => REQUIREMENT_ERROR,
        ); */
 
+    /**
     $requirements['imager_jquery_imgareaselect'] = array(
       'title' => 'jQuery imageAreaSelect',
       'value' => 'Not installed',
@@ -100,6 +101,7 @@ function imager_requirements($phase) {
         }
       }
     }
+    **/
   }
   return $requirements;
 }

@@ -13,14 +13,14 @@
  * render it, encode into json and print it.
  */
 function imager_display_entity() {
-  // dpm($_POST, 'imager_display_entity - $_POST');
+  // dpm($_POST, 'imager_display_entity - $_POST'); .
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
 
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
-  // dpm($file, 'imager_display_entity - $file');
+  // dpm($file, 'imager_display_entity - $file'); .
   $view = file_view($file, variable_get('imager_information_view_mode'));
 
   $icon_path = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'imager') . '/icons';
@@ -67,8 +67,8 @@ function imager_edit_form_load() {
   $cmp = _imager_extract_path_components($uri);
   $puri = "public://$cmp[dir]$cmp[filename].$cmp[suffix]";
 
-  // $out['debug'][] .= "uri: " . $uri . "<br>\n";
-  // $out['debug'][] .= "public uri: " . $puri . "<br>\n";
+  // $out['debug'][] .= "uri: " . $uri . "<br>\n"; .
+  // $out['debug'][] .= "public uri: " . $puri . "<br>\n"; .
   $fid = _imager_get_fid($puri);
   $file = file_load($fid);
   $form_id = 'file_entity_edit';
@@ -149,7 +149,7 @@ function imager_edit_form_field_load() {
   $field = $form[$field_name];
   $out['data']['rendered'] = drupal_render($field);
   $out['data']['type'] = _imager_get_field_type($field[LANGUAGE_NONE][0], 1);
-  // $out['debug'][] .= '#type: ' . $out['data']['type'];
+  // $out['debug'][] .= '#type: ' . $out['data']['type']; .
   print json_encode($out);
 }
 
@@ -165,7 +165,6 @@ function _imager_write_image($path) {
   fwrite($fp, base64_decode($filtered_data[1]));
   fclose($fp);
 }
-
 
 /**
  * Execute ImageMagick convert command to scale image.
@@ -251,7 +250,7 @@ function imager_save_image() {
     $file->filename = $ps['nfilename'] . '.' . $ps['suffix'];
     $file = file_save($file);
     $out['file_old'] = reset(module_invoke_all('imager_modify', $file->fid));
-    // dpm($out,"overwrite");
+    // dpm($out,"overwrite"); .
   }
   else {
     unset($file->fid);
@@ -277,7 +276,7 @@ function imager_email_file() {
   $out['status'] = 'pass';
 
   $uri = urldecode(check_plain($_POST['uri']));
-  // $out['debug'][] .= "imagerEmailFile() start uri: " . $uri . "<br>\n";
+  // $out['debug'][] .= "imagerEmailFile() start uri: " . $uri . "<br>\n"; .
   $ps = _imager_get_paths($uri);
   $ps['filename'] = substr($ps['filename'], 0, 12);
   $tmp_path = "/tmp/$ps[filename].$ps[suffix]";
@@ -309,10 +308,10 @@ function imager_email_file() {
   // $out['data']['body'] = drupal_html_to_text(drupal_render($view));
   $html = drupal_render($view);
   $html = preg_replace('/<\/div>/i', "\n", $html);
-  // $html = preg_replace('/<\/li>/i',"\n",$html);
-  // $html = preg_replace('/<li>/i','',$html);
-  // $html = preg_replace('/<\/ul>/i','',$html);
-  // $html = preg_replace('/<\/p>/i',"\n",$html);
+  // $html = preg_replace('/<\/li>/i',"\n",$html); .
+  // $html = preg_replace('/<li>/i','',$html); .
+  // $html = preg_replace('/<\/ul>/i','',$html); .
+  // $html = preg_replace('/<\/p>/i',"\n",$html); .
   $html = preg_replace('/\&nbsp;/', ' ', $html);
   $html = preg_replace('/<[^>]+>/i', '', $html);
 
@@ -396,7 +395,7 @@ function imager_print_image() {
 
   // Send file to printer.
   $ps = _imager_get_paths(urldecode(check_plain($_POST['uri'])));
-  // $file = file_load(_imager_get_fid($ps['puri']));
+  // $file = file_load(_imager_get_fid($ps['puri'])); .
   $dir = DRUPAL_ROOT . '/tmp';
   file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
 
@@ -453,13 +452,13 @@ function imager_save_file_entity_field() {
       else {
         // Otherwise its a normal text field.
         $vals = str_getcsv(check_plain($_POST['value']), ",", '"');
-        // dpm($vals, 'vals - str_getcsv');
-        // dpm($file, 'vals - $file');
+        // dpm($vals, 'vals - str_getcsv'); .
+        // dpm($file, 'vals - $file'); .
         unset($file->{$field_name}[LANGUAGE_NONE]);
         foreach ($vals as $key => $value) {
-          // $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid;
-          // dpm($tid, "tid");
-          // $file->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $tid;
+          // $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid; .
+          // dpm($tid, "tid"); .
+          /* $file->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $tid; */
           $file->{$field_name}[LANGUAGE_NONE][$key]['value'] = $value;
         }
       }
