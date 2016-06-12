@@ -33,10 +33,9 @@
     var dspec = $.extend({
       name: 'Brightness',
       autoOpen: false,
-      title: 'Brightness/Contrast',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog imager-noclose',
+      dialogClass: 'imager-dialog imager-brightness-dialog imager-noclose',
       cssId: 'imager-brightness',
       height: 'auto',
       resizable: false,
@@ -61,7 +60,7 @@
     // @TODO - this will fail if the dialog is being closed because another is being opened.
     // Add a report variable to both open and close.
     popup.dialogOnClose = function dialogOnClose() {
-      Viewer.setEditMode('view');
+//    Viewer.setEditMode('view');
     };
 
     /**

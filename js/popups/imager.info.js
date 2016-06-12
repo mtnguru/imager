@@ -47,7 +47,7 @@
       zIndex: 1015,
       width: 'auto',
       height: 'auto',
-      dialogClass: 'imager-dialog',
+      dialogClass: 'imager-dialog imager-info-dialog',
       cssId: 'imager-info',
       resizable: true,
       position: {

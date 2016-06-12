@@ -39,7 +39,7 @@
       title: 'Imager Configuration',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog',
+      dialogClass: 'imager-dialog imager-config-dialog',
       cssId: 'imager-config',
       height: 'auto',
       // resize: 'auto',

@@ -286,6 +286,10 @@
       // ctx2.drawImage(img, 0, 0);
     };
 
+    Drupal.imager.viewer.getImage = function() {
+      return image;
+    }
+
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
       Popups.$busy.show();
       var $canvas3 = $(document.createElement('CANVAS'));
@@ -1192,12 +1196,65 @@
         zoom(-1);
       });
 
+      //div#debug-buttons event handlers
+      // toggle debug
+      $('#debug-status').click(function(evt) {
+        if (localStorage.imagerShowStatus === "FALSE") {
+          localStorage.imagerShowStatus = "TRUE";
+          $(this).addClass('checked');
+          Popups.status.dialogOpen();
+        } else {
+          localStorage.imagerShowStatus = "FALSE";
+          $(this).removeClass('checked');
+          Popups.status.dialogClose();
+        }
+//      $('#imager-messages-content').append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>');
+        updateStatus();
+      });
+
+      $('#debug-messages').click(function(evt) {
+        localStorage.imagerShowDebug = (localStorage.imagerShowDebug === "TRUE") ? "FALSE" : "TRUE";
+        if (localStorage.imagerShowDebug === "TRUE") {
+          $(this).addClass('checked');
+          $imagerMessages.show();
+          $('#imager-messages-content').empty();
+        } else {
+          $(this).removeClass('checked');
+          $imagerMessages.hide();
+        }
+      });
+
+
+
       trackTransforms(ctx);
       setEditMode('view');
 
       popup.dialogOpen();
       return popup;
     };
+
+    /**
+     *
+     * @param {type} newMode
+     * @returns {undefined}
+     */
+    function setFullScreen(newMode) {
+      if (newMode) {
+        fullScreen = true;
+        $('#imager-canvas-wrapper').addClass('fullscreen');
+        $('#mode-fullscreen').addClass('checked');
+      } else {
+        $('#imager-canvas-wrapper').removeClass('fullscreen');
+        fullScreen = false;
+        $('#mode-fullscreen').removeClass('checked');
+      }
+      setTimeout(function() {
+//      setViewMode(1);
+        initializeImage();
+        redraw();
+      },250);
+    }
+
 
     /**
      * Copy the canvas into the current IMG

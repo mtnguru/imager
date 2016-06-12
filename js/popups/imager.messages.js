@@ -38,7 +38,7 @@
       title: 'System messages  ',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog',
+      dialogClass: 'imager-dialog imager-messages-dialog',
       cssId: 'imager-messages',
       height: 'auto',
       resizable: false,

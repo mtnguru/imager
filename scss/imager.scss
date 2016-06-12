@@ -51,12 +51,10 @@ $black: #000;
 #imager-viewer {
   overflow: auto;
   padding: 2px;
-  background-color: $grey;
   button {
     background-color: $lightgrey;
   }
   #imager-canvas-wrapper {
-    margin: 0;
     float: left;
     position: relative;
     #imager-canvas {
@@ -85,7 +83,6 @@ $black: #000;
       text-align: center;
       font-size: 65%;
       img {
-        border-radius: 0px;
         display: block;
         padding: 2px;
         margin: 0 auto;
@@ -98,6 +95,11 @@ $black: #000;
       }
       .specific {
         background-color: $darkgrey;
+      }
+      &#debug-buttons {
+        z-index: 1009;
+        position: absolute;
+        bottom: 0;
       }
     }
   }
@@ -233,7 +235,7 @@ $black: #000;
   }
 }
 
-#imager-filesave {
+.imager-filesave-dialog {
   #imager-filesave-filename {
     width: 15em;
     font-size: 90%;
@@ -244,14 +246,22 @@ $black: #000;
   }
 }
 
-#imager-brightness,
-#imager-color {
+.imager-dialog {
+  z-index: 1050;
+  .ui-dialog-content {
+    min-height: 0 !important;
+  }
+}
+.imager-brightness-dialog,
+.imager-color-dialog {
+  .ui-dialog-titlebar {
+    display: none;
+  }
   .error {
     background-color: $red;
   }
   .slider {
     -webkit-appearance: none;
-    z-index: 1060;
   }
   #slider-hue {
     background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, purple);
@@ -328,41 +338,24 @@ div#main {
   padding: 0;
   position: fixed;
   .ui-dialog-content {
-    background-color: $grey;
-  }
-  .ui-dialog-title {
-    margin: 0 1em 0 0;
-    color: #eee;
-  }
-  .ui-dialog-titlebar {
-    border: none;
-    background-color: $darkgrey;
-    padding: 0 0 0 1em;
+    background-color: $lightgrey;
   }
   .ui-dialog-buttonpane {
     margin: 0;
     background-color: $darkgrey;
     padding: 0 .5em 0 0.4em;
+    button {
+      cursor: pointer;
+      margin: 0.4em;
+      font-size: 90%
+    }
   }
   .ui-button-text {
-    padding: 0.2em 0.5em;
-  }
-  legend {
-    line-height: 1.5;
-    margin: 10px 0 0;
-    border-color: -moz-use-text-color -moz-use-text-color $grey;
-    font-size: 140%;
+    padding: 0.1em 0.5em;
   }
   .imager-content {
     margin: 0;
     padding: .25em .5em;
-  }
-  table {
-    margin: 0;
-  }
-  tr td,
-  tr th {
-    padding: 2px 8px;
   }
   .form-item {
     input {
@@ -378,10 +371,11 @@ div#main {
   }
 
   #imager-status-content {
+    padding: 0;
     text-align: center;
     .imager-status-col {
       float: left;
-      margin: 3px 3px 25px;
+      margin: 5px;
     }
 
     .imager-text-right {
@@ -390,15 +384,7 @@ div#main {
     .imager-status-file {
     }
     table {
-      border-spacing: 0;
       margin-bottom: 6px;
-      th {
-        padding: 2px 4px;
-      }
-      td {
-        min-width: 3em;
-        padding: 3px;
-      }
     }
   }
 }
@@ -407,15 +393,3 @@ div#main {
   z-index: 1011 !important;
 }
 
-/*
-html, body {
-  overflow: hidden;
-  height: 100%;
-}
-
-#main-wrapper,
-#page-wrapper {
-  overflow-y: scroll;
-  height: 100%;
-}
-*/

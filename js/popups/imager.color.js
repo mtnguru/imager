@@ -38,7 +38,8 @@
       title: 'Hue/Saturation/Lightness',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog imager-noclose',
+      dialogClass: 'imager-dialog imager-color-dialog imager-noclose',
+      draggable: true,
       cssId: 'imager-color',
       height: 'auto',
       resizable: false,
@@ -53,6 +54,7 @@
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
+      popup.draggable();
     };
 
     popup.dialogOnOpen = function dialogOnOpen() {
@@ -61,7 +63,6 @@
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-      Viewer.setEditMode('view');
     };
 
     popup.init = function init() {

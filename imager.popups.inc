@@ -174,7 +174,7 @@ function _imager_build_viewer() {
           '#weight' => 0,
         ),
         'image_exit' => _imager_build_button(1, 'image-exit', 'redx.png', t('Exit image popup')),
-        'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
+//      'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
         'image_left' => _imager_build_button(3, 'image-left', 'left_arrow.png', t('View image to the left')),
         'image_right' => _imager_build_button(4, 'image-right', 'right_arrow.png', t('View image to the right')),
         'mode_configure' => _imager_build_button(5, 'mode-configure', 'configure.png', t('Configure settings')),
@@ -206,8 +206,8 @@ function _imager_build_viewer() {
           '#weight' => 0,
         ),
         'view_browser' => _imager_build_button(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
-        'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')),
-     // 'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+//      'view_info' => _imager_build_button(2, 'view-info', 'information.png', t('View Image information')),
+//      'view_map' => _imager_build_button(3, 'view-map', 'map.png', t('View map showing image locations for page')),
         'view_zoom_in' => _imager_build_button(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
         'view_zoom_out' => _imager_build_button(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
       ),
@@ -244,9 +244,22 @@ function _imager_build_viewer() {
         'file_database' => _imager_build_button(1, 'file-database', 'database_go.png', t('Save edited image to database')),
         // @todo don't display if doesn't have permissions.
         'file_delete' => _imager_build_button(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
-        'file_download' => _imager_build_button(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
+//      'file_download' => _imager_build_button(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
         // @todo Don't display if not at appropriate IP addresses
         'file_print' => _imager_build_button(4, 'file-print', 'print.png', t('Print Image')),
+      ),
+      'debug_buttons' => array(
+        '#prefix' => '<div id="debug-buttons" class="buttons">',
+        '#suffix' => '</div>',
+        '#weight' => -5,
+        'title' => array(
+          '#type' => 'markup',
+          '#markup' => t('Debug'),
+          '#prefix' => '<div>',
+          '#suffix' => '</div>',
+        ),
+        'debug_status' => _imager_build_button(1, 'debug-status', 'bug.png', t('Toggle status output')),
+//      'debug_messages' => _imager_build_button(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
       ),
     ),
     'imager_canvas_wrapper' => array(
@@ -908,7 +921,7 @@ function _imager_build_form() {
   module_load_include('inc', 'file_entity', 'file_entity.pages');
   // @TODO Instead of specifying file ID 1,
   // query database to load one random image.
-  $file = file_load(1);
+  $file = file_load(243);
   $form_id = "file_entity_edit";
   $title1 = drupal_get_title();
   $form = drupal_get_form($form_id, $file);

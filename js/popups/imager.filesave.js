@@ -40,7 +40,7 @@
       title: 'Save edited image to database',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog imager-noclose',
+      dialogClass: 'imager-dialog imager-filesave-dialog imager-noclose',
       cssId: 'imager-filesave',
       // cssIdFinal:  'imager-filesave-database',
       height: 'auto',
@@ -182,7 +182,7 @@
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-      Viewer.setEditMode('view');
+//    Viewer.setEditMode('view');
       switch (popup.settings.saveMode) {
         case 'database':
           $('#file-database').removeClass('checked');
@@ -207,7 +207,7 @@
 
     popup.dialogOnOpen = function dialogOnOpen() {
       Viewer.setEditMode(popup.settings.saveMode);
-      var src = Viewer.getImage().src;
+      var src = Drupal.imager.viewer.getImage().src;
       var filename = decodeURIComponent(src.substring(src.lastIndexOf('/') + 1));
       $('#imager-filesave #imager-filesave-filename').show().val(filename);
       $('#imager-filesave #imager-filesave-messages').hide();

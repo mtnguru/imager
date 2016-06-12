@@ -44,7 +44,7 @@
       title: 'Imager Status',
       zIndex: 1015,
       width: 'auto',
-      dialogClass: 'imager-dialog',
+      dialogClass: 'imager-dialog imager-status-dialog',
       cssId: 'imager-status',
       height: 'auto',
       resize: 'auto',
