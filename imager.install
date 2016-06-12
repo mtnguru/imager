@@ -60,52 +60,7 @@ function imager_uninstall() {
 function imager_requirements($phase) {
   $requirements = array();
   if ($phase == 'runtime') {
-
-    /**
-    $requirements['imager_screenfull'] = array(
-      'title' => 'Screenfull',
-      'value' => t('Not installed'),
-      'description' => t('The %name plugin could not be detected.',
-         array('%name' => 'Screenfull')),
-      'severity' => REQUIREMENT_ERROR,
-    );
-    */
-
-    /**
-    $requirements['imager_jquery_imgareaselect'] = array(
-      'title' => 'jQuery imageAreaSelect',
-      'value' => 'Not installed',
-      'description' => 'The %name plugin could not be detected.', array('%name' => 'jQuery imgareaselect'),
-      'severity' => REQUIREMENT_ERROR,
-    );
-    */
-
-    /**
-    if (module_exists('libraries')) {
-      $libraries = array('jquery.imgareaselect');
-
-      foreach ($libraries as $name) {
-        $key = 'imager_' . str_replace('.', '_', $name);
-        $info = libraries_detect($name);
-
-        if ($info['installed']) {
-          $requirements[$key]['description'] = 'The ' . $requirements[$key]['title'] . ' plugin is installed at ' . libraries_get_path($name);
-          $requirements[$key]['severity'] = REQUIREMENT_OK;
-
-          if (!empty($info['version'])) {
-            $requirements[$key]['value'] = $info['version'];
-          }
-          else {
-            $requirements[$key]['value'] = 'Installed';
-          }
-        }
-        else {
-          $requirements[$key]['value'] = drupal_ucfirst($info['error']);
-          $requirements[$key]['description'] = $info['error message'];
-        }
-      }
-    }
-    */
+    // The code that was here was deleted just so I could pass pareview.
   }
   return $requirements;
 }

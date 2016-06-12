@@ -1233,7 +1233,6 @@
      *
      * @param {type} newMode
      *   The new mode.
-     * @return {null}
      */
     function setFullScreen(newMode) {
       if (newMode) {

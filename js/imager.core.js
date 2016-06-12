@@ -260,7 +260,7 @@
      * @param {type} tsrc
      *   Source path of source image.
      *
-     * @return string
+     * @return {strin}]
      *   Full file path of original image.
      */
     var getFullPath = function getFullPath(tsrc) {

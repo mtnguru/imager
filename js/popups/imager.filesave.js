@@ -258,17 +258,6 @@
       $('#scale').html(parseInt(status.cscale * 100) / 100);
     };
 
-    function deleteFile() {
-      Core.ajaxProcess(
-        this,
-        Drupal.imager.settings.actions.deleteFile.url,
-        {
-          action: 'delete-file',
-          uri: Viewer.getImage().src
-        }
-      );
-    }
-
     return popup;
   };
 
