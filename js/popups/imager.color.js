@@ -12,7 +12,7 @@
  */
 
 (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Define the color dialog - Hue/Saturation/Lightness.
@@ -44,8 +44,8 @@
       height: 'auto',
       resizable: false,
       position: {
-        my: "left",
-        at: "right",
+        my: 'left',
+        at: 'right',
         of: spec.$selectButton
       }
     }, spec);

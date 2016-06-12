@@ -9,7 +9,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   Drupal.imager.imageC = function imageC(settings) {
     return {

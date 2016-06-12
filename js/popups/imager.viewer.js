@@ -9,7 +9,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   Drupal.imager.viewer = {};
 
@@ -55,11 +55,15 @@
     var img = document.createElement('IMG'); // Storage for current image.
     var $imgOverlay;                 // Image that overlays the canvas.
     var clearOverlay = false;        // Clear the overlay with transparent image.
-    var $canvas, $canvas2;    // Primary and Secondary canvas's
-    var ctx, ctx2;            // Related contexts for canvas's
+    var $canvas;
+    var $canvas2;
+    var ctx;
+    var ctx2;
     var ias;                  // Image area select object.
-    var cw, ch;               // Canvas width and height.
-    var mw, mh;               // Maximum canvas width and height.
+    var cw;                   // Canvas width.
+    var ch;                   // Canvas height.
+    var mw;                   // Maximum canvas width.
+    var mh;                   // Maximum canvas height.
     var doInit;               // After loading should we reinitialize.
     var initScale = 1;        // Initial Zoom/scaling factor.
     var scaleFactor = 1.02;   // How much to scale image per click.
@@ -236,7 +240,7 @@
      * If enabled show the Information popup, if already showing update the contents
      */
     var showInfo = function showInfo() {
-      if (localStorage.imagerShowInfo === "true") {
+      if (localStorage.imagerShowInfo === 'true') {
         $('#view-info').addClass('checked');
         if (Popups.info.dialogIsOpen()) {
           Popups.info.dialogUpdate();
@@ -281,12 +285,12 @@
       // Set transform matrix to identity matrix.
       // The original img is kept unrotated.
       ctx2.drawImage($canvas[0], 0, 0);
-      /* ctx2.drawImage(img, 0, 0); */
+      // ctx2.drawImage(img, 0, 0); .
     };
 
     Drupal.imager.viewer.getImage = function () {
       return image;
-    }
+    };
 
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
       Popups.$busy.show();
@@ -699,6 +703,7 @@
      * Enable event handlers for cropping - disable handlers for panning and zooming.
      */
     function enableCrop() {
+
       /* $imgOverlay[0].removeEventListener('contextmenu', contextMenu); */
       /* $imgOverlay[0].removeEventListener('click', click); */
       $imgOverlay[0].removeEventListener('mousedown', mouseDown);
@@ -878,7 +883,7 @@
           $('#file-clipboard').addClass('checked');
           break;
       }
-      Popups.status.dialogUpdate({"edit-mode": editMode});
+      Popups.status.dialogUpdate({'edit-mode': editMode});
     };
 
     /**
@@ -889,7 +894,7 @@
      */
 
     function trackTransforms(ctx) {
-      var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       var xform = svg.createSVGMatrix();
       var savedTransforms = [];
       var save = ctx.save;
@@ -955,15 +960,15 @@
     function showPopups() {
       popup.dialogOpen();
       showInfo();
-      if (localStorage.imagerDebugStatus === "true") {
+      if (localStorage.imagerDebugStatus === 'true') {
         $('#debug-status').addClass('checked');
         Popups.status.dialogOpen();
       }
-      if (localStorage.imagerDebugMessages === "true") {
+      if (localStorage.imagerDebugMessages === 'true') {
         $('#debug-messages').addClass('checked');
         // Popups.messages.dialogOpen();
       }
-      if (localStorage.imagerShowMap === "true") {
+      if (localStorage.imagerShowMap === 'true') {
         $('#view-map').addClass('checked');
         Popups.map.dialogOpen();
       }
@@ -999,7 +1004,7 @@
       if (!clearOverlay) {
         return;
       }
-      $imgOverlay[0].src = "/" + Drupal.imager.settings.modulePath + "/icons/transparent.png";
+      $imgOverlay[0].src = '/' + Drupal.imager.settings.modulePath + '/icons/transparent.png';
       clearOverlay = false;
     };
 
@@ -1023,10 +1028,10 @@
       // Never displayed, used to save images temporarily.
       // Initialize Dialogs.
       Popups.initDialog('color', '#edit-color', function () {
-        setEditMode("color", true);
+        setEditMode('color', true);
       });
       Popups.initDialog('brightness', '#edit-brightness', function () {
-        setEditMode("brightness", true);
+        setEditMode('brightness', true);
       });
       Popups.initDialog('config', '#mode-configure', function () {
         Popups.config.dialogToggle();
@@ -1080,7 +1085,7 @@
       });
 
       $imgOverlay = $('#imager-image');
-      $imgOverlay.on("contextmenu", fillOverlayImg);
+      $imgOverlay.on('contextmenu', fillOverlayImg);
 
       /* $imgOverlay.click(vun);
          $imgOverlay.mousedown(function (evt) { $canvas.mousedown(); return false; });
@@ -1190,13 +1195,13 @@
 
       // div#debug-buttons event handlers.
       $('#debug-status').click(function (evt) {
-        if (localStorage.imagerShowStatus === "FALSE") {
-          localStorage.imagerShowStatus = "TRUE";
+        if (localStorage.imagerShowStatus === 'FALSE') {
+          localStorage.imagerShowStatus = 'TRUE';
           $(this).addClass('checked');
           Popups.status.dialogOpen();
         }
         else {
-          localStorage.imagerShowStatus = "FALSE";
+          localStorage.imagerShowStatus = 'FALSE';
           $(this).removeClass('checked');
           Popups.status.dialogClose();
         }
@@ -1205,8 +1210,8 @@
       });
 
       $('#debug-messages').click(function (evt) {
-        localStorage.imagerShowDebug = (localStorage.imagerShowDebug === "TRUE") ? "FALSE" : "TRUE";
-        if (localStorage.imagerShowDebug === "TRUE") {
+        localStorage.imagerShowDebug = (localStorage.imagerShowDebug === 'TRUE') ? 'FALSE' : 'TRUE';
+        if (localStorage.imagerShowDebug === 'TRUE') {
           $(this).addClass('checked');
           $imagerMessages.show();
           $('#imager-messages-content').empty();
@@ -1225,9 +1230,10 @@
     };
 
     /**
+     * Use full screen to display imager viewer.
      *
      * @param {type} newMode
-     * @returns {undefined}
+     * @return {undefined}
      */
     function setFullScreen(newMode) {
       if (newMode) {
@@ -1241,10 +1247,9 @@
         $('#mode-fullscreen').removeClass('checked');
       }
       setTimeout(function () {
-     /* setViewMode(1); */
         initializeImage();
         redraw();
-      },250);
+      }, 250);
     }
 
     /**

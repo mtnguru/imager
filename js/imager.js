@@ -22,7 +22,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   Drupal.imager.start = function imager() {
 
@@ -50,9 +50,6 @@
 
     /**
      * Build list of thumbnails and attach event handlers.
-     *
-     * @return
-     *   Pareview wants something here, so I wrote this.
      */
     function _attach() {
       images = [];

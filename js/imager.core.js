@@ -4,7 +4,7 @@
  */
 
 (function ($) {
-  "use strict";
+  'use strict';
 
   // Create the Drupal.imager namespace and subspaces.
   Drupal.imager = {
@@ -20,7 +20,7 @@
     var displayMessage = function displayMessage(msg) {
       // $imagerMessages.show();
       $('#imager-messages-content').html(msg);
-      if (localStorage['imagerDebugMessages'] === "false") {
+      if (localStorage['imagerDebugMessages'] === 'false') {
         messageTimeout = setTimeout(function () {
           // $imagerMessages.hide();
         }, 5000);
@@ -28,19 +28,19 @@
     };
 
     var getImage = function getImage(resolution, stream) {
-      var mimeType = "";
+      var mimeType = '';
       var pt_canvas_ul = Viewer.pt_canvas_ul;
       var pt_canvas_lr = Viewer.pt_canvas_lr;
       var status = Viewer.getStatus();
       var img = Viewer.getImg();
       var dataurl;
 
-      mimeType = "image/png";
+      mimeType = 'image/png';
       if (img.src.match(/\.png$/i)) {
-        mimeType = "image/png";
+        mimeType = 'image/png';
       }
       else if (img.src.match(/\.jpe*g$/i)) {
-        mimeType = "image/jpeg";
+        mimeType = 'image/jpeg';
       }
 
       switch (resolution) {
@@ -62,13 +62,11 @@
               height: nch
             });
             if (status.rotation === 0) {
-              /* Viewer.ctx2.rotate(Core.angleInRadians(status.rotation)); */
               pt.setPt(0, 0, Viewer.ctx);
               Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
                 -pt.getTxPt().y);
             }
             else {
-              /* status.rotation === 180 */
               Viewer.ctx2.translate(ncw, nch);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
               pt.setPt(status.cw, status.ch, Viewer.ctx);
@@ -88,8 +86,6 @@
               pt.setPt(status.cw, 0, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
               Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
-              /* parseInt(pt1.x), */
-              /* parseInt(pt2.y), */
             }
             else {
               Viewer.ctx2.translate(0, nch);
@@ -139,7 +135,7 @@
           break;
       }
       if (stream) {
-        dataurl = dataurl.replace(mimeType, "image/octet-stream");
+        dataurl = dataurl.replace(mimeType, 'image/octet-stream');
       }
       return dataurl;
     };
@@ -161,7 +157,7 @@
     var ajaxProcess = function ajaxProcess($callingElement, url, postData, processFunc) {
       postData['filePath'] = Drupal.imager.settings.filePath;
       $.ajax({
-        type: "POST",
+        type: 'POST',
         url: url,
         data: postData,
         success: function (response_json) {
@@ -171,15 +167,15 @@
           var display = false;
           var out;
           var i;
-          out = "<h2>" + response['action'] + ':' + response['status'] + "</h2>";
+          out = '<h2>' + response['action'] + ':' + response['status'] + '</h2>';
           if (response['info']) {
-            out += "<div class='info'>" + response['info'] + "</div>";
+            out += '<div class='info'>' + response['info'] + '</div>';
             display = true;
           }
           if (response['status'] === 'catch' ||
-              (response['debug'] && localStorage['imagerDebugMessages'] === "true")) {
+              (response['debug'] && localStorage['imagerDebugMessages'] === 'true')) {
             for (i = 0; i < response['debug'].length; i++) {
-              out += "<div class='debug'>" + response['debug'][i] + "</div>";
+              out += '<div class='debug'>' + response['debug'][i] + '</div>';
             }
             display = true;
           }
@@ -191,7 +187,7 @@
           if (processFunc) {
             processFunc.call($callingElement, response);
           }
-          if (localStorage['imagerDebugMessages'] === "false") {
+          if (localStorage['imagerDebugMessages'] === 'false') {
             setTimeout(function () {
               Popups.messages.dialogClose();
             }, 3000);
@@ -207,7 +203,7 @@
           if (processFunc) {
             processFunc('error', evt);
           }   // Execute users error function
-          if (localStorage['imagerDebugMessages'] === "false") {
+          if (localStorage['imagerDebugMessages'] === 'false') {
             setTimeout(function () {
               Popups.messages.dialogClose();
             }, 10000);
@@ -262,13 +258,14 @@
      * Otherwise look for the parent element to be a link to the full image.
      *
      * @param {type} tsrc
+     *   Source path of source image.
      *
      * @return string
      *   Full file path of original image.
      */
     var getFullPath = function getFullPath(tsrc) {
       var src;
-      // If the image has "/styles/" in it's path
+      // If the image has '/styles/' in it's path
       // then extract the large image path by modifying the thumbnail path
       // Kludgy but it works - any better ideas.
       if (tsrc.indexOf('/styles/')) {

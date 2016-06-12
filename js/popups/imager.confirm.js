@@ -17,7 +17,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Declare Confirmation Dialog class.

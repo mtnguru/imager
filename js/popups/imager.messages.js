@@ -12,7 +12,7 @@
  */
 
 (function ($) {
-  "use strict";
+  'use strict';
 
   if (localStorage.getItem('imagerDebugMessages') === null) {
     localStorage.setItem('imagerDebugMessages', false);
@@ -47,8 +47,8 @@
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
       position: {
-        my: "left",
-        at: "right",
+        my: 'left',
+        at: 'right',
         of: spec.$selectButton
       }
     }, spec);

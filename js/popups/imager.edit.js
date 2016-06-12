@@ -18,7 +18,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Declare the file_entity edit dialog.
@@ -46,8 +46,8 @@
       cssId: 'imager-edit',
       resizable: true,
       position: {
-        my: "left",
-        at: "right+25",
+        my: 'left',
+        at: 'right+25',
         of: spec.$selectButton
       },
       create: function () {
@@ -93,8 +93,8 @@
       // Display edit popup - render current field from default edit form.
       popup.spec.$elem.dialog({
         position: {
-          my: "left",
-          at: "right",
+          my: 'left',
+          at: 'right',
           of: popup.settings.$selectButton
         }
       });
@@ -129,7 +129,7 @@
           $elems.each(function (index, elem) {
             if (elem.checked) {
               value = elem.value;
-              out += "#imager-edit-apply -- field=" + popup.settings.editField + "   value=" + value + "<br>";
+              out += '#imager-edit-apply -- field=' + popup.settings.editField + '   value=' + value + '<br>';
             }
           });
           break;
@@ -144,7 +144,7 @@
           $elems = $('#imager-edit-content select');
           var editor = $elems[0].value;
           format = editor;
-          if (editor === "panopoly_wysiwyg_text") {
+          if (editor === 'panopoly_wysiwyg_text') {
             var id = Drupal.wysiwyg.activeId;
             value = tinyMCE.get(id).getContent();
           }

@@ -17,7 +17,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Declare Configuration Dialog class - configC - inherits from dialogBaseC.
@@ -42,10 +42,9 @@
       dialogClass: 'imager-dialog imager-config-dialog',
       cssId: 'imager-config',
       height: 'auto',
-      /* resize: 'auto', */
       position: {
-        my: "left",
-        at: "right",
+        my: 'left',
+        at: 'right',
         of: spec.$selectButton
       }
     }, spec);
@@ -67,13 +66,13 @@
      * Initialize checkboxes from localStorage.
      */
     popup.dialogInit = function dialogInit() {
-      if (localStorage.imagerBoundsEnable === "true") {
+      if (localStorage.imagerBoundsEnable === 'true') {
         $('#imager-bounds-enable').attr('checked', 'checked');
       }
-      if (localStorage.imagerDebugStatus === "true") {
+      if (localStorage.imagerDebugStatus === 'true') {
         $('#imager-debug-status').attr('checked', 'checked');
       }
-      if (localStorage.imagerDebugMessages === "true") {
+      if (localStorage.imagerDebugMessages === 'true') {
         $('#imager-debug-messages').attr('checked', 'checked');
       }
     };
@@ -83,31 +82,31 @@
      */
     popup.dialogSave = function dialogSave() {
       if ($('#imager-debug-status').attr('checked')) {
-        localStorage.imagerDebugStatus = "true";
+        localStorage.imagerDebugStatus = 'true';
         Popups.status.dialogOpen();
       }
       else {
-        localStorage.imagerDebugStatus = "false";
+        localStorage.imagerDebugStatus = 'false';
         Popups.status.dialogClose();
       }
 
       if ($('#imager-debug-messages').attr('checked')) {
-        localStorage.imagerDebugMessages = "true";
+        localStorage.imagerDebugMessages = 'true';
         Popups.messages.dialogOpen();
       }
       else {
-        localStorage.imagerDebugMessages = "false";
+        localStorage.imagerDebugMessages = 'false';
         Popups.messages.dialogClose();
       }
 
       if ($('#imager-bounds-enable').attr('checked')) {
-        localStorage.imagerBoundsEnable = "true";
+        localStorage.imagerBoundsEnable = 'true';
       }
       else {
-        localStorage.imagerBoundsEnable = "false";
+        localStorage.imagerBoundsEnable = 'false';
       }
 
-      localStorage.imagerPrinter = $("#imager-printer-select option:selected").text();
+      localStorage.imagerPrinter = $('#imager-printer-select option:selected').text();
 
       popup.dialogClose();
     };

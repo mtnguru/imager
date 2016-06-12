@@ -17,7 +17,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   if (localStorage.getItem('imagerDebugStatus') === null) {
     localStorage.setItem('imagerDebugStatus', false);
@@ -54,8 +54,8 @@
         closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
       },
       position: {
-        my: "right bottom",
-        at: "right bottom",
+        my: 'right bottom',
+        at: 'right bottom',
         of: spec.$selectButton
       }
     }, spec);

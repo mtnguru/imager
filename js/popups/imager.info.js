@@ -18,7 +18,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   if (localStorage.getItem('imagerShowInfo') === null) {
     localStorage.setItem('imagerShowInfo', false);
@@ -51,8 +51,8 @@
       cssId: 'imager-info',
       resizable: true,
       position: {
-        my: "left",
-        at: "right",
+        my: 'left',
+        at: 'right',
         of: spec.$selectButton
       },
       open: function () {
@@ -77,11 +77,11 @@
 
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
-      localStorage.imagerShowInfo = "true";
+      localStorage.imagerShowInfo = 'true';
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerShowInfo = "false";
+      localStorage.imagerShowInfo = 'false';
     };
 
     /**

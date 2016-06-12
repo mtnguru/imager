@@ -17,7 +17,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Declare Filesave Dialog class.
@@ -103,7 +103,7 @@
       Popups.$busy.show();
       var dataurl = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), true);
       window.location.href = dataurl;
-      window.location.download = "downloadit.jpg";
+      window.location.download = 'downloadit.jpg';
       Popups.$busy.hide();
       popup.dialogClose();
 
@@ -111,8 +111,8 @@
        img.src = dataurl;
 
        var a = document.createElement('a');
-       a.setAttribute("download", "YourFileName.jpeg");
-       a.setAttribute("href", dataurl);
+       a.setAttribute('download', 'YourFileName.jpeg');
+       a.setAttribute('href', dataurl);
        //    a.appendChild(img);
        a.click();
 
@@ -155,7 +155,6 @@
       Core.ajaxProcess(this,
         Drupal.imager.settings.actions.clipboard.url,
         {
-          /* overwrite: overwrite, */
           action: 'clipboard',
           saveMode: popup.settings.saveMode,
           uri: Viewer.getImage().src,
@@ -259,7 +258,7 @@
       $('#scale').html(parseInt(status.cscale * 100) / 100);
     };
 
-    var deleteFile = function deleteFile() {
+    function deleteFile() {
       Core.ajaxProcess(
         this,
         Drupal.imager.settings.actions.deleteFile.url,

@@ -26,7 +26,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   var imager;
   Drupal.behaviors.imager = {

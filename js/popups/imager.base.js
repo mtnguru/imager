@@ -46,7 +46,7 @@
  * @param $
  */
 (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Initialize a dialog.
