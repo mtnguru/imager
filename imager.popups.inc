@@ -174,7 +174,7 @@ function _imager_build_viewer() {
           '#weight' => 0,
         ),
         'image_exit' => _imager_build_button(1, 'image-exit', 'redx.png', t('Exit image popup')),
-     /* 'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')), */.
+     /* 'mode_fullscreen' => _imager_build_button(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')), */
         'image_left' => _imager_build_button(3, 'image-left', 'left_arrow.png', t('View image to the left')),
         'image_right' => _imager_build_button(4, 'image-right', 'right_arrow.png', t('View image to the right')),
         'mode_configure' => _imager_build_button(5, 'mode-configure', 'configure.png', t('Configure settings')),
@@ -269,9 +269,9 @@ function _imager_build_viewer() {
       'imager_image' => array(
         '#type' => 'markup',
         '#weight' => 2,
-        '#markup' => '<img id="imager-image" src="' 
-        .  $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/transparent.png' 
-        .  '" alt="" title="" />',
+        '#markup' => '<img id="imager-image" src="'
+        . $GLOBALS["base_url"] . '/' . $_imager_path . '/icons/transparent.png'
+        . '" alt="" title="" />',
       ),
       'imager_canvas' => array(
         '#weight' => 1,

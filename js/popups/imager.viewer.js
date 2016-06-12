@@ -39,7 +39,6 @@
       cssId: 'imager-viewer',
       height: 'auto',
       resizable: true,
-      // position: {'fixed'},
       position: {
         my: 'left top',
         at: 'left top'
@@ -604,7 +603,7 @@
           var npt;
           // Recommended x and y motions that won't go out of bounds.
           npt = outOfBounds();
-          if (npt !== undefined) {
+          if (npt !== null) {
             ctx.restore();
             ctx.translate(pt_now.getTxPt().x - pt_down.getTxPt().x + npt.x,
               pt_now.getTxPt().y - pt_down.getTxPt().y + npt.y);
@@ -667,7 +666,8 @@
      */
     function mouseWheel(evt) {
       setEditMode('view');
-      var delta = evt.wheelDelta ? evt.wheelDelta / 10 : -evt.detail ? evt.detail : 0;
+      var delta = -evt.detail ? evt.detail : 0;
+      delta = evt.wheelDelta ? evt.wheelDelta / 10 : delta;
       var y;
       var x = evt.offsetX || (evt.pageX - $canvas[0].offsetLeft);
       // @todo - pageY works intermittently
@@ -1051,7 +1051,7 @@
       Popups.initDialog('edit', '', function () {
         Popups.edit.dialogToggle();
       });
-      Popups.initDialog('filesave', '', undefined);
+      Popups.initDialog('filesave', '', null);
 
       // File Buttons.
       $('#file-database').click(function () {
@@ -1205,7 +1205,6 @@
           $(this).removeClass('checked');
           Popups.status.dialogClose();
         }
-     /* $('#imager-messages-content').append('<p>imagerShowStatus: ' + localStorage.imagerShowStatus + '</p>'); */
         updateStatus();
       });
 
@@ -1233,7 +1232,8 @@
      * Use full screen to display imager viewer.
      *
      * @param {type} newMode
-     * @return {undefined}
+     *   The new mode.
+     * @return {null}
      */
     function setFullScreen(newMode) {
       if (newMode) {

@@ -267,7 +267,7 @@
           uri: Viewer.getImage().src
         }
       );
-    };
+    }
 
     return popup;
   };

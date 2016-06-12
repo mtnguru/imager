@@ -169,13 +169,13 @@
           var i;
           out = '<h2>' + response['action'] + ':' + response['status'] + '</h2>';
           if (response['info']) {
-            out += '<div class='info'>' + response['info'] + '</div>';
+            out += '<div class="info">' + response['info'] + '</div>';
             display = true;
           }
           if (response['status'] === 'catch' ||
               (response['debug'] && localStorage['imagerDebugMessages'] === 'true')) {
             for (i = 0; i < response['debug'].length; i++) {
-              out += '<div class='debug'>' + response['debug'][i] + '</div>';
+              out += '<div class="debug">' + response['debug'][i] + '</div>';
             }
             display = true;
           }

@@ -426,8 +426,8 @@ function imager_save_file_entity_field() {
   $ps = _imager_get_paths($uri);
   $fid = _imager_get_fid($ps['puri']);
   $file = file_load($fid);
-  // dpm($file,'imagerSaveFileEntityField - $file');
-  // dpm(check_plain($_POST), 'POST');
+  // dpm($file,'imagerSaveFileEntityField - $file'); .
+  // dpm(check_plain($_POST), 'POST'); .
   switch ($field_type) {
     case 'hierarchical_select':
       $file->{$field_name}[LANGUAGE_NONE][0]['tid'] = check_plain($_POST['value']);

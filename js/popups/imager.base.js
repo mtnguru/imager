@@ -82,7 +82,7 @@
     }
     else {
       // Execute dialogs constructor.
-      popup = Popups[name + 'C']({$selectButton: undefined});
+      popup = Popups[name + 'C']({$selectButton: null});
     }
     Popups[name] = popup;
     return popup;
@@ -93,12 +93,12 @@
     popup.settings = {};
     spec = spec || {};
 
-    var $selectButton = spec.$selectButton || undefined;
+    var $selectButton = spec.$selectButton || null;
     // The button that was clicked to popup this dialog.
     popup.spec = spec || {};
     popup.spec.name = popup.spec.name || 'unknown';
     popup.spec.dialogClass = popup.spec.dialogClass || '';
-    popup.spec.$elem = popup.spec.$elem || undefined;
+    popup.spec.$elem = popup.spec.$elem || null;
 
     // Return if popup is loaded.
     popup.dialogHave = function dialogHave() {
