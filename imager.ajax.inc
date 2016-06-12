@@ -456,7 +456,7 @@ function imager_save_file_entity_field() {
         // dpm($file, 'vals - $file'); .
         unset($file->{$field_name}[LANGUAGE_NONE]);
         foreach ($vals as $key => $value) {
-          // $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid; .
+          // $tid = reset(taxonomy_get_term_by_name($value, "galleries"))->tid;.
           // dpm($tid, "tid"); .
           /* $file->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $tid; */
           $file->{$field_name}[LANGUAGE_NONE][$key]['value'] = $value;

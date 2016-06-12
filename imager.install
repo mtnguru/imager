@@ -61,24 +61,26 @@ function imager_requirements($phase) {
   $requirements = array();
   if ($phase == 'runtime') {
 
-    /*
+    /**
     $requirements['imager_screenfull'] = array(
-       'title' => 'Screenfull',
-       'value' => t('Not installed'),
-       'description' => t('The %name plugin could not be detected.',
+      'title' => 'Screenfull',
+      'value' => t('Not installed'),
+      'description' => t('The %name plugin could not be detected.',
          array('%name' => 'Screenfull')),
-       'severity' => REQUIREMENT_ERROR,
-     );
+      'severity' => REQUIREMENT_ERROR,
+    );
     */
 
-    /*
+    /**
     $requirements['imager_jquery_imgareaselect'] = array(
       'title' => 'jQuery imageAreaSelect',
       'value' => 'Not installed',
       'description' => 'The %name plugin could not be detected.', array('%name' => 'jQuery imgareaselect'),
       'severity' => REQUIREMENT_ERROR,
     );
+    */
 
+    /**
     if (module_exists('libraries')) {
       $libraries = array('jquery.imgareaselect');
 
