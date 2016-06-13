@@ -9,12 +9,3 @@ configure = admin/config/media/imager
 dependencies[] = entity
 dependencies[] = file_entity
 
-; jQuery imgAreaSelect.
-libraries[jquery.imgareaselect][download][type] = file
-libraries[jquery.imgareaselect][download][url] = http://odyniec.net/projects/imgareaselect/jquery.imgareaselect-0.9.10.zip
-libraries[jquery.imgareaselect][download][subtree] = jquery.imgareaselect-0.9.10
-
-; ; screenfull.js
-; libraries[jquery.imgareaselect][download][type] = file
-; libraries[jquery.imgareaselect][download][url] = http://odyniec.net/projects/imgareaselect/jquery.imgareaselect-0.9.10.zip
-; libraries[jquery.imgareaselect][download][subtree] = jquery.imgareaselect-0.9.10
