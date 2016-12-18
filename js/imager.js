@@ -26,9 +26,8 @@
 
   Drupal.imager.start = function imager() {
 
-    var $thumbnails;
-    // List of thumbnails on source page.
     var Popups = Drupal.imager.popups;
+    var $thumbnails;       // List of thumbnails on source page.
     var images = [];
     // Array of imageC - imager.image.js .
     /**
@@ -54,26 +53,24 @@
     function _attach() {
       images = [];
 
-      $thumbnails = $(Drupal.imager.settings.cssContainer);
-      if ($thumbnails.length === 0) {
-        return;
-      } // No thumbnails found, exit
+      $thumbnails = $('.im-image');
+      if ($thumbnails.length === 0) { return; } // No thumbnails found, exit
 
       $thumbnails.each(function (index, value) {
         // Add image to images array.
-        var $thumb = $(this).find(Drupal.imager.settings.cssImage);
+        var $thumb = $(this);
         if (!$thumb.attr('src')) {
           return;
         }
 
         images.push(Drupal.imager.imageC({
-          $container: $(this),
+//        $container: $(this),
           $thumb: $thumb,
           srcThumb: $thumb.attr('src'),
           src: Drupal.imager.core.getFullPath($thumb.attr('src'))
         }));
 
-        // Unbind any current event handlers on thumbnails.
+        // Unbind any click event handlers on thumbnails.
         $thumb.unbind('click');
         $thumb.parent().unbind('click');
 

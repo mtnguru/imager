@@ -167,7 +167,7 @@
       else {
         mw = $(window).width() - 95;
         // Maximum canvas width.
-        mh = $(window).height() - 20;
+        mh = $(window).height() - 40;
         // Maximum canvas height.
         calcCanvasDims(image.iw, image.ih);
         cscale = cw / image.iw;
@@ -520,7 +520,7 @@
       if (msg) {
         $('#imager-messages-content').html(msg);
       }
-      if (npt.x || npt.y) {
+      if (npt.x > -1 || npt.y > -1) {
         return npt;
       }
       return;
@@ -680,7 +680,7 @@
       }
       pt_now.setPt(x, y, ctx);
       if (delta) {
-        zoom(-delta);
+        zoom(delta);
       }
       evt.stopPropagation();
       evt.preventDefault();
@@ -1010,6 +1010,7 @@
 
     // Dialog handling functions.
     popup.dialogOnCreate = function dialogOnCreate() {
+
       Drupal.imager.viewer.$canvas = $canvas = $('#imager-canvas');
       Drupal.imager.viewer.ctx = ctx = $canvas[0].getContext('2d');
       ias = $canvas.imgAreaSelect({
@@ -1022,10 +1023,11 @@
         show: true
       });
 
-      Drupal.imager.viewer.$canvas2 = $canvas2 = $(document.createElement('CANVAS'));
+      // canvas2 is never displayed, used to save images temporarily.
+      Drupal.imager.viewer.$canvas2 = $canvas2 = $('#imager-canvas2');
       Drupal.imager.viewer.ctx2 = ctx2 = $canvas2[0].getContext('2d');
       $canvas2.hide();
-      // Never displayed, used to save images temporarily.
+
       // Initialize Dialogs.
       Popups.initDialog('color', '#edit-color', function () {
         setEditMode('color', true);

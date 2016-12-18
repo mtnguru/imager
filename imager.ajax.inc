@@ -490,8 +490,8 @@ function imager_render_dialog() {
   module_load_include('inc', 'imager', 'imager.popups');
   $out['action'] = check_plain($_POST['action']);
   $out['status'] = 'pass';
-  $dialog_name = check_plain($_POST['dialogName']);
-  $func_name = '_imager_build_' . $dialog_name;
+  $popup_name = check_plain($_POST['popupName']);
+  $func_name = '_imager_build_' . $popup_name;
   if (function_exists($func_name)) {
     $render = $func_name();
     $out['data'] = drupal_render($render);

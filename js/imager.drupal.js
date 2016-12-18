@@ -33,55 +33,55 @@
     // Attach functions are executed by Drupal upon page load or ajax loads.
     attach: function (context, settings) {
 
-      // Initialize paths and variables needed in JavaScript.
-      // Run imager.init() to initialize Imager and assign event handlers.
-      $('#imager-wrapper').once(function () {
-        var basepath = Drupal.settings.basePath;
+      if (!imager) {
+        var basepath = drupalSettings.path.baseUrl;
         imager = Drupal.imager.start();
         imager.init({
-          modulePath: Drupal.settings.imager.modulePath,
-          cssContainer: Drupal.settings.imager.cssContainer,
-          cssImage: Drupal.settings.imager.cssImage,
+          modulePath: drupalSettings.imager.modulePath,
+          cssContainer: drupalSettings.imager.cssContainer,
+          cssImage: drupalSettings.imager.cssImage,
           basePath: basepath,
-          filePath: Drupal.settings.filePath,
+          filePath: drupalSettings.filePath,
           attachBehaviors: Drupal.attachBehaviors,
           actions: {
             displayEntity: {
-              url: basepath + '?q=imager/ajax/display_entity'
+              url: basepath + 'imager/ajax/display_entity'
             },
             displayMap: {
-              url: basepath + '?q=imager/ajax/display_map'
+              url: basepath + 'imager/ajax/display_map'
             },
             editFormFieldLoad: {
-              url: basepath + '?q=imager/ajax/edit_form_field_load'
+              url: basepath + 'imager/ajax/edit_form_field_load'
             },
             saveFileEntityField: {
-              url: basepath + '?q=imager/ajax/save_file_entity_field'
+              url: basepath + 'imager/ajax/save_file_entity_field'
             },
             saveFile: {
-              url: basepath + '?q=imager/ajax/save_image'
+              url: basepath + 'imager/ajax/save_image'
             },
             viewBrowser: {
-              url: basepath + '?q=imager/ajax/view_browser'
+              url: basepath + 'imager/ajax/view_browser'
             },
             emailFile: {
-              url: basepath + '?q=imager/ajax/email_file'
+              url: basepath + 'imager/ajax/email_file'
             },
             deleteFile: {
-              url: basepath + '?q=imager/ajax/delete_file'
+              url: basepath + 'imager/ajax/delete_file'
             },
             printImage: {
-              url: basepath + '?q=imager/ajax/print_image'
+              url: basepath + 'imager/ajax/print_image'
             },
             renderDialog: {
-              url: basepath + '?q=imager/ajax/render_dialog'
+              url: basepath + 'imager/ajax/render_dialog'
             }
           }
         });
-      });
+        imager.attach();
+        Drupal.imager.$wrapper = $(document.createElement('div')).attr('id', 'imager-wrapper');
+        $('body').append(Drupal.imager.$wrapper);
+      };
 
       // Build thumbnail list and initializes event handlers on thumbnails.
-      imager.attach();
     }
   };
 })(jQuery);

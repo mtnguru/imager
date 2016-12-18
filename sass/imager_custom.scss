@@ -1,0 +1,415 @@
+
+/* @file
+ * imager.sass
+ */
+
+$lightblue: #ccf;
+$greyblue: #558;
+$darkblue: #114;
+$darkgreyblue: #446;
+$darkergreyblue: #335;
+$purple:       #351a55;
+$darkpurple:   #2a0a5a;
+$greypurple:       #858;
+$darkgreypurple:   #554466;
+$darkergreypurple: #443355;
+$lightyellow: #ffffbb;
+$faintpurple:  #f0e0ff;
+$lightpurple:  #f0c0ff;
+$purple:       #351a55;
+$darkpurple:   #2a0a5a;
+$greypurple:       #858;
+$darkgreypurple:   #554466;
+$darkergreypurple: #443355;
+//  reds
+$darkred:      #330000;
+$red:          #551919;
+$lightred:     #ffaaaa;
+$faintred:     #ffcccc;
+  //  oranges
+$darkorange:   #602000;
+$orange:       #aa3a20;
+$lightorange:  #ffc299;
+$faintorange:  #ffeddf;
+
+$brown:        #6f3d10;
+$lighterbrown: #e1d0c5;
+$lightbrown:   #ede0d2;
+$faintbrown:   #f9f0e7;
+$darkbrown:    #341005;
+
+//  greens
+$faintgreen:   #dcffdc;
+$lightgreen:   #cfc;
+$green:        #353;
+$darkergreen:  #104010;
+$darkgreen:    #092009;
+
+$white:        #fff;
+$lightgrey:    #bbb;
+$grey:         #888;
+$darkgrey:     #333;
+$darkergrey:   #222;
+
+
+@mixin pi-border($radius,$shadow,$color) {
+  border: solid 1px lighten(adjust-hue($color,0deg),50%);
+  background-color: $color;
+//box-shadow: 0px 0px 4px 3px lighten(adjust-hue($color,20deg),30%), 0px 0px 3px 2px lighten(adjust-hue($color,-20deg),30%) inset;
+  border-radius: $radius;
+}
+
+@mixin pa-border($radius,$shadow,$color) {
+  border: solid 1px darken(adjust-hue($color,0deg),60%);
+  background-color: $color;
+//box-shadow: 0px 0px 4px 3px darken(adjust-hue($color,20deg),50%), 0px 0px 3px 2px darken(adjust-hue($color,-20deg),30%) inset;
+  border-radius: $radius;
+}
+
+
+
+// @import "normalize"
+
+.imager-dialog {
+  table {
+    margin-top: 0;
+    border: 0px;
+    border-radius: 10px;
+    border-spacing: 3px;
+    border-collapse: separate;
+    background-color: $greyblue;
+
+    tr {
+      background-color: $greyblue;
+    }
+
+    th {
+      padding: 2px 4px;
+      text-align: center;
+      color: $lightyellow;
+      background-color: $darkgreyblue;
+
+      &:first-child {
+        border-radius: 8px 0 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 8px 0 0;
+      }
+
+      &only-child {
+        border-radius: 8px 8px 0 0;
+      }
+    }
+
+    td {
+      min-width: 3em;
+      padding: 2px 4px;
+      color: $lightblue;
+    }
+  }
+}
+
+#imager-viewer-dialog.fullscreen {
+  margin: 0;
+  box-shadow: none;
+  width: 100%;
+  padding: 100px;
+}
+
+.imager-viewer-dialog {
+  background: $darkblue;
+
+  @include pi-border(15px, 3px, $darkpurple);
+
+  margin: 0px;
+  padding: 0px;
+
+  #imager-viewer {
+    background: $darkgreypurple;
+    #imager-canvas-wrapper {
+      margin: 3px;
+      padding: 0;
+
+      #imager-canvas-org {
+        display: none;
+      }
+
+      #imager-canvas {
+        padding: 0;
+        margin: 0;
+      }
+    }
+
+    #button-wrapper {
+      div {
+        font-size: 75%;
+        text-align: center;
+        margin: 2px 0;
+        padding: 0;
+      }
+
+      .buttons {
+        margin: 3px 0px 0;
+        color: #000;
+
+        @include pa-border(6px, 3px, $lightblue);
+
+        padding: 5px 2px;
+
+        img {
+          display: block;
+          margin: 0 2px;
+          padding: 3px 5px;
+          border-radius: 5px;
+        }
+
+        .checked {
+          background-color: $lightyellow;
+        }
+
+        .disabled {
+          background-color: $grey;
+        }
+
+        .specific {
+          background-color: $lightblue;
+        }
+
+        &#debug-buttons {
+          bottom: 3px;
+        }
+      }
+    }
+  }
+}
+
+.imgareaselect-outer {}
+
+//border-radius: 12px
+
+.imager-buttons {
+  @include pa-border(12px, 3px, $lightblue);
+
+  padding: 0 5px;
+
+  img {
+    padding: 5px 5px 1px;
+  }
+}
+
+.imager-status-dialog {
+  @include pi-border(15px, 3px, $darkorange);
+
+  #imager-status {
+    padding: 0;
+  }
+
+  font-size: 90%;
+
+  .ui-dialog-content {
+    background: $darkorange;
+    min-width: 450px;
+
+    #imager-status-content {
+      padding: 5px;
+      text-align: center;
+    }
+
+    span {
+      padding: 5px;
+    }
+  }
+}
+
+#imager-info {
+  @include pi-border(15px, 3px, $darkpurple);
+
+  padding: 5px 10px;
+  max-width: 600px;
+
+  .title {
+    color: $brown;
+    text-align: center;
+    font-size: 120%;
+    font-weight: bold;
+    word-wrap: break-word;
+  }
+
+  .filename {
+    color: #050;
+    font-style: italic;
+    font-size: 70%;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+
+  .error {
+    background-color: $red;
+    color: white;
+  }
+
+  #imager-info-content {
+    img.imager-info-edit {
+      margin: 0 5px 3px 0;
+    }
+  }
+
+  .imager-buttons {
+    img {
+      padding: 5px;
+    }
+  }
+}
+
+#imager-edit {
+  @include pi-border(15px, 3px, $darkgreen);
+
+  padding: 5px 5px;
+
+  .form-text {
+    max-width: 300px;
+  }
+}
+
+#imager-confirm {
+  @include pi-border(15px, 3px, $darkgreen);
+
+  padding: 5px 10px;
+}
+
+#imager-map {
+  @include pi-border(15px, 3px, $darkred);
+
+  max-width: 700px;
+  padding: 5px 5px;
+
+  .description {
+    max-width: 300px;
+  }
+
+  .form-text {
+    max-width: 300px;
+  }
+}
+
+#imager-messages.error {
+  color: white;
+  font-size: 140%;
+  background-color: $red;
+  background-image: none;
+}
+
+#imager-messages {
+  @include pi-border(15px, 3px, $red);
+
+  .info {
+    font-size: 110%;
+    font-weight: bold;
+  }
+
+  h2 {
+    margin: 5px 0;
+  }
+
+  padding: 10px;
+
+  .error {
+    background-color: $red;
+  }
+}
+
+.imager-dialog.ui-dialog {
+  border-radius: 10px;
+
+  .ui-dialog-titlebar {
+    border-radius: 10px 10px 0 0;
+    color: $lightyellow;
+    background: $darkgreypurple;
+  }
+
+  .ui-dialog-content {
+
+    td {
+      padding: 0 5px;
+    }
+  }
+
+  .ui-dialog-buttonpane {
+    border: 0;
+    border-radius: 0 0 10px 10px;
+    background: $darkgreypurple;
+  }
+
+  .ui-widget-header {
+    border: 0;
+  }
+}
+
+.imager-filesave-dialog {
+  @include pi-border(10px, 3px, $orange);
+
+  #imager-filesave {
+    background: $orange;
+  }
+
+  .imager-filesave-content {
+    background: $orange;
+  }
+
+  #resolution {
+    margin: 0 auto 10px;
+  }
+
+  #imager-filesave-messages {
+    font-style: italic;
+    font-size: 80%;
+    word-wrap: break-word;
+    text-align: center;
+  }
+
+  #imager-filesave-filename-container {
+    margin: 10px 0;
+  }
+
+  #save-file-title {
+    font-size: 140%;
+    font-weight: bold;
+    margin: 10px;
+  }
+}
+
+.imager-brightness-dialog,
+.imager-color-dialog {
+  @include pi-border(10px, 3px, $darkgreen);
+
+  .ui-dialog-content {
+    border-radius: 10px 10px 0 0;
+    background: $darkgreen;
+  }
+
+  .error {
+    background-color: $darkred;
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    border-radius: 6px;
+  }
+}
+
+.imager-config-dialog {
+//@include pi-border(10px, 3px, $lightgreen);
+//color: white;
+
+  .ui-dialog-content {
+    background: $lightblue;
+  }
+}
+
+.clicktoexit {
+  margin-top: 10px;
+  font-size: 70%;
+  font-style: italic;
+  color: $lightgrey;
+}

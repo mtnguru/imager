@@ -6,6 +6,12 @@
 (function ($) {
   'use strict';
 
+
+  Drupal.AjaxCommands.prototype.imagerCommand = function(ajax, response, status) {
+    Drupal.imager[response.component].imagerCommand(response);
+  } 
+
+
   // Create the Drupal.imager namespace and subspaces.
   Drupal.imager = {
     popups: {},
@@ -159,11 +165,17 @@
       $.ajax({
         type: 'POST',
         url: url,
-        data: postData,
-        success: function (response_json) {
-          clearTimeout(messageTimeout);
-          // Popups.$busy.hide();
-          var response = JSON.parse(response_json);
+        data: JSON.stringify(postData),
+        success: function (response) {
+          for (var i = 0; i < response.length; i++) {
+            if (response[i].command == 'ImagerCommand') {
+              if (processFunc) {
+                processFunc.call($callingElement, response[i].data);
+              }
+            }
+          }
+
+          /**
           var display = false;
           var out;
           var i;
@@ -183,19 +195,19 @@
           if (display) {
             Popups.messages.dialogOpen();
             $('#imager-messages-content').html(out);
-          }
-          if (processFunc) {
-            processFunc.call($callingElement, response);
-          }
+          } */
+
+          /**
           if (localStorage['imagerDebugMessages'] === 'false') {
             setTimeout(function () {
               Popups.messages.dialogClose();
             }, 3000);
           }
           Popups.$busy.hide();
+          **/
         },
         error: function (evt) {
-          Popups.$busy.hide();
+/**       Popups.$busy.hide();
           clearTimeout(messageTimeout);
           Popups.messages.dialogOpen();
           $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +
@@ -208,7 +220,8 @@
               Popups.messages.dialogClose();
             }, 10000);
           }
-        }
+**/
+        },
       });
     }; // ajaxProcess()
 
@@ -268,7 +281,9 @@
       // If the image has '/styles/' in it's path
       // then extract the large image path by modifying the thumbnail path
       // Kludgy but it works - any better ideas.
-      if (tsrc.indexOf('/styles/')) {
+      if (tsrc.indexOf('/styles/') == -1) {
+        src = tsrc;
+      } else {
         var sindex = tsrc.indexOf('styles');
         var index = sindex;
         var slashes = 0;

@@ -5,164 +5,36 @@
  * Provides full image viewing and editing capability from a page of thumbnails.
  */
 
-/**
- * Implements hook_init().
- */
-function imager_init() {
-}
-
-/**
- * Implements hook_menu().
- */
-function imager_menu() {
-  // Administer configuration settings for Imager module.
-  $items['admin/config/media/imager'] = array(
-    'title' => 'Imager',
-    'description' => 'Configure Imager module paths and settings.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('imager_admin_form'),
-    'file' => 'imager.admin.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-  // AJAX - Retrieve a rendered file_entity.
-  $items['imager/ajax/display_entity'] = array(
-    'title' => 'Display file_entity',
-    'description' => 'Retrieve a rendered file_entity',
-    'page callback' => 'imager_display_entity',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Display map showing location of current image.
-  $items['imager/ajax/display_map'] = array(
-    'title' => 'Display Map',
-    'description' => 'Display a map of where this image was taken',
-    'page callback' => 'imager_display_map',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Overwrite or save a new image file and the file_entity.
-  $items['imager/ajax/save_image'] = array(
-    'title' => 'Save edited image file',
-    'description' => 'Save an edited image file back into Drupal',
-    'page callback' => 'imager_save_image',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Attach image to outgoing email message in users email client.
-  $items['imager/ajax/email_file'] = array(
-    'title' => 'Email edited image file',
-    'description' => 'Start users default email client with subject, body and image attached.',
-    'page callback' => 'imager_email_file',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Display image and rendered file_entity in a new browser window.
-  $items['imager/ajax/view_browser'] = array(
-    'title' => 'View Image natively in Browser',
-    'description' => 'Save image so it can be displayed natively in browser, then copied or printed.',
-    'page callback' => 'imager_view_browser',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Retrieve a rendered file_entity form.
-  $items['imager/ajax/edit_form_load'] = array(
-    'title' => 'Retrieve the edit form for a file_entity',
-    'description' => 'Retrieve the edit form for a file_entity',
-    'page callback' => 'imager_edit_form_load',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Retrieve a field from a rendered file_entity form.
-  $items['imager/ajax/edit_form_field_load'] = array(
-    'title' => 'Retrieve a field from the edit form',
-    'description' => 'Retrieve a field from the edit form.',
-    'page callback' => 'imager_edit_form_field_load',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Delete a file_entity and it's image file.
-  $items['imager/ajax/delete_file'] = array(
-    'title' => 'Delete a file_entity from Drupal',
-    'description' => 'Delete a file_entity from Drupal',
-    'page callback' => 'imager_delete_file',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Save a file_entity field.
-  $items['imager/ajax/save_file_entity_field'] = array(
-    'title' => 'Save file_entity field',
-    'description' => 'Save a file_entity field',
-    'page callback' => 'imager_save_file_entity_field',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Print image.
-  $items['imager/ajax/print_image'] = array(
-    'title' => 'Print image to local printer',
-    'description' => 'Print image to local printer',
-    'page callback' => 'imager_print_image',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  // AJAX - Load Dialog.
-  $items['imager/ajax/render_dialog'] = array(
-    'title' => 'Load dialog',
-    'description' => 'Render the contents for a dialog and return it.',
-    'page callback' => 'imager_render_dialog',
-    'file' => 'imager.ajax.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  return $items;
-}
-
-/**
- * Implements hook_views_pre_view().
- *
- * Determine if this view needs imager module, if so set $_imager_enable = true.
- */
-function imager_views_pre_view(&$view, &$display_id, &$args) {
-  global $_imager_enable;
-  if (preg_match('/' . variable_get('imager_views_css_class') . '/',
-    $view->display['default']->display_options['css_class'])) {
-    if (!preg_match('/browser/', $view->name)) {
-      $_imager_enable = TRUE;
-    }
-  }
-}
 
 /**
  * Implements hook_theme().
  */
 function imager_theme() {
   return array(
+    'imager_formatter' => array(
+      'variables' => array('item' => NULL, 'item_attributes' => NULL, 'url' => NULL, 'image_style' => NULL),
+      'file' => 'imager.field.inc',
+    ),
     'imager_add_button' => array(
-      'render element' => 'element',
+      'var'
     ),
   );
+}
+
+
+/**
+ * Implements hook_views_pre_view().
+ *
+ * Determine if this view needs imager module, if so set $_imager_enable = true.
+ */
+function imager_views_pre_view($view, $display_id, &$args) {
+//global $_imager_enable;
+//if (preg_match('/' . variable_get('imager_views_css_class') . '/',
+//  $view->display['default']->display_options['css_class'])) {
+//  if (!preg_match('/browser/', $view->name)) {
+//    $_imager_enable = TRUE;
+//  }
+//}
 }
 
 /**
@@ -172,6 +44,7 @@ function imager_theme() {
  * that will contain the Imager HTML.
  */
 function imager_page_alter(array &$page) {
+/*
   global $_imager_enable;
   // If the imager module has been enabled elsewhere, load and initialize it.
   if (isset($_imager_enable)) {
@@ -184,6 +57,7 @@ function imager_page_alter(array &$page) {
       drupal_get_path('module', 'imager') . '/css/imager_admin.css',
     );
   }
+*/
 }
 
 /**
@@ -198,6 +72,7 @@ function imager_page_alter(array &$page) {
  *   Return the form render array.
  */
 function imager_file_entity_edit(array $form, array &$form_state) {
+/*
   $form['#attributes']['class'][] = 'file-form';
 
   // Basic file information.
@@ -300,6 +175,7 @@ function imager_file_entity_edit(array $form, array &$form_state) {
     // '#access' => file_entity_access('delete', $file), .
   );
   return $form;
+*/
 }
 
 /**
@@ -308,6 +184,7 @@ function imager_file_entity_edit(array $form, array &$form_state) {
  * Adds view modes to file entities.
  */
 function imager_entity_info_alter(array &$entity_info) {
+/*
   $entity_info['file']['view modes']['media_imager_info'] = array(
     'label' => t('Imager Info'),
     'custom settings' => TRUE,
@@ -320,6 +197,7 @@ function imager_entity_info_alter(array &$entity_info) {
     'label' => t('Imager Browser'),
     'custom settings' => TRUE,
   );
+*/
 }
 
 /**
@@ -328,6 +206,7 @@ function imager_entity_info_alter(array &$entity_info) {
  * Add filename, owner, filesize, fid and image geometry to the file view.
  */
 function imager_file_view_alter(array &$build, $type) {
+/*
   // Exit if view_mode != configured view mode for information dialog.
   if ($build['#view_mode'] !== variable_get('imager_information_view_mode')) {
     return $build;
@@ -431,6 +310,7 @@ function imager_file_view_alter(array &$build, $type) {
       '#markup' => $file->fid,
     ),
   );
+*/
 }
 
 /**
@@ -445,6 +325,7 @@ function imager_file_view_alter(array &$build, $type) {
  *   TRUE if the variant exists, FALSE otherwise.
  */
 function imager_library_detect_variant(array $library, $variant) {
+/*
   if (!empty($library['variants'][$variant]['files'])) {
     $files = $library['variants'][$variant]['files'];
 
@@ -457,59 +338,6 @@ function imager_library_detect_variant(array $library, $variant) {
   }
 
   return FALSE;
+*/
 }
 
-/**
- * Implements hook_libraries_info().
- */
-function imager_libraries_info() {
-  $libraries = array();
-
-  $libraries['jquery.imgareaselect'] = array(
-    'name' => 'jQuery imgAreaSelect',
-    'vendor url' => 'http://odyniec.net/projects/imgareaselect',
-    'version callback' => 'libraries_get_version',
-    'version arguments' => array(
-      'file' => 'scripts/jquery.imgareaselect.js',
-      'pattern' => '#version ([0-9\.]+)#',
-      'lines' => 10,
-      'cols' => 20,
-    ),
-    'files' => array(
-      'js' => array(
-        'scripts/jquery.imgareaselect.js',
-      ),
-      'css' => array(
-        'css/imgareaselect-animated.css',
-      ),
-    ),
-    'variants' => array(
-      'minified' => array(
-        'files' => array(
-          'js' => array(
-            'scripts/jquery.imgareaselect.min.js',
-          ),
-          'css' => array(
-            'css/imgareaselect-animated.css',
-          ),
-        ),
-        'variant callback' => 'imager_library_detect_variant',
-        'variant arguments' => array(),
-      ),
-      'packed' => array(
-        'files' => array(
-          'js' => array(
-            'scripts/jquery.imgareaselect.pack.js',
-          ),
-          'css' => array(
-            'css/imgareaselect-animated.css',
-          ),
-        ),
-        'variant callback' => 'imager_library_detect_variant',
-        'variant arguments' => array(),
-      ),
-    ),
-  );
-
-  return $libraries;
-}

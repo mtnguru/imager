@@ -111,14 +111,14 @@
         Drupal.imager.settings.actions.renderDialog.url,
         {
           action: 'render-dialog',
-          dialogName: popup.spec.name
+          popupName: popup.spec.name
         },
         popup.dialogCreate);
     };
 
     // Load the popup using AJAX.
     popup.dialogCreate = function dialogCreate(response, $callingElement) {
-      Drupal.imager.$wrapper.append(response['data']);
+      Drupal.imager.$wrapper.html(response['popupHtml']);
       popup.spec.$elem = $('#' + popup.spec.cssId);
       if (popup.spec.cssIdFinal) {
         popup.spec.$elem.removeClass(popup.spec.cssId).addClass(popup.spec.cssIdFinal);
