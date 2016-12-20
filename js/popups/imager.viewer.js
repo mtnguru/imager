@@ -129,7 +129,7 @@
     /**
      * Upon completion of image loading, initialize and draw the image to canvas.
      */
-    var drawImage = function drawImage() {
+    img.addEventListener('load', function() {
       if (doInit) {
         initializeImage();
         doInit = false;
@@ -137,9 +137,8 @@
       redraw();
       showInfo();
       Popups.$busy.hide();
-    };
+    }, false);
 
-    img.addEventListener('load', drawImage, false);
 
     /**
      * Calculate canvas and image dimensions, reset variables, initialize transforms
@@ -172,8 +171,7 @@
         calcCanvasDims(image.iw, image.ih);
         cscale = cw / image.iw;
       }
-      initScale = cscale;
-      // Save scaling where image fits canvas.
+      initScale = cscale; // Save scaling where image fits canvas.
       $canvas.attr({width: cw, height: ch});
       $imgOverlay.width(cw).height(ch);
       $('#imager-canvas-wrapper').width(cw).height(ch);

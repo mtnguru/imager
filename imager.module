@@ -5,6 +5,8 @@
  * Provides full image viewing and editing capability from a page of thumbnails.
  */
 
+use Drupal\Core\Form\FormStateInterface;
+
 
 /**
  * Implements hook_theme().
@@ -21,6 +23,23 @@ function imager_theme() {
   );
 }
 
+/**
+ * Implements hook_entity_presave().
+ */
+// function imager_entity_presave(EntityInterface $entity) {
+//   return;
+// }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * FORM ID: media_image_form
+ * Set default photographer to be the logged in user.
+ */
+function imager_form_media_image_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['field_photographer']['widget'][0]['target_id']['#default_value'] = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  return;
+}
 
 /**
  * Implements hook_views_pre_view().
@@ -184,20 +203,22 @@ function imager_file_entity_edit(array $form, array &$form_state) {
  * Adds view modes to file entities.
  */
 function imager_entity_info_alter(array &$entity_info) {
-/*
-  $entity_info['file']['view modes']['media_imager_info'] = array(
+  $entity_info['media']['view modes']['media_imager_info'] = array(
     'label' => t('Imager Info'),
     'custom settings' => TRUE,
   );
-  $entity_info['file']['view modes']['media_imager_email'] = array(
-    'label' => t('Imager Email'),
+  $entity_info['media']['view modes']['media_imager_map'] = array(
+    'label' => t('Imager Map'),
     'custom settings' => TRUE,
   );
-  $entity_info['file']['view modes']['media_imager_browser'] = array(
-    'label' => t('Imager Browser'),
-    'custom settings' => TRUE,
-  );
-*/
+//$entity_info['file']['view modes']['media_imager_email'] = array(
+//  'label' => t('Imager Email'),
+//  'custom settings' => TRUE,
+//);
+//$entity_info['media']['view modes']['media_imager_browser'] = array(
+//  'label' => t('Imager Browser'),
+//  'custom settings' => TRUE,
+//);
 }
 
 /**
@@ -340,4 +361,5 @@ function imager_library_detect_variant(array $library, $variant) {
   return FALSE;
 */
 }
+
 

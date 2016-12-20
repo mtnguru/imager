@@ -1,3 +1,19 @@
+
+Initially the canvas size is set by the screen size and image size as I do now.
+Once the viewer is up, the canvas remains at it's current size.
+Changing the image changes the viewport?
+Have an option to fit browser and an option for full screen.
+
+Once the viewer is displayed it can be resized.
+If resized the final dimensions are exactly what they are set to be.
+Make the canvas-wrapper 100% width and height.
+When resized the wrapper changes size.:w
+
+
+
+
+
+
 At this point the viewer isn't loaded.  I used to create this in a div:w
 
 

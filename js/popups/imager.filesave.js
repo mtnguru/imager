@@ -64,6 +64,7 @@
           action: 'save-file',
           saveMode: popup.settings.saveMode,
           uri: Viewer.getImage().src,
+          mid: Viewer.getImage().mid,
           imgBase64: img
         }, function (response) {
           var $row;

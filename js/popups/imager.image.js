@@ -15,6 +15,7 @@
     return {
       src: settings.src || '',
       srcThumb: settings.srcThumb || '',
+      mid: settings.mid,
       $container: settings.$container || null,
       $thumb: settings.$thumb || null,
       iw: settings.iw || 0,

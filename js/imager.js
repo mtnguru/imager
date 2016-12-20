@@ -67,6 +67,7 @@
 //        $container: $(this),
           $thumb: $thumb,
           srcThumb: $thumb.attr('src'),
+          mid: $thumb.attr('data-mid'),
           src: Drupal.imager.core.getFullPath($thumb.attr('src'))
         }));
 

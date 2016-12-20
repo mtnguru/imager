@@ -978,10 +978,6 @@ function _imager_build_configuration() {
       '#prefix' => '<div id="imager-config-content" class="imager-content">',
       '#suffix' => '</div>',
       '#weight' => 1,
-      'description' => array(
-        '#type' => 'markup',
-        '#markup' => '<p><em>All settings are stored specific to each browser you use.</em></p>',
-      ),
       'viewer' => array(
         '#type' => 'fieldset',
         '#title' => 'Image Viewer',

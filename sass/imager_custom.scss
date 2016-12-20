@@ -3,54 +3,21 @@
  * imager.sass
  */
 
-$lightblue: #ccf;
-$greyblue: #558;
-$darkblue: #114;
-$darkgreyblue: #446;
-$darkergreyblue: #335;
-$purple:       #351a55;
-$darkpurple:   #2a0a5a;
-$greypurple:       #858;
-$darkgreypurple:   #554466;
-$darkergreypurple: #443355;
-$lightyellow: #ffffbb;
-$faintpurple:  #f0e0ff;
-$lightpurple:  #f0c0ff;
-$purple:       #351a55;
-$darkpurple:   #2a0a5a;
-$greypurple:       #858;
-$darkgreypurple:   #554466;
-$darkergreypurple: #443355;
-//  reds
-$darkred:      #330000;
-$red:          #551919;
-$lightred:     #ffaaaa;
-$faintred:     #ffcccc;
-  //  oranges
-$darkorange:   #602000;
-$orange:       #aa3a20;
-$lightorange:  #ffc299;
-$faintorange:  #ffeddf;
+$color-table-bg:      #585;
+$color-title-fg:      #ffffbb;
+$color-title-bg:      #464;
+$color-title-dark-bg: #541;
+$color-light-bg:      #ffd;
+$color-light-alt-bg:  #f5a;
+$color-dark-bg:       #405040;
+$color-dark-alt-bg:   #431;
+$color-status-bg:     #602005;
+$color-edit-bg:       #431;
+$color-map-bg:        #330000;
+$color-filesave-bg:   #efe;
 
-$brown:        #6f3d10;
-$lighterbrown: #e1d0c5;
-$lightbrown:   #ede0d2;
-$faintbrown:   #f9f0e7;
-$darkbrown:    #341005;
-
-//  greens
-$faintgreen:   #dcffdc;
-$lightgreen:   #cfc;
-$green:        #353;
-$darkergreen:  #104010;
-$darkgreen:    #092009;
-
-$white:        #fff;
-$lightgrey:    #bbb;
-$grey:         #888;
-$darkgrey:     #333;
-$darkergrey:   #222;
-
+$color-error:         #330000;
+$color-disabled:      #888;
 
 @mixin pi-border($radius,$shadow,$color) {
   border: solid 1px lighten(adjust-hue($color,0deg),50%);
@@ -59,42 +26,32 @@ $darkergrey:   #222;
   border-radius: $radius;
 }
 
-@mixin pa-border($radius,$shadow,$color) {
-  border: solid 1px darken(adjust-hue($color,0deg),60%);
-  background-color: $color;
-//box-shadow: 0px 0px 4px 3px darken(adjust-hue($color,20deg),50%), 0px 0px 3px 2px darken(adjust-hue($color,-20deg),30%) inset;
-  border-radius: $radius;
-}
-
-
-
-// @import "normalize"
-
 .imager-dialog {
   table {
     margin-top: 0;
     border: 0px;
-    border-radius: 10px;
+    border-radius: 5px;
     border-spacing: 3px;
     border-collapse: separate;
-    background-color: $greyblue;
+    background-color: $color-table-bg;
 
     tr {
-      background-color: $greyblue;
+      background-color: $color-table-bg;
     }
 
     th {
       padding: 2px 4px;
       text-align: center;
-      color: $lightyellow;
-      background-color: $darkgreyblue;
+      color: $color-title-fg;
+      background-color: $color-title-bg;
+      border: none;
 
       &:first-child {
-        border-radius: 8px 0 0 0;
+        border-radius: 4px 0 0 0;
       }
 
       &:last-child {
-        border-radius: 0 8px 0 0;
+        border-radius: 0 4px 0 0;
       }
 
       &only-child {
@@ -105,7 +62,7 @@ $darkergrey:   #222;
     td {
       min-width: 3em;
       padding: 2px 4px;
-      color: $lightblue;
+      color: $color-light-bg;
     }
   }
 }
@@ -118,17 +75,14 @@ $darkergrey:   #222;
 }
 
 .imager-viewer-dialog {
-  background: $darkblue;
-
-  @include pi-border(15px, 3px, $darkpurple);
 
   margin: 0px;
   padding: 0px;
 
   #imager-viewer {
-    background: $darkgreypurple;
+    background: $color-dark-bg;
     #imager-canvas-wrapper {
-      margin: 3px;
+      margin: 0px 0px 0px 3px;
       padding: 0;
 
       #imager-canvas-org {
@@ -138,6 +92,7 @@ $darkergrey:   #222;
       #imager-canvas {
         padding: 0;
         margin: 0;
+        border-radius: 3px;
       }
     }
 
@@ -145,17 +100,18 @@ $darkergrey:   #222;
       div {
         font-size: 75%;
         text-align: center;
-        margin: 2px 0;
         padding: 0;
+        line-height: 2em;
       }
 
       .buttons {
-        margin: 3px 0px 0;
+        margin: 3px 0;
+        &#image-buttons {
+          margin: 0 0 3px;
+        }
         color: #000;
-
-        @include pa-border(6px, 3px, $lightblue);
-
-        padding: 5px 2px;
+        background: $color-light-bg;
+        border-radius: 4px;
 
         img {
           display: block;
@@ -165,19 +121,19 @@ $darkergrey:   #222;
         }
 
         .checked {
-          background-color: $lightyellow;
+          background-color: $color-light-alt-bg;
         }
 
         .disabled {
-          background-color: $grey;
+          background-color: $color-disabled;
         }
 
         .specific {
-          background-color: $lightblue;
+          background-color: $color-light-bg;
         }
 
         &#debug-buttons {
-          bottom: 3px;
+          bottom: 0px;
         }
       }
     }
@@ -189,8 +145,6 @@ $darkergrey:   #222;
 //border-radius: 12px
 
 .imager-buttons {
-  @include pa-border(12px, 3px, $lightblue);
-
   padding: 0 5px;
 
   img {
@@ -199,7 +153,7 @@ $darkergrey:   #222;
 }
 
 .imager-status-dialog {
-  @include pi-border(15px, 3px, $darkorange);
+  @include pi-border(15px, 3px, $color-status-bg);
 
   #imager-status {
     padding: 0;
@@ -208,8 +162,9 @@ $darkergrey:   #222;
   font-size: 90%;
 
   .ui-dialog-content {
-    background: $darkorange;
+    background: $color-status-bg;
     min-width: 450px;
+    padding: 10px;
 
     #imager-status-content {
       padding: 5px;
@@ -223,13 +178,13 @@ $darkergrey:   #222;
 }
 
 #imager-info {
-  @include pi-border(15px, 3px, $darkpurple);
+  @include pi-border(15px, 3px, $color-dark-alt-bg);
 
   padding: 5px 10px;
   max-width: 600px;
 
   .title {
-    color: $brown;
+    color: $color-title-dark-bg;
     text-align: center;
     font-size: 120%;
     font-weight: bold;
@@ -245,7 +200,7 @@ $darkergrey:   #222;
   }
 
   .error {
-    background-color: $red;
+    background-color: $color-error;
     color: white;
   }
 
@@ -263,7 +218,7 @@ $darkergrey:   #222;
 }
 
 #imager-edit {
-  @include pi-border(15px, 3px, $darkgreen);
+  @include pi-border(15px, 3px, $color-edit-bg);
 
   padding: 5px 5px;
 
@@ -273,13 +228,13 @@ $darkergrey:   #222;
 }
 
 #imager-confirm {
-  @include pi-border(15px, 3px, $darkgreen);
+  @include pi-border(15px, 3px, $color-edit-bg);
 
   padding: 5px 10px;
 }
 
 #imager-map {
-  @include pi-border(15px, 3px, $darkred);
+  @include pi-border(15px, 3px, $color-map-bg);
 
   max-width: 700px;
   padding: 5px 5px;
@@ -296,12 +251,12 @@ $darkergrey:   #222;
 #imager-messages.error {
   color: white;
   font-size: 140%;
-  background-color: $red;
+  background-color: $color-error;
   background-image: none;
 }
 
 #imager-messages {
-  @include pi-border(15px, 3px, $red);
+  @include pi-border(15px, 3px, $color-error);
 
   .info {
     font-size: 110%;
@@ -315,7 +270,7 @@ $darkergrey:   #222;
   padding: 10px;
 
   .error {
-    background-color: $red;
+    background-color: $color-error;
   }
 }
 
@@ -324,12 +279,12 @@ $darkergrey:   #222;
 
   .ui-dialog-titlebar {
     border-radius: 10px 10px 0 0;
-    color: $lightyellow;
-    background: $darkgreypurple;
+    color: $color-title-fg;
+    background: $color-dark-alt-bg;
   }
 
   .ui-dialog-content {
-
+    padding: 0px 10px;
     td {
       padding: 0 5px;
     }
@@ -338,7 +293,7 @@ $darkergrey:   #222;
   .ui-dialog-buttonpane {
     border: 0;
     border-radius: 0 0 10px 10px;
-    background: $darkgreypurple;
+    background: $color-dark-alt-bg;
   }
 
   .ui-widget-header {
@@ -346,15 +301,18 @@ $darkergrey:   #222;
   }
 }
 
-.imager-filesave-dialog {
-  @include pi-border(10px, 3px, $orange);
+.imager-filesave-dialog.ui-dialog {
+  @include pi-border(10px, 3px, $color-filesave-bg);
 
+  .ui-dialog-content {
+    padding: 10px 10px 0 10px;
+  }
   #imager-filesave {
-    background: $orange;
+    background: $color-filesave-bg;
   }
 
   .imager-filesave-content {
-    background: $orange;
+    background: $color-filesave-bg;
   }
 
   #resolution {
@@ -379,17 +337,17 @@ $darkergrey:   #222;
   }
 }
 
-.imager-brightness-dialog,
-.imager-color-dialog {
-  @include pi-border(10px, 3px, $darkgreen);
+.imager-brightness-dialog.ui-dialog,
+.imager-color-dialog.ui-dialog {
+  @include pi-border(10px, 3px, $color-edit-bg);
 
   .ui-dialog-content {
-    border-radius: 10px 10px 0 0;
-    background: $darkgreen;
+    background: $color-edit-bg;
+    padding: 10px 10px 0px 10px;
   }
 
   .error {
-    background-color: $darkred;
+    background-color: $color-error;
   }
 
   .slider {
@@ -403,13 +361,15 @@ $darkergrey:   #222;
 //color: white;
 
   .ui-dialog-content {
-    background: $lightblue;
+    background: $color-light-bg;
   }
 }
 
+/*
 .clicktoexit {
   margin-top: 10px;
   font-size: 70%;
   font-style: italic;
   color: $lightgrey;
 }
+*/

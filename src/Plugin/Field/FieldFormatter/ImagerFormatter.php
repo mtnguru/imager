@@ -30,7 +30,7 @@ use Drupal\imager\ImagerInit;
  *
  * @FieldFormatter(
  *   id = "imager_formatter",
- *   label = @Translation("Imager embed"),
+ *   label = @Translation("Imager"),
  *   description = @Translation("Display an image in an imager viewer window."),
  *   field_types = {
  *     "image", 

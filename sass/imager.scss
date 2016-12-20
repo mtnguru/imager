@@ -356,7 +356,9 @@ div#main {
   }
   .imager-content {
     margin: 0;
-    padding: .25em .5em;
+  }
+  label {
+    font-weight: normal;
   }
   .form-item {
     input {
@@ -371,6 +373,11 @@ div#main {
     }
   }
 
+  .js-form-type-checkbox {
+    label {
+      display: inline;
+    }
+  }
   #imager-status-content {
     padding: 0;
     text-align: center;

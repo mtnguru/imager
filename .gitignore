@@ -1,5 +1,6 @@
 nbproject
 *.swp
+*.map
 .sass-cache
 js/ui-lightness
 icons

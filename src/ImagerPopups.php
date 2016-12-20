@@ -573,10 +573,10 @@ class ImagerPopups {
         '#prefix' => '<div id="imager-config-content" class="imager-content">',
         '#suffix' => '</div>',
         '#weight' => 1,
-        'description' => array(
-          '#type' => 'markup',
-          '#markup' => '<p><em>All settings are stored specific to each browser you use.</em></p>',
-        ),
+//      'description' => array(
+//        '#type' => 'markup',
+//        '#markup' => '<p><em>Settings are specific to the browser.</em></p>',
+//      ),
         'viewer' => array(
           '#type' => 'fieldset',
           '#title' => 'Image Viewer',
@@ -637,16 +637,18 @@ class ImagerPopups {
           '#prefix' => '<div id="imager-filesave-messages">',
           '#suffix' => '</div>',
         ),
-        'table' => buildResolutionTable(3),
+        'table' => $this->buildResolutionTable(3),
         'filename' => array(
           '#weight' => 4,
           '#prefix' => '<div id="imager-filesave-filename-container">',
           '#suffix' => '</div>',
           '#type' => 'markup',
-          '#markup' => "<span>" . t('File name: @link', array(" </span><input id='imager-filesave-filename' type='text' />")),
+          '#markup' => "<span>" . t('File name:') . "</span><input id='imager-filesave-filename' type='text' />",
+          '#allowed_tags' => ['span', 'input'],
         ),
       ),
     );
+    return $page;
   }
 
   /**
@@ -662,10 +664,10 @@ class ImagerPopups {
     $page = array(
       '#weight' => $weight,
       '#type' => 'table',
-      '#attributes' => array('class' => 'table-no-striping'),
+      '#attributes' => array('class' => array('table-no-striping')),
       '#theme' => 'table',
       '#header' => array(
-        '',
+        t(''),
         t('Image'),
         t('Resolution'),
         t('Geometry'),
@@ -676,9 +678,14 @@ class ImagerPopups {
         array(
           'no_striping' => TRUE,
           'data' => array(
-            '<input type="radio" name="resolution" value="screen" />',
+            array(
+              'data' => array(
+                '#markup' => '<input type="radio" name="resolution" value="screen" />',
+                '#allowed_tags' => ['input'],
+              ),
+            ),
             t('Displayed'),
-            t('Display'),
+            t('Screen'),
             array('id' => 'canvas-resolution'),
             array('id' => 'scale', 'rowspan' => 2),
           ),
@@ -686,7 +693,12 @@ class ImagerPopups {
         array(
           'no_striping' => TRUE,
           'data' => array(
-            '<input type="radio" name="resolution" value="image-cropped" checked="checked" />',
+            array(
+              'data' => array(
+                '#markup' => '<input type="radio" name="resolution" value="image-cropped" checked="checked" />',
+                '#allowed_tags' => ['input'],
+              ),
+            ),
             t('Displayed'),
             t('Image'),
             array('id' => 'image-display-resolution'),
@@ -695,7 +707,12 @@ class ImagerPopups {
         array(
           'no_striping' => TRUE,
           'data' => array(
-            '<input type="radio" name="resolution" value="image-full" />',
+            array(
+              'data' => array(
+                '#markup' => '<input type="radio" name="resolution" value="image-full" />',
+                '#allowed_tags' => ['input'],
+              ),
+            ),
             t('Full'),
             t('Image'),
             array('id' => 'image-full-resolution'),
@@ -703,6 +720,7 @@ class ImagerPopups {
         ),
       ),
     );
+    return $page;
   }
 
 

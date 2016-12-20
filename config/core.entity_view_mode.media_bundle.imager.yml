@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - imager
+id: media_bundle.imager
+label: 'Imager maps'
+targetEntityType: media_bundle
+cache: true
+
