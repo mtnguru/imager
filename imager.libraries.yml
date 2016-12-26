@@ -17,6 +17,7 @@ imager-base:
       css/imgareaselect-animated.css: {}
   dependencies:
     - core/drupal.ajax
+    - core/jquery.ui.dialog
 
 imager-editor:
   js:

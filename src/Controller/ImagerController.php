@@ -9,6 +9,9 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\imager\ImagerPopups;
 use Drupal\imager\Ajax\ImagerCommand;
 
+use Drupal\file\Entity\File;
+
+
 // use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -116,42 +119,31 @@ class ImagerController extends ControllerBase {
    */
   public function saveFile() {
     $data = json_decode(file_get_contents("php://input"), true);
-    $out['action'] = $data['action'];
-    $out['status'] = 'pass';
 
-    $overwrite = $data['overwrite'];
-    $uri = urldecode($data['uri']);
-    $mid = $data['mid'];
+    $fp = $this->getFileParts(urldecode($data['uri']));
+    $media = \Drupal::entityTypeManager()->getStorage('media')->load($data['mid']);
 
-    $fp = $this->getFileParts($uri);
-
-    $media = \Drupal::entityTypeManager()->getStorage('media')->load($mid);
-
-//  $media->set('mid')
-    // Save the image to a tmp file.
     $tmpPath = file_directory_temp() . '/' . $fp['newfilename'] . '.' . $fp['extension'];
     $this->writeImage($tmpPath, $data['imgBase64']);
-
-    // @TODO Make this configurable
     $this->convertImage($tmpPath, $fp['newpath']);
+    $file = File::create(['uri' => 'public://' . $fp['newfilename']]);
+    $file->save();
 
-    if ($overwrite == "true") {
-      $file->uri = $ps['nuri'];
-      $file->filename = $ps['nfilename'] . '.' . $ps['suffix'];
-      $file = file_save($file);
-      $out['file_old'] = reset(module_invoke_all('imager_modify', $file->fid));
-      // dpm($out,"overwrite"); .
-    }
-    else {
-      unset($media->values['mid']);
-      // Forces file_save to create a new file entity.
-      $file->uri = $ps['nuri'];
-      $file->filename = $ps['nfilename'] . '.' . $ps['suffix'];
-      $file = file_save($file);
-      $result = reset(module_invoke_all('imager_modify', $file->fid));
-      $out['file_new'] = $result;
-    }
-    print json_encode($out);
+    $media->get('image')->setValue($this->image);
+    $image = $media->get('image')->getValue();
+    $thumb = $media->get('thumbnail')->getValue();
+
+    $media = ($data['overwrite'] == "true") ? $media : $media->createDuplicate();
+
+    $image[0]['target_id'] = $file->id();
+    $media->get('image')->setValue(($image));
+
+    $thumb[0]['target_id'] = $file->id();
+    $media->get('thumbnail')->setValue($thumb);
+
+    $media->get('changed')->setValue(REQUEST_TIME);
+
+    $media->save();
 
     $response = new AjaxResponse();
     return $response;

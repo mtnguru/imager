@@ -6,7 +6,8 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
-
+use Drupal\user\UserInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 /**
  * Implements hook_theme().
@@ -16,9 +17,6 @@ function imager_theme() {
     'imager_formatter' => array(
       'variables' => array('item' => NULL, 'item_attributes' => NULL, 'url' => NULL, 'image_style' => NULL),
       'file' => 'imager.field.inc',
-    ),
-    'imager_add_button' => array(
-      'var'
     ),
   );
 }
@@ -63,20 +61,6 @@ function imager_views_pre_view($view, $display_id, &$args) {
  * that will contain the Imager HTML.
  */
 function imager_page_alter(array &$page) {
-/*
-  global $_imager_enable;
-  // If the imager module has been enabled elsewhere, load and initialize it.
-  if (isset($_imager_enable)) {
-    module_load_include('inc', 'imager', 'imager.popups');
-    _imager_build_wrapper($page);
-  }
-  // If this is the Imager config page, load a little extra CSS.
-  if ($_GET['q'] == 'admin/config/media/imager') {
-    $page['content']['#attached']['css'] = array(
-      drupal_get_path('module', 'imager') . '/css/imager_admin.css',
-    );
-  }
-*/
 }
 
 /**
@@ -211,6 +195,7 @@ function imager_entity_info_alter(array &$entity_info) {
     'label' => t('Imager Map'),
     'custom settings' => TRUE,
   );
+  return;
 //$entity_info['file']['view modes']['media_imager_email'] = array(
 //  'label' => t('Imager Email'),
 //  'custom settings' => TRUE,
@@ -221,6 +206,32 @@ function imager_entity_info_alter(array &$entity_info) {
 //);
 }
 
+function imager_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
+  return;
+}
+
+/**
+ * Implements HOOK_node_view().
+ *
+ * @param array $build
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param $view_mode
+ */
+function imager_node_view_alter(array &$build, Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display) {
+  return;
+}
+/**
+ * Implements HOOK_user_view_alter().
+ *
+ * @param array $build
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param $view_mode
+ */
+function imager_user_view_alter(array &$build, UserInterface $account, EntityViewDisplayInterface $display) {
+  return;
+}
 /**
  * Implements hook_file_view_alter().
  *

@@ -79,6 +79,9 @@
         imager.attach();
         Drupal.imager.$wrapper = $(document.createElement('div')).attr('id', 'imager-wrapper');
         $('body').append(Drupal.imager.$wrapper);
+
+        var $busy = $(document.createElement('img')).attr('id', 'imager-busy').attr('src', basepath + 'modules/custom/imager/icons/busy.gif');
+        Drupal.imager.$wrapper.append($busy);
       };
 
       // Build thumbnail list and initializes event handlers on thumbnails.

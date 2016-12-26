@@ -206,6 +206,10 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
           'label' => 'Imager Formatter',
         ]);
         $elements[$delta]['#attached'] = $imager['#attached'];
+        $elements[$delta]['imager_busy'] = array(
+          '#type' => 'markup',
+          '#markup' => '<img alt="" id="imager-busy" src="' . $GLOBALS["base_url"] . '/' . drupal_get_path('module', 'imager') . '/icons/busy.gif" />',
+        );
       }
     }
 
