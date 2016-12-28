@@ -119,12 +119,14 @@
     // Load the popup using AJAX.
     popup.dialogCreate = function dialogCreate(response, $callingElement) {
       Drupal.imager.$wrapper.html(response['popupHtml']);
+
       popup.spec.$elem = $('#' + popup.spec.cssId);
       if (popup.spec.cssIdFinal) {
         popup.spec.$elem.removeClass(popup.spec.cssId).addClass(popup.spec.cssIdFinal);
       }
       var $elem = popup.spec.$elem;
-      $elem.dialog(popup.spec);
+      var $popup = $elem.dialog(popup.spec);
+      $popup.dialog('option', 'draggable', true);
       // Create the popup.
       popup.dialogOnCreate();
     };

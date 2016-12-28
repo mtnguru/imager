@@ -36,6 +36,19 @@ function imager_theme() {
  */
 function imager_form_media_image_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form['field_photographer']['widget'][0]['target_id']['#default_value'] = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  $form['#submit'][] = 'imager_form_media_image_form_submit';
+}
+
+/**
+ * 'media_image_form' submit function.
+ *
+ * If user did not set the image 'alt' field then set it from the Media name field.
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function imager_form_media_image_form_submit($form, FormStateInterface $form_state) {
+
   return;
 }
 

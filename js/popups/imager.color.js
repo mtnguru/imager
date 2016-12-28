@@ -54,7 +54,6 @@
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
-      popup.draggable();
     };
 
     popup.dialogOnOpen = function dialogOnOpen() {
@@ -91,6 +90,7 @@
     };
 
     popup.adjustColor = function adjustColor($cvssrc, $cvsdst) {
+      Popups.busy.show();
       hue = parseInt($('#slider-hue').val() * 100) / 100;
       saturation = parseInt($('#slider-saturation').val() * 100) / 9000;
       lightness = parseInt($('#slider-lightness').val() * 100) / 10000;
@@ -302,6 +302,7 @@
 
       }
       ctxdst.putImageData(dataDesc, 0, 0);
+      Popups.busy.hide();
     };
 
     popup.dialogReset = function dialogReset() {

@@ -161,6 +161,7 @@
      * @TODO Drupal probably has an API for this.
      */
     var ajaxProcess = function ajaxProcess($callingElement, url, postData, processFunc) {
+      Popups.$busy.show();
       postData['filePath'] = Drupal.imager.settings.filePath;
       $.ajax({
         type: 'POST',
@@ -203,8 +204,9 @@
               Popups.messages.dialogClose();
             }, 3000);
           }
-          Popups.$busy.hide();
           **/
+
+          Popups.$busy.hide();
         },
         error: function (evt) {
 /**       Popups.$busy.hide();

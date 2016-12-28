@@ -123,6 +123,12 @@
       return;
     };
 
+    /**
+     * Search thumbnail list for image with matching thumbnail path.
+     *
+     * @param srcThumb
+     * @returns {*}
+     */
     function findImageFromThumbSrc(srcThumb) {
       var i;
       for (i = 0; i < images.length; i++) {

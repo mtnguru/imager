@@ -33,6 +33,7 @@
     var dspec = $.extend({
       name: 'Brightness',
       autoOpen: false,
+      title: 'Brightness/Contrast',
       zIndex: 1015,
       width: 'auto',
       dialogClass: 'imager-dialog imager-brightness-dialog imager-noclose',

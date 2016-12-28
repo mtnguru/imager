@@ -115,10 +115,11 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
       $this->t('Configure Image Styles'),
       Url::fromRoute('entity.image_style.collection')
     );
+    $style = $this->getSetting('imager_style');
     $elements['imager_style'] = [
       '#title' => t('Image style'),
       '#type' => 'select',
-      '#default_value' => $this->getSetting('image_style'),
+      '#default_value' => ($style) ? $style : $this->defaultSettings()['imager_style'],
       '#empty_option' => t('None (original image)'),
       '#options' => $image_styles,
       '#description' => $description_link->toRenderable() + [
@@ -126,12 +127,12 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
       ],
     ];
 
-    $imager = $this->getSetting('imager_mode');
+    $mode = $this->getSetting('imager_mode');
     $elements['imager_mode'] = array(
       '#type' => 'select',
       '#options' => array("popup" => 'Popup', 'inplace' => 'In place'),
       '#title' => t('Imager mode'),
-      '#default_value' => ($imager) ? $imager : defaultSettings()['imager_mode'],
+      '#default_value' => ($mode) ? $mode : $this->defaultSettings()['imager_mode'],
       '#required' => TRUE,
     );
 
@@ -143,7 +144,8 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
    */
   public function settingsSummary() {
     $summary = array();
-    $summary[] = t('Imager: @imager', array('@imager' => $this->getSetting('imager_mode')));
+    $summary[] = t('Image style: @style', array('@style' => $this->getSetting('imager_style')));
+    $summary[] = t('Display mode: @mode', array('@mode' => $this->getSetting('imager_mode')));
 
     return $summary;
   }

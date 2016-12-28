@@ -11,9 +11,6 @@ use Drupal\imager\Ajax\ImagerCommand;
 
 use Drupal\file\Entity\File;
 
-
-// use Symfony\Component\Yaml\Yaml;
-
 /**
  * Class ImagerController.
  *
@@ -67,7 +64,6 @@ class ImagerController extends ControllerBase {
     return $fp;
   }
 
-
   /**
    * Write POSTed image to file path.
    *
@@ -113,38 +109,47 @@ class ImagerController extends ControllerBase {
   }
 
   /**
-   * Save an image file.
+   * Save an edited image into the current media entity or a new one.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function saveFile() {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $fp = $this->getFileParts(urldecode($data['uri']));
+    // Load the media entity.
     $media = \Drupal::entityTypeManager()->getStorage('media')->load($data['mid']);
 
+    $fp = $this->getFileParts(urldecode($data['uri']));
+
+    // Save the image, process through 'convert' command to reduce file size (quality).
     $tmpPath = file_directory_temp() . '/' . $fp['newfilename'] . '.' . $fp['extension'];
     $this->writeImage($tmpPath, $data['imgBase64']);
     $this->convertImage($tmpPath, $fp['newpath']);
     $file = File::create(['uri' => 'public://' . $fp['newfilename']]);
     $file->save();
 
+    // Initialize some variables.
     $media->get('image')->setValue($this->image);
     $image = $media->get('image')->getValue();
     $thumb = $media->get('thumbnail')->getValue();
 
     $media = ($data['overwrite'] == "true") ? $media : $media->createDuplicate();
 
+    // Set the primary image.
     $image[0]['target_id'] = $file->id();
     $media->get('image')->setValue(($image));
 
+    // Set the thumbnail.
     $thumb[0]['target_id'] = $file->id();
     $media->get('thumbnail')->setValue($thumb);
 
+    // Set the changed time to current time
     $media->get('changed')->setValue(REQUEST_TIME);
 
+    // Save the media entity
     $media->save();
 
+    // @TODO - return confirmation message.
     $response = new AjaxResponse();
     return $response;
   }

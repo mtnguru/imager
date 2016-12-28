@@ -10,6 +10,7 @@ imager-base:
     js/popups/imager.messages.js: {}
     js/popups/imager.status.js: {}
     js/popups/imager.viewer.js: {}
+    js/popups/imager.busy.js: {}
     js/lib/imgareaselect.min.js: {}
   css:
     component:
@@ -18,6 +19,7 @@ imager-base:
   dependencies:
     - core/drupal.ajax
     - core/jquery.ui.dialog
+    - core/jquery.ui.draggable
 
 imager-editor:
   js:

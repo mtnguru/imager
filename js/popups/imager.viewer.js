@@ -115,7 +115,7 @@
      *   New image to display of imageC.
      */
     var changeImage = function changeImage(newImage) {
-      Popups.$busy.show();
+      Popups.busy.show();
       // Set transform matrix to identity matrix.
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // Clear the canvas.
@@ -136,7 +136,7 @@
       }
       redraw();
       showInfo();
-      Popups.$busy.hide();
+      Popups.busy.hide();
     }, false);
 
 
@@ -252,7 +252,7 @@
      * Print image to web server.
      */
     var printImage = function printImage() {
-      Popups.$busy.hide();
+      Popups.busy.hide();
       var img = Drupal.imager.core.getImage('image-cropped', false);
       Drupal.imager.core.ajaxProcess(
         $('#file-print'),
@@ -290,7 +290,7 @@
     };
 
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
-      Popups.$busy.show();
+      Popups.busy.show();
       var $canvas3 = $(document.createElement('CANVAS'));
 
       $canvas2.attr({width: image.iw, height: image.ih});
@@ -304,7 +304,7 @@
 
       redraw();
       setEditMode('view');
-      Popups.$busy.hide();
+      Popups.busy.hide();
     };
 
     /**
@@ -374,7 +374,7 @@
      * Crop image.
      */
     var crop = function crop() {
-      Popups.$busy.show();
+      Popups.busy.show();
       var selection = ias.getSelection();
       pt_crop_ul.setPt(selection.x1, selection.y1, ctx);
       pt_crop_lr.setPt(selection.x2, selection.y2, ctx);
@@ -403,7 +403,7 @@
       ctx.scale(cw / niw, ch / nih);
       // Scale image to fit canvas.
       updateStatusGeometries();
-      Popups.$busy.hide();
+      Popups.busy.hide();
     };
 
     /**
@@ -1009,6 +1009,9 @@
     // Dialog handling functions.
     popup.dialogOnCreate = function dialogOnCreate() {
 
+      // Initialize the busy indicator
+      Popups.busy = Drupal.imager.popups.busyC();
+
       Drupal.imager.viewer.$canvas = $canvas = $('#imager-canvas');
       Drupal.imager.viewer.ctx = ctx = $canvas[0].getContext('2d');
       ias = $canvas.imgAreaSelect({
@@ -1161,7 +1164,7 @@
 
       // View Buttons.
       $('#view-browser').click(function () {
-        Popups.$busy.hide();
+        Popups.busy.hide();
         var img = Drupal.imager.core.getImage('image-cropped', false);
         Drupal.imager.core.ajaxProcess(
           this,
