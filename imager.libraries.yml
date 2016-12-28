@@ -12,6 +12,7 @@ imager-base:
     js/popups/imager.viewer.js: {}
     js/popups/imager.busy.js: {}
     js/lib/imgareaselect.min.js: {}
+    js/lib/fullscreen.js: {}
   css:
     component:
       css/imager.css: {}
