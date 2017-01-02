@@ -76,22 +76,17 @@ $color-disabled:      #888;
 
 .imager-viewer-dialog {
 
-  margin: 0px;
-  padding: 0px;
+//margin: 0px;
+//padding: 0px;
 
   #imager-viewer {
     background: $color-dark-bg;
     #imager-canvas-wrapper {
-      margin: 0px 0px 0px 3px;
-      padding: 0;
+//    margin: 0px 0px 0px 3px;
+//    padding: 0;
 
-      #imager-canvas-org {
-        display: none;
-      }
 
       #imager-canvas {
-        padding: 0;
-        margin: 0;
         border-radius: 3px;
       }
     }

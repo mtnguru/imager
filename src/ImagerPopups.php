@@ -26,11 +26,10 @@ class ImagerPopups {
             '#weight' => 0,
           ),
           'image_exit' => ImagerComponents::buildButton(1, 'image-exit', 'redx.png', t('Exit image popup')),
-          'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
           'image_left' => ImagerComponents::buildButton(3, 'image-left', 'left_arrow.png', t('View image to the left')),
           'image_right' => ImagerComponents::buildButton(4, 'image-right', 'right_arrow.png', t('View image to the right')),
         ),
-        'mode_buttons' => array(
+/*      'mode_buttons' => array(
           '#prefix' => '<div id="mode-buttons" class="buttons">',
           '#suffix' => '</div>',
           '#weight' => 2,
@@ -43,7 +42,7 @@ class ImagerPopups {
           ),
           'mode_view' => ImagerComponents::buildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
           'mode_configure' => ImagerComponents::buildButton(4, 'mode-configure', 'configure.png', t('Configure settings')),
-        ),
+        ), */
         'view_buttons' => array(
           '#prefix' => '<div id="view-buttons" class="buttons">',
           '#suffix' => '</div>',
@@ -55,9 +54,10 @@ class ImagerPopups {
             '#suffix' => '</div>',
             '#weight' => 0,
           ),
-          'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
-          'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
-          'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+//        'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
+//        'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
+//        'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+          'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
           'view_zoom_in' => ImagerComponents::buildButton(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
           'view_zoom_out' => ImagerComponents::buildButton(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
         ),
@@ -93,23 +93,23 @@ class ImagerPopups {
           // @TODO don't display if doesn't have permissions.
           'file_database' => ImagerComponents::buildButton(1, 'file-database', 'database_go.png', t('Save edited image to database')),
           // @TODO Don't display if doesn't have permissions.
-          'file_delete' => ImagerComponents::buildButton(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
+//        'file_delete' => ImagerComponents::buildButton(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
           'file_download' => ImagerComponents::buildButton(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
           // @TODO Don't display if not at appropriate IP addresses.
-          'file_print' => ImagerComponents::buildButton(4, 'file-print', 'print.png', t('Print Image')),
+//        'file_print' => ImagerComponents::buildButton(4, 'file-print', 'print.png', t('Print Image')),
         ),
         'debug_buttons' => array(
           '#prefix' => '<div id="debug-buttons" class="buttons">',
           '#suffix' => '</div>',
           '#weight' => -5,
-          'title' => array(
-            '#type' => 'markup',
-            '#markup' => t('Debug'),
-            '#prefix' => '<div>',
-            '#suffix' => '</div>',
-          ),
+//        'title' => array(
+//          '#type' => 'markup',
+//          '#markup' => t('Debug'),
+//          '#prefix' => '<div>',
+//          '#suffix' => '</div>',
+//        ),
           'debug_status' => ImagerComponents::buildButton(1, 'debug-status', 'bug.png', t('Toggle status output')),
-          'debug_messages' => ImagerComponents::buildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
+//        'debug_messages' => ImagerComponents::buildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
         ),
       ),
       'imager_canvas_wrapper' => array(

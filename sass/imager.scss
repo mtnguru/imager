@@ -50,29 +50,26 @@ $black: #000;
 }
 
 #imager-viewer {
-  overflow: auto;
-  padding: 2px;
+  overflow: none;
+  padding: 3px;
   button {
     background-color: $lightgrey;
   }
   #imager-canvas-wrapper {
-    float: left;
+    width: calc(100% - 35px);
+    display: inline-flex;
     position: relative;
+    padding-bottom: 0px;  // WTF, I would expect this to be zero!
+    #imager-image,
     #imager-canvas {
+      width: 100%;
       position: absolute;
-      top: 0;
-      right: 0;
-    }
-    #imager-canvas-org {
-//    display: hidden;
-    }
-    #imager-image {
-      position: absolute;
-      top: 0;
-      right: 0;
+      top: 0px;
+      right: 0px;
     }
   }
   #button-wrapper {
+    margin-right: 3px;
     float: left;
     div {
       text-align: center;
@@ -400,6 +397,10 @@ div#main {
 
 .imgareaselect-outer {
   z-index: 1011 !important;
+}
+
+.ui-button.ui-widget {
+  background: buttonface;
 }
 
 @import "imager_custom.scss";

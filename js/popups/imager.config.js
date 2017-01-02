@@ -90,7 +90,7 @@
         Popups.status.dialogClose();
       }
 
-      if ($('#imager-debug-messages').attr('checked')) {
+      if ($('#imager-debug-messages').checked) {
         localStorage.imagerDebugMessages = 'true';
         Popups.messages.dialogOpen();
       }
@@ -99,12 +99,7 @@
         Popups.messages.dialogClose();
       }
 
-      if ($('#imager-bounds-enable').attr('checked')) {
-        localStorage.imagerBoundsEnable = 'true';
-      }
-      else {
-        localStorage.imagerBoundsEnable = 'false';
-      }
+      localStorage.imagerBoundsEnable = ($('#imager-bounds-enable').checked) ? 'true' : 'false';
 
       localStorage.imagerPrinter = $('#imager-printer-select option:selected').text();
 

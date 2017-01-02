@@ -1,6 +1,8 @@
 /**
  * @file
  * Declare Imager module Viewer dialog - Drupal.imager.popups.viewerC.
+ *
+ * @TODO - Break this into smaller modules - viewer, editor, ??
  */
 
 /**
@@ -122,7 +124,7 @@
       ctx.clearRect(0, 0, cw, ch);
       image = newImage;
       doInit = true;
-      // Starts the loading, caught by 'load' listener.
+      // Start loading image - 'load' event listener (immediataely below) is fired on completion.
       img.src = image.src;
     };
 
@@ -144,7 +146,7 @@
      * Calculate canvas and image dimensions, reset variables, initialize transforms
      *
      * @TODO - When calculating the canvas dimensions the borders and padding must be
-     * accounted for.  Currently these are constants that look good with my theme.
+     * accounted for.  Currently these are constants are made to look good with my theme.
      */
     var initializeImage = function initializeImage() {
       var hscale;
@@ -153,10 +155,9 @@
       image.iw = img.width;
       image.ih = img.height;
       if (fullScreen) {
+        // Maximum canvas width and height.
         mw = $(window).width() - 45;
-        // Maximum canvas width.
         mh = $(window).height() - 10;
-        // Maximum canvas height.
         cw = mw;
         ch = mh;
         hscale = ch / image.ih;
@@ -164,10 +165,9 @@
         cscale = (hscale < vscale) ? hscale : vscale;
       }
       else {
+        // Maximum canvas width and height.
         mw = $(window).width() - 95;
-        // Maximum canvas width.
         mh = $(window).height() - 40;
-        // Maximum canvas height.
         calcCanvasDims(image.iw, image.ih);
         cscale = cw / image.iw;
       }
@@ -313,21 +313,18 @@
      * @param {number} deg - Number of degrees to rotate - 0, 90, 180, 270
      */
     var rotate = function rotate(deg) {
+      // Determine maximum canvas width and height
       mw = $(window).width() - 200;
-      // Maximum canvas width.
       mh = $(window).height() - 20;
-      // Maximum canvas height.
-      ctx.clearHistory();
       image.iw = img.width;
       image.ih = img.height;
       if (deg === 90) {
-        rotation = (rotation === 270) ? 0 : rotation += 90;
+        rotation = (rotation === 270) ? 0 : rotation + 90;
       }
-      else {
-        if (deg === -90) {
-          rotation = (rotation === 0) ? 270 : rotation -= 90;
-        }
+      else if (deg === -90) {
+        rotation = (rotation === 0) ? 270 : rotation - 90;
       }
+      ctx.clearHistory();
       Popups.status.dialogUpdate({rotation: rotation});
       if (rotation === 0 || rotation === 180) {
         calcCanvasDims(image.iw, image.ih);
@@ -459,7 +456,7 @@
         y: 0
       };
       if (localStorage.imagerBoundsEnable === 'false') {
-        return;
+        return npt;
       }
       var pw;
       var ph;
@@ -665,7 +662,7 @@
     function mouseWheel(evt) {
       setEditMode('view');
       var delta = -evt.detail ? evt.detail : 0;
-      delta = evt.wheelDelta ? evt.wheelDelta / 10 : delta;
+      delta = evt.wheelDelta ? evt.wheelDelta / 50 : delta;
       var y;
       var x = evt.offsetX || (evt.pageX - $canvas[0].offsetLeft);
       // @todo - pageY works intermittently
@@ -1141,24 +1138,29 @@
       $('#image-exit').click(function () {
         if (fullScreen) {
           screenfull.exit();
-          setFullScreen(false);
+//        setFullScreen(false);
         }
         else {
           hidePopups();
         }
       });
 
+      ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(function (e) {
+        document.addEventListener(e, function(event) {
+          setFullScreen((document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) ? true : false);
+        });
+      });
+
+      window.addEventListener('resize', function (event) {
+
+      });
+
       // Mode Buttons.
       $('#mode-fullscreen').click(function () {
         if (screenfull.enabled) {
-          // We can use `this` since we want the clicked element.
-          screenfull.toggle(Drupal.imager.$wrapper[0]);
-          if (fullScreen) {
-            setFullScreen(false);
-          }
-          else {
-            setFullScreen(true);
-          }
+          var $viewer = $('#imager-viewer');
+          screenfull.toggle($viewer[0]);
+//        setFullScreen(!fullScreen);
         }
       });
 
@@ -1238,31 +1240,28 @@
      *   The new mode.
      */
     function setFullScreen(newMode) {
-      if (newMode) {
-        fullScreen = true;
+      fullScreen = newMode;
+      if (fullScreen) {
         $('#imager-canvas-wrapper').addClass('fullscreen');
         $('#mode-fullscreen').addClass('checked');
       }
       else {
         $('#imager-canvas-wrapper').removeClass('fullscreen');
-        fullScreen = false;
         $('#mode-fullscreen').removeClass('checked');
       }
-      setTimeout(function () {
-        initializeImage();
-        redraw();
-      }, 250);
+      initializeImage();
+      redraw();
     }
 
-    /**
-     * Copy the canvas into the current IMG
-     *
-     * @return {viewerC} popup
-     */
-    Drupal.imager.viewer.copyCanvasToImg = function copyCanvasToImg() {
-      img.src = $canvas[0].toDataURL();
-      return popup;
-    };
+//  /**
+//   * Copy the canvas into the current IMG
+//   *
+//   * @return {viewerC} popup
+//   */
+//  Drupal.imager.viewer.copyCanvasToImg = function copyCanvasToImg() {
+//    img.src = $canvas[0].toDataURL();
+//    return popup;
+//  };
 
     /**
      * Return the <IMG> element containing the current image.
