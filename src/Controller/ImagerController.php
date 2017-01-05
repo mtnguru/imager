@@ -190,11 +190,11 @@ class ImagerController extends ControllerBase {
     return $response;
   }
 
-  static $popups = null;
   /**
    * Load one of the Imager dialogs.
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
+  static $popups = null;
   public function loadDialog() {
     $data = json_decode(file_get_contents("php://input"), true);
 
@@ -202,8 +202,12 @@ class ImagerController extends ControllerBase {
       self::$popups = new ImagerPopups();
     }
 
-    $build = self::$popups->build($data);
-    $data['popupHtml'] = render($build);
+    $dialog = self::$popups->build($data);
+    $data['content'] = render($dialog['content']);
+    if (!empty($dialog['buttonpane'])) {
+      $data['buttonpane'] = render($dialog['buttonpane']);
+    }
+    $data['id'] = $dialog['id'];
 
     $response = new AjaxResponse();
     $response->addCommand(new ImagerCommand($data));

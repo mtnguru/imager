@@ -34,23 +34,41 @@
 
     var dspec = $.extend({
       name: 'Color',
-      autoOpen: false,
       title: 'Hue/Saturation/Lightness',
       zIndex: 1015,
-      width: 'auto',
-      dialogClass: 'imager-dialog imager-color-dialog imager-noclose',
-      draggable: true,
       cssId: 'imager-color',
-      height: 'auto',
+      draggable: true,
       resizable: false,
       position: {
-        my: 'left',
-        at: 'right',
-        of: spec.$selectButton
+        left: '50px',
+        top: '150px'
       }
     }, spec);
     // Initialize the popup.
     popup = Popups.baseC(dspec);
+
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-color-apply':
+          Viewer.applyFilter(adjustColor);
+          break;
+
+        case 'imager-color-reset':
+          init();
+          $('#slider-hue').val(0);
+          $('#slider-saturation').val(0);
+          $('#slider-lightness').val(0);
+          adjustColor(Viewer.$canvas2, Viewer.$canvas);
+          break;
+
+        case 'imager-color-cancel':
+          Viewer.setEditMode('view');
+          Viewer.redraw();
+          popup.dialogClose();
+          popup.updateStatus();
+          break;
+      }
+    };
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
@@ -64,24 +82,24 @@
     popup.dialogOnClose = function dialogOnClose() {
     };
 
-    popup.init = function init() {
+    function init() {
       hue = 0;
       saturation = 0;
       lightness = 0;
       popup.updateStatus();
-    };
+    }
 
     popup.dialogInit = function dialogInit() {
-      popup.init();
+      init();
       if (popup.dialogIsOpen()) {
         $('#slider-hue').change(function () {
-          popup.adjustColor(Viewer.$canvas2, Viewer.$canvas);
+          adjustColor(Viewer.$canvas2, Viewer.$canvas);
         });
         $('#slider-saturation').change(function () {
-          popup.adjustColor(Viewer.$canvas2, Viewer.$canvas);
+          adjustColor(Viewer.$canvas2, Viewer.$canvas);
         });
         $('#slider-lightness').change(function () {
-          popup.adjustColor(Viewer.$canvas2, Viewer.$canvas);
+          adjustColor(Viewer.$canvas2, Viewer.$canvas);
         });
         $('#slider-hue').val(hue);
         $('#slider-saturation').val(saturation);
@@ -89,7 +107,7 @@
       }
     };
 
-    popup.adjustColor = function adjustColor($cvssrc, $cvsdst) {
+    function adjustColor($cvssrc, $cvsdst) {
       Popups.busy.show();
       hue = parseInt($('#slider-hue').val() * 100) / 100;
       saturation = parseInt($('#slider-saturation').val() * 100) / 9000;
@@ -305,20 +323,6 @@
       Popups.busy.hide();
     };
 
-    popup.dialogReset = function dialogReset() {
-      popup.init();
-      if (popup.dialogIsOpen()) {
-        $('#slider-hue').val(0);
-        $('#slider-saturation').val(0);
-        $('#slider-lightness').val(0);
-        popup.adjustColor(Viewer.$canvas2, Viewer.$canvas);
-      }
-    };
-
-    popup.dialogApply = function dialogApply() {
-      Viewer.applyFilter(popup.adjustColor);
-    };
-
     popup.dialogUpdate = function dialogUpdate() {
     };
 
@@ -330,12 +334,6 @@
       });
     };
 
-    // Dialog buttons are defined last to ensure methods are defined.
-    popup.spec['buttons'] = {
-      Apply: popup.dialogApply,
-      Reset: popup.dialogReset,
-      Cancel: popup.dialogClose
-    };
     return popup;
   };
 })(jQuery);

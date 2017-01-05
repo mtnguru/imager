@@ -7,70 +7,68 @@ use Drupal\imager\ImagerComponents;
 class ImagerPopups {
 
   private function buildViewer($config) {
-    $page = array(
-      '#prefix' => '<div id="imager-viewer">',
-      '#suffix' => '</div>',
-      'button_wrapper' => array(
+    $id = 'imager-viewer';
+    $content = [
+      'button_wrapper' => [
         '#prefix' => '<div id="button-wrapper">',
         '#suffix' => '</div>',
         '#weight' => 1,
-        'image_buttons' => array(
-          '#prefix' => '<div id="image-buttons" class="buttons">',
+        'image_buttons' => [
+          '#prefix' => '<div id="image-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => 1,
-          'title' => array(
+          'title' => [
             '#type' => 'markup',
             '#markup' => t('Image'),
             '#prefix' => '<div>',
             '#suffix' => '</div>',
             '#weight' => 0,
-          ),
+          ],
           'image_exit' => ImagerComponents::buildButton(1, 'image-exit', 'redx.png', t('Exit image popup')),
           'image_left' => ImagerComponents::buildButton(3, 'image-left', 'left_arrow.png', t('View image to the left')),
           'image_right' => ImagerComponents::buildButton(4, 'image-right', 'right_arrow.png', t('View image to the right')),
-        ),
-/*      'mode_buttons' => array(
-          '#prefix' => '<div id="mode-buttons" class="buttons">',
+        ],
+/*      'mode_buttons' => [
+          '#prefix' => '<div id="mode-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => 2,
-          'title' => array(
+          'title' => [
             '#type' => 'markup',
             '#markup' => t('Mode'),
             '#prefix' => '<div>',
             '#suffix' => '</div>',
             '#weight' => 0,
-          ),
+          ],
           'mode_view' => ImagerComponents::buildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
-          'mode_configure' => ImagerComponents::buildButton(4, 'mode-configure', 'configure.png', t('Configure settings')),
-        ), */
-        'view_buttons' => array(
-          '#prefix' => '<div id="view-buttons" class="buttons">',
+        ], */
+        'view_buttons' => [
+          '#prefix' => '<div id="view-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => 3,
-          'title' => array(
+          'title' => [
             '#type' => 'markup',
             '#markup' => t('View'),
             '#prefix' => '<div>',
             '#suffix' => '</div>',
             '#weight' => 0,
-          ),
+          ],
 //        'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
 //        'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
 //        'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
           'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
           'view_zoom_in' => ImagerComponents::buildButton(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
           'view_zoom_out' => ImagerComponents::buildButton(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
-        ),
-        'edit_buttons' => array(
-          '#prefix' => '<div id="edit-buttons" class="buttons">',
+        ],
+        'edit_buttons' => [
+          '#prefix' => '<div id="edit-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => 4,
-          'title' => array(
+          'title' => [
             '#type' => 'markup',
             '#markup' => t('Edit'),
             '#prefix' => '<div>',
             '#suffix' => '</div>',
-          ),
+          ],
           'mode_crop' => ImagerComponents::buildButton(1, 'mode-crop', 'frame.png', t('Start crop - select area to crop')),
           'edit_crop' => ImagerComponents::buildButton(2, 'edit-crop', 'scissors.png', t('Crop selected area')),
           'edit_brightness' => ImagerComponents::buildButton(3, 'edit-brightness', 'contrast.png', t('Edit brightness and contrast')),
@@ -79,63 +77,67 @@ class ImagerPopups {
           'edit_cw' => ImagerComponents::buildButton(6, 'edit-cw', 'rotate-right.png', t('Rotate image 90 degrees clockwise')),
 //        'edit-reset' does not work.  It must be used by another program.
           'view_reset' => ImagerComponents::buildButton(7, 'view-reset', 'reset.png', t('Reset the image back to the original')),
-        ),
-        'file_buttons' => array(
-          '#prefix' => '<div id="file-buttons" class="buttons">',
+        ],
+        'file_buttons' => [
+          '#prefix' => '<div id="file-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => 5,
-          'title' => array(
+          'title' => [
             '#type' => 'markup',
             '#markup' => t('File'),
             '#prefix' => '<div>',
             '#suffix' => '</div>',
-          ),
+          ],
           // @TODO don't display if doesn't have permissions.
-          'file_database' => ImagerComponents::buildButton(1, 'file-database', 'database_go.png', t('Save edited image to database')),
+          'file_save' => ImagerComponents::buildButton(1, 'file-save', 'database_go.png', t('Save edited image to database')),
           // @TODO Don't display if doesn't have permissions.
 //        'file_delete' => ImagerComponents::buildButton(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
           'file_download' => ImagerComponents::buildButton(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
           // @TODO Don't display if not at appropriate IP addresses.
 //        'file_print' => ImagerComponents::buildButton(4, 'file-print', 'print.png', t('Print Image')),
-        ),
-        'debug_buttons' => array(
-          '#prefix' => '<div id="debug-buttons" class="buttons">',
+          'mode_configure' => ImagerComponents::buildButton(4, 'mode-configure', 'configure.png', t('Configure settings')),
+        ],
+        'debug_buttons' => [
+          '#prefix' => '<div id="debug-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => -5,
-//        'title' => array(
+//        'title' => [
 //          '#type' => 'markup',
 //          '#markup' => t('Debug'),
 //          '#prefix' => '<div>',
 //          '#suffix' => '</div>',
-//        ),
+//        ],
           'debug_status' => ImagerComponents::buildButton(1, 'debug-status', 'bug.png', t('Toggle status output')),
 //        'debug_messages' => ImagerComponents::buildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
-        ),
-      ),
-      'imager_canvas_wrapper' => array(
+        ],
+      ],
+      'imager_canvas_wrapper' => [
         '#prefix' => '<div id="imager-canvas-wrapper">',
         '#suffix' => '</div>',
         '#weight' => 2,
-        'imager_canvas' => array(
+        'imager_canvas' => [
           '#weight' => 1,
           '#markup' => '<canvas id="imager-canvas"></canvas>',
           '#allowed_tags' => ['canvas'],
-        ),
-        'imager_image' => array(
+        ],
+        'imager_image' => [
           '#type' => 'markup',
           '#weight' => 2,
           '#markup' => '<img id="imager-image" src="'
             . $GLOBALS["base_url"] . '/' . drupal_get_path('module', 'imager') . '/icons/transparent.png'
             . '" alt="" title="" />',
-        ),
-        'imager_canvas2' => array(
+        ],
+        'imager_canvas2' => [
           '#weight' => 3,
           '#markup' => '<canvas id="imager-canvas2"></canvas>',
           '#allowed_tags' => ['canvas'],
-        ),
-      ),
-    );
-    return $page;
+        ],
+      ],
+    ];
+    return [
+      'content' => $content,
+      'id' => $id,
+    ];
   }
 
   /**
@@ -145,58 +147,54 @@ class ImagerPopups {
    *   Render array for Hue/Saturation/Lightness dialog.
    */
   private function buildColor($config) {
-    $page = array(
-      '#prefix' => '<div id="imager-color">',
-      '#suffix' => '</div>',
-      'content' => array(
-        '#prefix' => '<div id="imager-color-content" class="imager-content">',
-        '#suffix' => '</div>',
-        '#allowed_tags' => ['input'],
-        'table' => array(
-          '#theme' => 'table',
-          '#attributes' => array('class' => 'table-no-striping'),
-          '#rows' => array(
-            array(
-              'no_striping' => TRUE,
-              'data' => array(
-                t('Hue'),
-                array(
-                  'data' => array(
-                    '#markup' => '<input id="slider-hue" class="slider" type="range" min="-100" max="100" step="1" />',
-                    '#allowed_tags' => ['input'],
-                  ),
-                ),
-              ),
-            ),
-            array(
-              'no_striping' => TRUE,
-              'data' => array(
-                t('Saturation'),
-                array(
-                  'data' => array(
-                    '#markup' => '<input id="slider-saturation" class="slider" type="range" min="-100" max="100" step="1" />',
-                    '#allowed_tags' => ['input'],
-                  ),
-                ),
-              ),
-            ),
-            array(
-              'no_striping' => TRUE,
-              'data' => array(
-                t('Lightness'),
-                array(
-                  'data' => array(
-                    '#markup' => '<input id="slider-lightness"  class="slider" type="range" min="-100" max="100" step="1" />',
-                    '#allowed_tags' => ['input'],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    return $page;
+    $id = 'imager-color';
+    $content = [
+      '#theme' => 'table',
+      '#attributes' => ['class' => 'table-no-striping'],
+      '#rows' => [
+        [
+          'no_striping' => TRUE,
+          'data' => [
+            t('Hue'),
+            [
+              'data' => [
+                '#markup' => '<input id="slider-hue" class="imager-slider" type="range" min="-100" max="100" step="1" />',
+                '#allowed_tags' => ['input'],
+              ],
+            ],
+          ],
+        ],
+        [
+          'no_striping' => TRUE,
+          'data' => [
+            t('Saturation'),
+            [
+              'data' => [
+                '#markup' => '<input id="slider-saturation" class="imager-slider" type="range" min="-100" max="100" step="1" />',
+                '#allowed_tags' => ['input'],
+              ],
+            ],
+          ],
+        ],
+        [
+          'no_striping' => TRUE,
+          'data' => [
+            t('Lightness'),
+            [
+              'data' => [
+                '#markup' => '<input id="slider-lightness"  class="imager-slider" type="range" min="-100" max="100" step="1" />',
+                '#allowed_tags' => ['input'],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    return [
+      'content' => $content,
+      'buttons' => ['Cancel', 'Reset', 'Apply'],
+      'id' => $id,
+    ];
   }
 
 
@@ -207,45 +205,42 @@ class ImagerPopups {
  *   Render array for brightness/contrast slider.
  */
   private function buildBrightness($config) {
-    $page = array(
-      '#prefix' => '<div id="imager-brightness">',
-      '#suffix' => '</div>',
-      'content' => array(
-        '#prefix' => '<div id="imager-brightness-content" class="imager-content">',
-        '#suffix' => '</div>',
-        'table' => array(
-          '#theme' => 'table',
-          '#attributes' => array('class' => 'table-no-striping'),
-          '#rows' => array(
-            array(
-              'no_striping' => TRUE,
-              'data' => array(
-                t('Brightness'),
-                array(
-                  'data' => array(
-                    '#markup' => '<input id="slider-brightness" class="slider" type="range" min="-100" max="100" step="1" />',
-                    '#allowed_tags' => ['input'],
-                  ),
-                ),
-              ),
-            ),
-            array(
-              'no_striping' => TRUE,
-              'data' => array(
-                t('Contrast'),
-                array(
-                  'data' => array(
-                    '#markup' => '<input id="slider-contrast"   class="slider" type="range" min="-100" max="100" step="1" />',
-                    '#allowed_tags' => ['input'],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    return $page;
+    $id = 'imager-brightness';
+    $content = [
+      '#theme' => 'table',
+      '#attributes' => ['class' => 'table-no-striping'],
+      '#rows' => [
+        [
+          'no_striping' => TRUE,
+          'data' => [
+            t('Brightness'),
+            [
+              'data' => [
+                '#markup' => '<input id="slider-brightness" class="imager-slider" type="range" min="-100" max="100" step="1" />',
+                '#allowed_tags' => ['input'],
+              ],
+            ],
+          ],
+        ],
+        [
+          'no_striping' => TRUE,
+          'data' => [
+            t('Contrast'),
+            [
+              'data' => [
+                '#markup' => '<input id="slider-contrast"   class="imager-slider" type="range" min="-100" max="100" step="1" />',
+                '#allowed_tags' => ['input'],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    return [
+      'content' => $content,
+      'buttons' => ['Cancel', 'Reset', 'Apply'],
+      'id' => $id,
+    ];
   }
 
   /**
@@ -255,301 +250,312 @@ class ImagerPopups {
    *   Render array for Imager status dialog.
    */
   private function buildStatus($config) {
-    $page = array(
-      '#prefix' => '<div id="imager-status">',
+    $id = 'imager-status';
+    $content = [
+      '#prefix' => '<div id="' . $id . '">',
       '#suffix' => '</div>',
-      'content' => array(
-        '#attributes' => array('id' => array('imager-status-content')),
+      'content' => [
+        '#attributes' => ['id' => ['imager-status-content']],
         '#weight' => 1,
         '#type' => 'container',
-        'col_left' => array(
+        'col_left' => [
           '#type' => 'container',
-          '#attributes' => array('class' => array('imager-status-col')),
-          'table_general' => array(
+          '#attributes' => [
+            'class' => ['imager-status-col'],
+            'id' => 'imager-status-col-1',
+          ],
+          'table_general' => [
             '#type' => 'table',
             '#theme' => 'table',
-            '#header' => array(
+            '#header' => [
               t('Name'),
               t('Value'),
-            ),
-            '#rows' => array(
-              array(
+            ],
+            '#rows' => [
+              [
                 'Edit Mode',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-edit-mode',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Full Screen',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-full-screen',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Distance',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-distance',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Elapsed',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-elapsed',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Zoom',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-zoom',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Rotation',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-rotation',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Brightness',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-brightness',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Contrast',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-contrast',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Hue',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-hue',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Saturation',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-saturation',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Lightness',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-lightness',
-                ),
-              ),
-            ),
-          ),
-        ),
-        'col_right' => array(
+                ],
+              ],
+            ],
+          ],
+        ],
+        'col_right' => [
           '#type' => 'container',
-          '#attributes' => array('class' => array('imager-status-col')),
-          'table_geometries' => array(
+          '#attributes' => [
+            'class' => ['imager-status-col'],
+            'id' => 'imager-status-col-2',
+          ],
+          'table_geometries' => [
             '#type' => 'table',
             '#theme' => 'table',
-            '#header' => array(
+            '#header' => [
               t('Name'),
               t('Width'),
               t('Value'),
-            ),
-            '#rows' => array(
-              array(
+            ],
+            '#rows' => [
+              [
                 'Maximum Canvas',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-max-canvas-width',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-max-canvas-height',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Actual Canvas',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-actual-canvas-width',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-actual-canvas-height',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Displayed Image',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-disp-image-width',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-disp-image-height',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Full Image',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-full-image-width',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-full-image-height',
-                ),
-              ),
-            ),
-          ),
-          'table_points' => array(
+                ],
+              ],
+            ],
+          ],
+          'table_points' => [
             '#type' => 'table',
             '#title' => 'Points',
             '#theme' => 'table',
-            '#header' => array(
+            '#header' => [
               t('Name'),
               t('X'),
               t('Y'),
-            ),
-            '#rows' => array(
-              array(
+            ],
+            '#rows' => [
+              [
                 'Mouse Now',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-now-x',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-now-y',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Mouse Now Tx',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-now-x-tx',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-now-y-tx',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Mouse Down',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-down-x',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-down-y',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Mouse Down Tx',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-down-x-tx',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-down-y-tx',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Crop Upper Left',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-crop-ul-x',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-crop-ul-y',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Crop Lower Right',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-crop-lr-x',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-crop-lr-y',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Upper Left Canvas',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-canvas-ul-x',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-canvas-ul-y',
-                ),
-              ),
-              array(
+                ],
+              ],
+              [
                 'Lower Right Canvas',
-                array(
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-canvas-lr-x',
-                ),
-                array(
+                ],
+                [
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-canvas-lr-y',
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    return $page;
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    return [
+      'content' => $content,
+      'buttons' => ['Close'],
+      'id' => $id,
+    ];
   }
 
   /**
@@ -558,65 +564,47 @@ class ImagerPopups {
    * @return array
    *    Render array for configuration dialog.
    */
-  function buildConfiguration() {
+  function buildConfig() {
 //  $printers = array();
 //  $handle = popen(variable_get('imager_printer_search'), 'r');
 //  while (($line = fgets($handle)) !== FALSE) {
 //    $printers[] = rtrim($line, "\n");
 //  }
 //  pclose($handle);
-
-    $page = array(
-      '#prefix' => '<div id="imager-config">',
-      '#suffix' => '</div>',
-      'content' => array(
-        '#prefix' => '<div id="imager-config-content" class="imager-content">',
-        '#suffix' => '</div>',
-        '#weight' => 1,
-//      'description' => array(
-//        '#type' => 'markup',
-//        '#markup' => '<p><em>Settings are specific to the browser.</em></p>',
-//      ),
-        'viewer' => array(
-          '#type' => 'fieldset',
-          '#title' => 'Image Viewer',
-          'imager_bounds_enable' => array(
-            '#type' => 'checkbox',
-            '#title' => t('Enable Bounds limiting'),
-            '#description' => t('Prevents image from zooming smaller than the viewing area and from being panned (dragged) offscreen.'),
-            '#attributes' => array('id' => 'imager-bounds-enable'),
-          ),
-        ),
-//      'printer' => array(
-//        '#type' => 'fieldset',
-//        '#title' => 'Printer',
-//        'imager_printer_select' => array(
-//          '#type' => 'select',
-//          '#title' => t('Select a printer'),
-//          '#default_value' => '',
-//          '#options' => $printers,
-//          '#attributes' => array('id' => 'imager-printer-select'),
-//        ),
-//      ),
-        'debug' => array(
-          '#type' => 'fieldset',
-          '#title' => 'Debug',
-          'imager_debug_status' => array(
-            '#type' => 'checkbox',
-            '#title' => t('Display Status'),
-            '#description' => t('Display current state of variables.'),
-            '#attributes' => array('id' => 'imager-debug-status'),
-          ),
-          'imager_debug_messages' => array(
-            '#type' => 'checkbox',
-            '#title' => t('Display Messages'),
-            '#description' => t('Display messages involving AJAX communications and debug messages.'),
-            '#attributes' => array('id' => 'imager-debug-messages'),
-          ),
-        ),
-      ),
-    );
-    return $page;
+    $id = 'imager-config';
+    $content = [
+      '#weight' => 1,
+      'viewer' => [
+        '#type' => 'fieldset',
+        '#title' => 'Image Viewer',
+        'imager_bounds_enable' => [
+          '#type' => 'checkbox',
+          '#title' => t('Enable Bounds limiting'),
+          '#description' => t('Prevents image from zooming smaller than the viewing area and from being panned (dragged) offscreen.'),
+          '#attributes' => ['id' => 'imager-bounds-enable'],
+        ],
+      ],
+      'debug' => [
+        '#type' => 'fieldset',
+        '#title' => 'Debug',
+        'imager_debug_status' => [
+          '#type' => 'checkbox',
+          '#title' => t('Display Status'),
+          '#description' => t('Display current state of variables.'),
+          '#attributes' => ['id' => 'imager-debug-status'],
+        ],
+        'imager_debug_messages' => [
+          '#title' => t('Display Messages'),
+          '#description' => t('Display messages involving AJAX communications and debug messages.'),
+          '#attributes' => ['id' => 'imager-debug-messages'],
+        ],
+      ],
+    ];
+    return [
+      'content' => $content,
+      'buttons' => ['Cancel', 'Apply'],
+      'id' => $id,
+    ];
   }
 
   /**
@@ -626,29 +614,28 @@ class ImagerPopups {
    *    Render array for filesave dialog
    */
   private function buildFilesave($config) {
-    $page = array(
-      '#prefix' => '<div id="imager-filesave">',
-      '#suffix' => '</div>',
-      'content' => array(
-        '#prefix' => '<div id="imager-filesave-content" class="imager-content">',
+    $id = 'imager-filesave';
+    $content = [
+      'messages' => [
+        '#weight' => 2,
+        '#prefix' => '<div id="imager-filesave-messages">',
         '#suffix' => '</div>',
-        'messages' => array(
-          '#weight' => 2,
-          '#prefix' => '<div id="imager-filesave-messages">',
-          '#suffix' => '</div>',
-        ),
-        'table' => $this->buildResolutionTable(3),
-        'filename' => array(
-          '#weight' => 4,
-          '#prefix' => '<div id="imager-filesave-filename-container">',
-          '#suffix' => '</div>',
-          '#type' => 'markup',
-          '#markup' => "<span>" . t('File name:') . "</span><input id='imager-filesave-filename' type='text' />",
-          '#allowed_tags' => ['span', 'input'],
-        ),
-      ),
-    );
-    return $page;
+      ],
+      'table' => $this->buildResolutionTable(3),
+      'filename' => [
+        '#weight' => 4,
+        '#prefix' => '<div id="imager-filesave-filename-container">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => "<span>" . t('File name:') . "</span><input id='imager-filesave-filename' type='text' />",
+        '#allowed_tags' => ['span', 'input'],
+      ],
+    ];
+    return [
+      'content' => $content,
+      'buttons' => ['Cancel', 'Overwrite', 'New image', 'Download image'],
+      'id' => $id,
+    ];
   }
 
   /**
@@ -661,74 +648,92 @@ class ImagerPopups {
    *   Render array for image resolution selection table.
    */
   private function buildResolutionTable($weight) {
-    $page = array(
+    $build = [
       '#weight' => $weight,
       '#type' => 'table',
-      '#attributes' => array('class' => array('table-no-striping')),
+      '#attributes' => ['class' => ['table-no-striping']],
       '#theme' => 'table',
-      '#header' => array(
+      '#header' => [
         t(''),
         t('Image'),
         t('Resolution'),
         t('Geometry'),
-        t('Ratio'),
-      ),
+//      t('Ratio'),
+      ],
       '#sticky' => FALSE,
-      '#rows' => array(
-        array(
+      '#rows' => [
+        [
           'no_striping' => TRUE,
-          'data' => array(
-            array(
-              'data' => array(
+          'data' => [
+            [
+              'data' => [
                 '#markup' => '<input type="radio" name="resolution" value="screen" />',
                 '#allowed_tags' => ['input'],
-              ),
-            ),
+              ],
+            ],
             t('Displayed'),
             t('Screen'),
-            array('id' => 'canvas-resolution'),
-            array('id' => 'scale', 'rowspan' => 2),
-          ),
-        ),
-        array(
+            ['id' => 'canvas-resolution'],
+//          ['id' => 'scale', 'rowspan' => 2],
+          ],
+        ],
+        [
           'no_striping' => TRUE,
-          'data' => array(
-            array(
-              'data' => array(
+          'data' => [
+            [
+              'data' => [
                 '#markup' => '<input type="radio" name="resolution" value="image-cropped" checked="checked" />',
                 '#allowed_tags' => ['input'],
-              ),
-            ),
+              ],
+            ],
             t('Displayed'),
             t('Image'),
-            array('id' => 'image-display-resolution'),
-          ),
-        ),
-        array(
+            ['id' => 'image-display-resolution'],
+          ],
+        ],
+        [
           'no_striping' => TRUE,
-          'data' => array(
-            array(
-              'data' => array(
+          'data' => [
+            [
+              'data' => [
                 '#markup' => '<input type="radio" name="resolution" value="image-full" />',
                 '#allowed_tags' => ['input'],
-              ),
-            ),
+              ],
+            ],
             t('Full'),
             t('Image'),
-            array('id' => 'image-full-resolution'),
-          ),
-        ),
-      ),
-    );
-    return $page;
+            ['id' => 'image-full-resolution'],
+          ],
+        ],
+      ],
+    ];
+    return $build;
   }
-
-
-
 
   public function build($config) {
     $func = 'build' . $config['popupName'];
-    return $this->$func($config);
+
+    // Define the dialog contents
+    $build = $this->$func($config);
+
+    // If the dialog has buttons than create them.
+    if ($build['buttons']) {
+      $build['buttonpane'] = [
+        '#type' => 'container',
+      ];
+      foreach ($build['buttons'] as $name) {
+        $build['buttonpane'][$name] = [
+          '#type' => 'button',
+          '#value' => $name,
+          '#attributes' => [
+            'class' => ['imager-button'],
+            'id' => 'imager-' . strtolower($config['popupName']) . '-' . str_replace(' ', '-', strtolower($name)),
+          ],
+        ];
+      }
+    }
+
+    return $build;
   }
 }
 

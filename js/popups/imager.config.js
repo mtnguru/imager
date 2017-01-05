@@ -34,22 +34,29 @@
     var popup;
 
     var dspec = $.extend({
-      name: 'Configuration',
-      autoOpen: false,
+      name: 'Config',
       title: 'Imager Configuration',
       zIndex: 1015,
-      width: 'auto',
       dialogClass: 'imager-dialog imager-config-dialog',
       cssId: 'imager-config',
-      height: 'auto',
       position: {
-        my: 'left',
-        at: 'right',
-        of: spec.$selectButton
+        left: '50px',
+        top: '200px',
       }
     }, spec);
     // Initialize the dialog.
     popup = Popups.baseC(dspec);
+
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-config-apply':
+          break;
+
+        case 'imager-config-cancel':
+          popup.dialogClose();
+          break;
+      }
+    };
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
@@ -66,13 +73,13 @@
      * Initialize checkboxes from localStorage.
      */
     popup.dialogInit = function dialogInit() {
-      if (localStorage.imagerBoundsEnable === 'true') {
+      if (localStorage.imagerBoundsEnable === 'TRUE') {
         $('#imager-bounds-enable').attr('checked', 'checked');
       }
-      if (localStorage.imagerDebugStatus === 'true') {
+      if (localStorage.imagerDebugStatus === 'TRUE') {
         $('#imager-debug-status').attr('checked', 'checked');
       }
-      if (localStorage.imagerDebugMessages === 'true') {
+      if (localStorage.imagerDebugMessages === 'TRUE') {
         $('#imager-debug-messages').attr('checked', 'checked');
       }
     };
@@ -82,24 +89,24 @@
      */
     popup.dialogSave = function dialogSave() {
       if ($('#imager-debug-status').attr('checked')) {
-        localStorage.imagerDebugStatus = 'true';
+        localStorage.imagerDebugStatus = 'TRUE';
         Popups.status.dialogOpen();
       }
       else {
-        localStorage.imagerDebugStatus = 'false';
+        localStorage.imagerDebugStatus = 'FALSE';
         Popups.status.dialogClose();
       }
 
       if ($('#imager-debug-messages').checked) {
-        localStorage.imagerDebugMessages = 'true';
+        localStorage.imagerDebugMessages = 'TRUE';
         Popups.messages.dialogOpen();
       }
       else {
-        localStorage.imagerDebugMessages = 'false';
+        localStorage.imagerDebugMessages = 'FALSE';
         Popups.messages.dialogClose();
       }
 
-      localStorage.imagerBoundsEnable = ($('#imager-bounds-enable').checked) ? 'true' : 'false';
+      localStorage.imagerBoundsEnable = ($('#imager-bounds-enable').checked) ? 'TRUE' : 'FALSE';
 
       localStorage.imagerPrinter = $('#imager-printer-select option:selected').text();
 

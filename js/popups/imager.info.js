@@ -20,8 +20,8 @@
 (function ($) {
   'use strict';
 
-  if (localStorage.getItem('imagerShowInfo') === null) {
-    localStorage.setItem('imagerShowInfo', false);
+  if (localStorage.imagerShowInfo === null) {
+    localStorage.imagerShowInfo = 'FALSE';
   }
 
   /**
@@ -77,11 +77,11 @@
 
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
-      localStorage.imagerShowInfo = 'true';
+      focalStorage.imagerShowInfo = 'TRUE';
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerShowInfo = 'false';
+      localStorage.imagerShowInfo = 'FALSE';
     };
 
     /**

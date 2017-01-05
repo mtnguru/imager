@@ -36,18 +36,14 @@
 
     var dspec = $.extend({
       name: 'Filesave',
-      autoOpen: false,
       title: 'Save edited image to database',
       zIndex: 1015,
-      width: 'auto',
-      dialogClass: 'imager-dialog imager-filesave-dialog imager-noclose',
       cssId: 'imager-filesave',
-      height: 'auto',
+      draggable: true,
       resizable: false,
       position: {
-        my: 'left',
-        at: 'right',
-        of: $('#file-database')
+        left: '50px',
+        top: '150px'
       }
     }, spec);
     // Initialize the popup.
@@ -123,33 +119,6 @@
        //    w.document.body.appendChild(a); */
     };
 
-    var email = function email() {
-      Popups.$busy.show();
-      var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
-      Popups.$busy.hide();
-      popup.dialogClose();
-      Core.ajaxProcess(
-        this,
-        Drupal.imager.settings.actions.emailFile.url,
-        {
-          action: 'email',
-          saveMode: popup.settings.saveMode,
-          uri: Viewer.getImage().src,
-          imgBase64: img
-        }, function (response) {
-          var address = '';
-          var path = response['data']['attachPath'];
-          var subject = response['data']['subject'];
-          var mailto_link = 'mailto:' + address +
-            '?subject=' + encodeURIComponent(subject) +
-            '&body=simple&attachment=' + path + '';
-
-          alert('mailit dude:' + mailto_link);
-          window.location.href = mailto_link;
-        }
-      );
-    };
-
     var clipboard = function clipboard() {
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
@@ -166,18 +135,52 @@
       popup.dialogClose();
     };
 
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-color-apply':
+          break;
+
+        case 'imager-color-reset':
+          popup.init();
+          if (popup.dialogIsOpen()) {
+            $('#slider-hue').val(0);
+            $('#slider-saturation').val(0);
+            $('#slider-lightness').val(0);
+            adjustColor(Viewer.$canvas2, Viewer.$canvas);
+          }
+          break;
+
+        case 'imager-color-cancel':
+          popup.dialogClose();
+          break;
+      }
+    };
+
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-filesave-new-image':
+          break;
+
+        case 'imager-filesave-overwrite':
+          break;
+
+        case 'imager-filesave-download-image-image':
+          break;
+
+        case 'imager-filesave-cancel':
+          popup.dialogClose();
+          break;
+      }
+    };
+
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
     };
 
     popup.dialogOnClose = function dialogOnClose() {
       switch (popup.settings.saveMode) {
-        case 'database':
-          $('#file-database').removeClass('checked');
-          break;
-
-        case 'email':
-          $('#file-email').removeClass('checked');
+        case 'save':
+          $('#file-save').removeClass('checked');
           break;
 
         case 'download':
@@ -197,53 +200,26 @@
       Viewer.setEditMode(popup.settings.saveMode);
       var src = Drupal.imager.viewer.getImage().src;
       var filename = decodeURIComponent(src.substring(src.lastIndexOf('/') + 1));
-      $('#imager-filesave #imager-filesave-filename').show().val(filename);
-      $('#imager-filesave #imager-filesave-messages').hide();
+      popup.$wrapper.find('#imager-filesave-filename').show().val(filename);
+//    popup.$wrapper.find('#imager-filesave #imager-filesave-messages').hide();
       initTable();
       switch (popup.settings.saveMode) {
-        case 'database':
-          popup.spec.$elem.dialog({
-            title: 'Save image to Database',
-            buttons: {
-              'New Image': function () {
-                database(false);
-              },
-              'Overwrite': function () {
-                database(true);
-              },
-              'Cancel': popup.dialogClose
-            }
-          });
-          break;
-
-        case 'email':
-          popup.spec.$elem.dialog({
-            title: 'Send image to Email',
-            buttons: {
-              'Send in Email': email,
-              'Cancel': popup.dialogClose
-            }
-          });
+        case 'save':
+          popup.$title.html('Save image to Database');
+          $('#imager-filesave-new-image').show();
+          $('#imager-filesave-overwrite').show();
+          $('#imager-filesave-download-image').hide();
           break;
 
         case 'download':
-          popup.spec.$elem.dialog({
-            title: 'Download Image',
-            buttons: {
-              'Download Image': download,
-              'Cancel': popup.dialogClose
-            }
-          });
+          popup.$title.html('Download image');
+          $('#imager-filesave-new-image').hide();
+          $('#imager-filesave-overwrite').hide();
+          $('#imager-filesave-download-image').show();
           break;
 
         case 'clipboard':
-          popup.spec.$elem.dialog({
-            title: 'Send image to Clipboard',
-            buttons: {
-              Clipboard: clipboard,
-              Cancel: popup.dialogClose
-            }
-          });
+          popup.$title.html('Send image to Clipboard');
           break;
       }
     };

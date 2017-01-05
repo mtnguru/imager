@@ -19,8 +19,8 @@
 (function ($) {
   'use strict';
 
-  if (localStorage.getItem('imagerDebugStatus') === null) {
-    localStorage.setItem('imagerDebugStatus', false);
+  if (localStorage.imagerDebugStatus === null) {
+    localStorage.imagerDebugStatus = 'FALSE';
   }
 
   /**
@@ -40,41 +40,37 @@
 
     var dspec = $.extend({
       name: 'Status',
-      autoOpen: false,
       title: 'Imager Status',
       zIndex: 1015,
-      width: 'auto',
       dialogClass: 'imager-dialog imager-status-dialog',
       cssId: 'imager-status',
-      height: 'auto',
-      resize: 'auto',
-      resizable: true,
-      open: function () {
-        var closeBtn = $('.ui-dialog-titlebar-close');
-        closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span>');
-      },
-      position: {
-        my: 'right bottom',
-        at: 'right bottom',
-        of: spec.$selectButton
-      }
+      resizable: false,
+      draggable: true,
     }, spec);
     // Initialize the popup.
     popup = Popups.baseC(dspec);
+
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-status-close':
+          popup.dialogClose();
+          break;
+      }
+    };
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
     };
 
     popup.dialogOnOpen = function dialogOnOpen() {
-      localStorage.imagerDebugStatus = 'true';
+      localStorage.imagerDebugStatus = 'TRUE';
       Viewer.updateStatus();
       Popups.brightness.updateStatus();
       Popups.color.updateStatus();
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerDebugStatus = 'false';
+      localStorage.imagerDebugStatus = 'FALSE';
     };
 
     popup.dialogInit = function dialogInit() {

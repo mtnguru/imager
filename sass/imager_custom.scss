@@ -1,370 +1,124 @@
-
 /* @file
  * imager.sass
  */
 
-$color-table-bg:      #585;
-$color-title-fg:      #ffffbb;
-$color-title-bg:      #464;
-$color-title-dark-bg: #541;
-$color-light-bg:      #ffd;
-$color-light-alt-bg:  #f5a;
-$color-dark-bg:       #405040;
-$color-dark-alt-bg:   #431;
-$color-status-bg:     #602005;
-$color-edit-bg:       #431;
-$color-map-bg:        #330000;
-$color-filesave-bg:   #efe;
+$color-content-bg: #f1f1f0;
+$color-viewer-bg: #3d4e78;
+$color-table-bg: #f1f1f0;
+$color-table-header-bg: #3d4e78;
+$color-button-bg: #f1f1f0;
+$color-button-checked-bg: #acacff;
+$color-title-bg: #c1d0e7;
+$color-buttonpane-bg: #c1d0e7;
+$color-table-header-bg: #5f80b6;
+$color-table-data-bg: #c1d0e7;
+$radius-outer: 6px;
+$radius-inner: 4px;
+$radius-button: 2px;
 
-$color-error:         #330000;
-$color-disabled:      #888;
+#imager-wrapper {
 
-@mixin pi-border($radius,$shadow,$color) {
-  border: solid 1px lighten(adjust-hue($color,0deg),50%);
-  background-color: $color;
-//box-shadow: 0px 0px 4px 3px lighten(adjust-hue($color,20deg),30%), 0px 0px 3px 2px lighten(adjust-hue($color,-20deg),30%) inset;
-  border-radius: $radius;
-}
+  .imager-popup {
+    border-radius: $radius-outer;
+  }
+  .imager-title {
+    background-color: $color-title-bg;
+    border-radius: $radius-outer $radius-outer 0 0;
+  }
 
-.imager-dialog {
+  .imager-content {
+    background-color: $color-content-bg;
+  }
+
+  .imager-buttonpane {
+    background-color: $color-buttonpane-bg;
+    border-radius: 0 0 $radius-outer $radius-outer;
+    input.button {
+    }
+  }
+
+  .imager-button {
+    border-radius: $radius-inner;
+  }
+
+  .imager-slider {
+    border-radius: $radius-inner;
+    height: 2em;
+  }
+
   table {
-    margin-top: 0;
-    border: 0px;
-    border-radius: 5px;
-    border-spacing: 3px;
+    border-radius: $radius-outer;
     border-collapse: separate;
-    background-color: $color-table-bg;
-
-    tr {
-      background-color: $color-table-bg;
-    }
-
+    border-spacing: 2px;
     th {
-      padding: 2px 4px;
-      text-align: center;
-      color: $color-title-fg;
-      background-color: $color-title-bg;
-      border: none;
-
+      background-color: $color-table-header-bg;
       &:first-child {
-        border-radius: 4px 0 0 0;
+        border-radius: $radius-inner 0 0 0;
       }
-
       &:last-child {
-        border-radius: 0 4px 0 0;
+        border-radius: 0 $radius-inner 0 0;
       }
-
-      &only-child {
-        border-radius: 8px 8px 0 0;
+      &:only-child {
+        border-radius: $radius-inner $radius-inner 0 0;
       }
     }
-
     td {
-      min-width: 3em;
-      padding: 2px 4px;
-      color: $color-light-bg;
+      background-color: $color-table-data-bg;
+      line-height: 1;
+      border-top: 0;
+      padding: 2px;
     }
   }
 }
 
-#imager-viewer-dialog.fullscreen {
-  margin: 0;
-  box-shadow: none;
-  width: 100%;
-  padding: 100px;
+#imager-busy {
 }
 
-.imager-viewer-dialog {
-
-//margin: 0px;
-//padding: 0px;
-
-  #imager-viewer {
-    background: $color-dark-bg;
-    #imager-canvas-wrapper {
-//    margin: 0px 0px 0px 3px;
-//    padding: 0;
-
-
-      #imager-canvas {
-        border-radius: 3px;
-      }
+#imager-viewer {
+  .imager-content {
+    background-color: $color-viewer-bg;
+  }
+  #imager-canvas-wrapper {
+    #imager-image,
+    #imager-canvas {
     }
-
-    #button-wrapper {
-      div {
-        font-size: 75%;
-        text-align: center;
-        padding: 0;
-        line-height: 2em;
-      }
-
-      .buttons {
-        margin: 3px 0;
-        &#image-buttons {
-          margin: 0 0 3px;
-        }
-        color: #000;
-        background: $color-light-bg;
-        border-radius: 4px;
-
+  }
+  #button-wrapper {
+    div {
+    }
+    .imager-buttons {
+      border-radius: $radius-button;
+      background-color: $color-button-bg;
+      a {
         img {
-          display: block;
-          margin: 0 2px;
-          padding: 3px 5px;
-          border-radius: 5px;
+          border-radius: $radius-outer;
         }
-
-        .checked {
-          background-color: $color-light-alt-bg;
+        &.checked {
+          img {
+            background-color: $color-button-checked-bg;
+          }
         }
-
-        .disabled {
-          background-color: $color-disabled;
-        }
-
-        .specific {
-          background-color: $color-light-bg;
-        }
-
-        &#debug-buttons {
-          bottom: 0px;
-        }
+      }
+      .disabled {
       }
     }
   }
 }
 
-.imgareaselect-outer {}
-
-//border-radius: 12px
-
-.imager-buttons {
-  padding: 0 5px;
-
-  img {
-    padding: 5px 5px 1px;
-  }
-}
-
-.imager-status-dialog {
-  @include pi-border(15px, 3px, $color-status-bg);
-
-  #imager-status {
-    padding: 0;
-  }
-
-  font-size: 90%;
-
-  .ui-dialog-content {
-    background: $color-status-bg;
-    min-width: 450px;
-    padding: 10px;
-
-    #imager-status-content {
-      padding: 5px;
-      text-align: center;
-    }
-
-    span {
-      padding: 5px;
-    }
-  }
-}
-
-#imager-info {
-  @include pi-border(15px, 3px, $color-dark-alt-bg);
-
-  padding: 5px 10px;
-  max-width: 600px;
-
-  .title {
-    color: $color-title-dark-bg;
-    text-align: center;
-    font-size: 120%;
-    font-weight: bold;
-    word-wrap: break-word;
-  }
-
-  .filename {
-    color: #050;
-    font-style: italic;
-    font-size: 70%;
-    text-align: center;
-    margin-bottom: 5px;
-  }
-
-  .error {
-    background-color: $color-error;
-    color: white;
-  }
-
-  #imager-info-content {
-    img.imager-info-edit {
-      margin: 0 5px 3px 0;
-    }
-  }
-
-  .imager-buttons {
-    img {
-      padding: 5px;
-    }
-  }
-}
-
-#imager-edit {
-  @include pi-border(15px, 3px, $color-edit-bg);
-
-  padding: 5px 5px;
-
-  .form-text {
-    max-width: 300px;
-  }
-}
-
-#imager-confirm {
-  @include pi-border(15px, 3px, $color-edit-bg);
-
-  padding: 5px 10px;
-}
-
-#imager-map {
-  @include pi-border(15px, 3px, $color-map-bg);
-
-  max-width: 700px;
-  padding: 5px 5px;
-
-  .description {
-    max-width: 300px;
-  }
-
-  .form-text {
-    max-width: 300px;
-  }
-}
-
-#imager-messages.error {
-  color: white;
-  font-size: 140%;
-  background-color: $color-error;
-  background-image: none;
-}
-
-#imager-messages {
-  @include pi-border(15px, 3px, $color-error);
-
-  .info {
-    font-size: 110%;
-    font-weight: bold;
-  }
-
-  h2 {
-    margin: 5px 0;
-  }
-
-  padding: 10px;
-
-  .error {
-    background-color: $color-error;
-  }
-}
-
-.imager-dialog.ui-dialog {
-  border-radius: 10px;
-
-  .ui-dialog-titlebar {
-    border-radius: 10px 10px 0 0;
-    color: $color-title-fg;
-    background: $color-dark-alt-bg;
-  }
-
-  .ui-dialog-content {
-    padding: 0px 10px;
+#imager-brightness,
+#imager-color {
+  table {
     td {
-      padding: 0 5px;
+      padding: 0;
+      background-color: $color-content-bg;
     }
   }
-
-  .ui-dialog-buttonpane {
-    border: 0;
-    border-radius: 0 0 10px 10px;
-    background: $color-dark-alt-bg;
-  }
-
-  .ui-widget-header {
-    border: 0;
-  }
 }
 
-.imager-filesave-dialog.ui-dialog {
-  @include pi-border(10px, 3px, $color-filesave-bg);
-
-  .ui-dialog-content {
-    padding: 10px 10px 0 10px;
-  }
-  #imager-filesave {
-    background: $color-filesave-bg;
-  }
-
-  .imager-filesave-content {
-    background: $color-filesave-bg;
-  }
-
-  #resolution {
-    margin: 0 auto 10px;
-  }
-
-  #imager-filesave-messages {
-    font-style: italic;
-    font-size: 80%;
-    word-wrap: break-word;
-    text-align: center;
-  }
-
-  #imager-filesave-filename-container {
-    margin: 10px 0;
-  }
-
-  #save-file-title {
-    font-size: 140%;
-    font-weight: bold;
-    margin: 10px;
-  }
+#imager-config {
 }
 
-.imager-brightness-dialog.ui-dialog,
-.imager-color-dialog.ui-dialog {
-  @include pi-border(10px, 3px, $color-edit-bg);
-
-  .ui-dialog-content {
-    background: $color-edit-bg;
-    padding: 10px 10px 0px 10px;
-  }
-
-  .error {
-    background-color: $color-error;
-  }
-
-  .slider {
-    -webkit-appearance: none;
-    border-radius: 6px;
-  }
+#imager-status {
 }
 
-.imager-config-dialog {
-//@include pi-border(10px, 3px, $lightgreen);
-//color: white;
 
-  .ui-dialog-content {
-    background: $color-light-bg;
-  }
-}
-
-/*
-.clicktoexit {
-  margin-top: 10px;
-  font-size: 70%;
-  font-style: italic;
-  color: $lightgrey;
-}
-*/

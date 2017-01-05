@@ -2,7 +2,6 @@
  * imager.sass
  */
 
-
 $red: #c00;
 $white: #fff;
 $lightestgrey: #f0f0f0;
@@ -14,52 +13,78 @@ $darkgrey: #666;
 $darkergrey: #444;
 $black: #000;
 
+$spacing: 10px;
+
 #imager-wrapper {
-  color: $black;
-  background-color: $lightergrey;
+  color: black;
+
+  .imager-popup {
+    position: fixed;
+  }
+
+  .imager-title {
+    font-size: 120%;
+    font-weight: bold;
+    background: $lightgrey;
+    padding: $spacing;
+  }
+
+  .imager-content {
+    background: $lightergrey;
+    padding: $spacing;
+  }
+
+  .imager-buttonpane {
+    background: $lightgrey;
+    padding: 5px;
+    width: 100%;
+    height: 2.7em;
+    input.button {
+      background: $lightestgrey;
+      display: inline-block;
+      float: right;
+      padding: 3px 8px;
+      margin: 0 0 0 5px;
+      &:first-child {
+      }
+    }
+  }
+
+  .imager-slider {
+    line-height: 1;
+    -webkit-appearance: none;
+  }
+
   table {
-    background-color: $lightgrey;
-    border-collapse: separate;
-    border-spacing: 2px;
-    td {
-      line-height: 1;
-      border-top: 0;
-      padding: 2px;
-    }
     th {
-      color: $lightgrey;
-      background-color: $darkgrey;
+      padding: 0 5px;
+    }
+    td {
+      padding: 0 5px;
     }
   }
 }
 
-#imager-hidden-form {
-  display: none;
-}
-
-#imager-viewer.fullscreen {
-  width: 100%;
-}
-
-.imager-viewer-dialog {
+#imager-busy {
   position: fixed;
-  z-index: 1010 !important;
-  .ui-dialog-titlebar {
-    display: none;
-  }
+  top: 300px;
+  left: 500px;
+  z-index: 1110;
 }
 
 #imager-viewer {
-  overflow: none;
-  padding: 3px;
-  button {
-    background-color: $lightgrey;
+  overflow: hidden;
+  &.fullscreen {
+    width: 100%;
+  }
+  .imager-content {
+    background: $grey;
+    padding: 3px;
   }
   #imager-canvas-wrapper {
-    width: calc(100% - 35px);
     display: inline-flex;
     position: relative;
-    padding-bottom: 0px;  // WTF, I would expect this to be zero!
+    padding-bottom: 0px;  // WTF, I can't find anything that works!!!!
     #imager-image,
     #imager-canvas {
       width: 100%;
@@ -69,30 +94,33 @@ $black: #000;
     }
   }
   #button-wrapper {
+    vertical-align: top;
+    display: inline-block;
     margin-right: 3px;
-    float: left;
     div {
       text-align: center;
     }
-    .buttons {
+    .imager-buttons {
+      width: 28px;
       background-color: $lightergrey;
-      padding: 2px 1px;
-      margin: 0 2px 2px 0;
+      padding: 2px 0;
+      margin: 0 0 2px;
       text-align: center;
       font-size: 65%;
-      img {
-        display: block;
-        padding: 2px;
-        margin: 0 auto;
-      }
-      .checked {
-        background-color: $grey;
+      a {
+        img {
+          display: block;
+          margin: 0 auto;
+          padding: 3px;
+        }
+        &.checked {
+          img {
+            background-color: $grey;
+          }
+        }
       }
       .disabled {
         background-color: $grey;
-      }
-      .specific {
-        background-color: $darkgrey;
       }
       &#debug-buttons {
         z-index: 1009;
@@ -103,304 +131,56 @@ $black: #000;
   }
 }
 
-.imager-buttons {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  background-color: $lightestgrey;
-  img {
-    padding: 4px;
-  }
-}
-
-#imager-info {
-  padding: 5px;
-  .title {
-    text-align: center;
-    word-wrap: break-word;
-  }
-  .filename {
-    text-align: center;
-  }
-  .error {
-    background-color: $red;
-    color: $white;
-  }
-  .field-name-sfield-owner,
-  .field-name-sfield-filename,
-  .field-name-sfield-filesize,
-  .field-name-sfield-geometry {
-    float: none;
-    clear: both;
-  }
-  #imager-info-geometry {
-    clear: both;
-  }
-  #imager-info-content {
-    img.imager-info-edit {
-      float: left;
-      clear: both;
-    }
-    section {
-      float: left;
-    }
-  }
-}
-
-#imager-edit {
-  padding: 10px;
-  .form-item {
-    margin: 0;
-  }
-  .description {
-    font-style: italic;
-    margin-top: 10px;
-    max-width: 500px;
-  }
-  .form-text {
-    width: 500px;
-  }
-  table.cke_editor {
-    background-color: #ccc;
-    border-radius: 0;
-    body {
-      background-image: none;
-    }
-  }
-  .field-widget-text-textarea {
-    .fieldset-wrapper {
-      margin: 0;
-    }
-    fieldset {
-      .form-wrapper {
-        display: none;
-      }
-    }
-  }
-}
-
-.imager-confirm-dialog {
-  .ui-dialog-titlebar {
-    display: none;
-  }
-}
-
-#imager-confirm {
-  max-width: 700px;
-  z-index: 1020;
-  padding: 1.2em 10px 0;
-  .imager-content {
-    margin: 0;
-  }
-  #imager-confirm-content {
-    font-size: 140%;
-    padding: 0 2em;
-  }
-  #imager-confirm-buttons {
-    position: static;
-    margin: 0 auto;
-    width: 53px;
-    float: none;
-  }
-}
-
-#imager-map {
-  max-width: 800px;
-  padding: 5px;
-  position: fixed;
-  z-index: 1013;
-  .description {
-    max-width: 300px;
-  }
-}
-
-#imager-messages.error {
-  background: $red none;
-}
-
-#imager-messages {
-  padding: 10px;
-  font-size: 80%;
-  .info {
-  }
-  h2 {
-  }
-  .error {
-    padding: 0.5em;
-    background-color: $red;
-    color: white;
-    font-size: 130%;
-  }
-}
-
-.imager-filesave-dialog {
-  #imager-filesave-filename {
-    width: 15em;
-    font-size: 90%;
-  }
-  #resolution {
-    margin: 0 auto 10px;
-    width: auto;
-  }
-}
-
-.imager-dialog {
-  z-index: 1050;
-  .ui-dialog-content {
-    min-height: 0 !important;
-  }
-}
-.imager-brightness-dialog,
-.imager-color-dialog {
-  .ui-dialog-titlebar {
-//  display: none;
-  }
-  .error {
-    background-color: $red;
-  }
-  .slider {
-    -webkit-appearance: none;
-  }
-  #slider-hue {
-    background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, purple);
-  }
-  #slider-saturation {
-    background-image: linear-gradient(to right, rgba(200, 200, 200, 1), rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(red, yellow, #008888);
-  }
-  #slider-lightness,
-  #slider-brightness {
-    background: linear-gradient(to right, $black, $white);
-  }
+#imager-brightness {
   #slider-contrast {
     background-image: linear-gradient(to right, #888, #666, #222, #000), linear-gradient(to right, #888, #aaa, #ddd, #fff);
     background-size: 100% 50%, 100% 50%;
     background-position: 0 0, 0 100%;
     background-repeat: no-repeat;
   }
+  #slider-brightness {
+    background: linear-gradient(to right, $black, $white);
+  }
 }
 
-#imager-email {
+#imager-color {
+  #slider-hue {
+    background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, purple);
+  }
+  #slider-saturation {
+    background-image: linear-gradient(to right, rgba(200, 200, 200, 1), rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(red, yellow, #008888);
+  }
+  #slider-lightness {
+    background: linear-gradient(to right, $black, $white);
+  }
+}
+
+#imager-config {
+  legend,
+  fieldset {
+    margin: 0;
+  }
+}
+
+#imager-status {
+  .imager-status-col {
+    display: inline-block;
+    vertical-align: top;
+  }
+  #imager-status-col-1 {
+    td {
+      min-width: 6em;
+    }
+  }
   table {
-    margin: 0 auto;
-    width: auto;
-  }
-  position: fixed;
-  z-index: 1050;
-  input {
-    width: 97%;
-  }
-  padding: 10px;
-  #resolution {
-    margin: 0 auto 10px;
-    width: auto;
-  }
-}
-
-#imager-busy {
-//display: none;
-  position: fixed;
-  top: 400px;
-  left: 600px;
-  z-index: 1110;
-}
-
-// @TODO The remaining declarations don't belong here and are for
-// development convenience only.  Delete these
-.imager {
-  .views-row {
-    line-height: 1.1;
-    font-size: 90%;
-    float: left;
-    margin: 10px;
-    width: 190px;
-    height: 200px;
-  }
-}
-
-div#main {
-  width: auto;
-}
-
-.imager-noclose {
-  .ui-dialog-titlebar-close {
-    display: none;
-  }
-}
-
-.dialogStatus {
-  position: fixed;
-  z-index: 1014;
-  background-color: $grey;
-}
-
-.imager-dialog {
-  padding: 0;
-  position: fixed;
-  .ui-dialog-content {
-    background-color: $lightgrey;
-  }
-  .ui-dialog-buttonpane {
-    margin: 0;
-    background-color: $darkgrey;
-    padding: 0 .5em 0 0.4em;
-    button {
-      cursor: pointer;
-      margin: 0.4em;
-      font-size: 90%
+    margin-bottom: $spacing;
+    th {
+      min-width: 4em;
     }
-  }
-  .ui-button-text {
-    padding: 0.1em 0.5em;
-  }
-  .imager-content {
-    margin: 0;
-  }
-  label {
-    font-weight: normal;
-  }
-  .form-item {
-    input {
-      font-size: 100%;
-    }
-    .option {
-      font-size: 100%;
-      padding-left: 0.5em;
-    }
-    .description {
-      color: $darkgrey;
-    }
-  }
-
-  .js-form-type-checkbox {
-    label {
-      display: inline;
-    }
-  }
-  #imager-status-content {
-    padding: 0;
-    text-align: center;
-    .imager-status-col {
-      float: left;
-      margin: 5px;
-    }
-
-    .imager-text-right {
-      text-align: right;
-    }
-    .imager-status-file {
-    }
-    table {
-      margin-bottom: 6px;
+    td {
+      min-width: 4em;
     }
   }
 }
 
-.imgareaselect-outer {
-  z-index: 1011 !important;
-}
 
-.ui-button.ui-widget {
-  background: buttonface;
-}
-
-@import "imager_custom.scss";

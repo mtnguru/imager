@@ -44,7 +44,7 @@
       Drupal.imager.popups.$busy = $('#imager-busy').hide();
 
       Drupal.imager.popups.initDialog('viewer', null);
-      Drupal.imager.popups.base = Drupal.imager.popups.baseC();
+//    Drupal.imager.popups.base = Drupal.imager.popups.baseC();
     }
 
     /**

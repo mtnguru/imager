@@ -26,7 +26,7 @@
     var displayMessage = function displayMessage(msg) {
       // $imagerMessages.show();
       $('#imager-messages-content').html(msg);
-      if (localStorage['imagerDebugMessages'] === 'false') {
+      if (localStorage.imagerDebugMessages === 'FALSE') {
         messageTimeout = setTimeout(function () {
           // $imagerMessages.hide();
         }, 5000);
@@ -186,7 +186,7 @@
             display = true;
           }
           if (response['status'] === 'catch' ||
-              (response['debug'] && localStorage['imagerDebugMessages'] === 'true')) {
+              (response['debug'] && localStorage.imagerDebugMessages === 'TRUE')) {
             for (i = 0; i < response['debug'].length; i++) {
               out += '<div class="debug">' + response['debug'][i] + '</div>';
             }
@@ -199,7 +199,7 @@
           } */
 
           /**
-          if (localStorage['imagerDebugMessages'] === 'false') {
+          if (localStorage.imagerDebugMessages === 'FALSE') {
             setTimeout(function () {
               Popups.messages.dialogClose();
             }, 3000);
@@ -217,7 +217,7 @@
           if (processFunc) {
             processFunc('error', evt);
           }   // Execute users error function
-          if (localStorage['imagerDebugMessages'] === 'false') {
+          if (localStorage.imagerDebugMessages === 'FALSE') {
             setTimeout(function () {
               Popups.messages.dialogClose();
             }, 10000);

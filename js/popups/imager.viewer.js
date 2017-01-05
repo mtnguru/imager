@@ -15,8 +15,8 @@
 
   Drupal.imager.viewer = {};
 
-  if (localStorage.getItem('imagerBoundsEnable') === null) {
-    localStorage.setItem('imagerBoundsEnable', true);
+  if (localStorage.imagerBoundsEnable === null) {
+    localStorage.imagerBoundsEnable = 'TRUE';
   }
 
   /**
@@ -33,22 +33,15 @@
     // Declare default specs and merge in additional specs.
     var dspec = $.extend({
       name: 'Viewer',
-      autoOpen: false,
-      title: 'Imager Viewer/Editor',
       zIndex: 1010,
-      width: 'auto',
       dialogClass: 'imager-viewer-dialog imager-noclose',
       cssId: 'imager-viewer',
-      height: 'auto',
       resizable: true,
+      draggable: false,
       position: {
-        my: 'left top',
-        at: 'left top'
+        left: 0,
+        top: 0,
       },
-      // Keep the dialog position fixed and in upper left corner.
-      open: function (event, ui) {
-        $(this).parent().css('position', 'fixed');
-      }
     }, spec);
 
     var popup = Popups.baseC(dspec); // Initialize viewerC from baseC.
@@ -71,7 +64,7 @@
     var cscale;               // Current scaling factor.
     var rotation = 0;         // Current rotation.
     var editMode = 'init';    // init, view, crop, brightness, hsl,
-                              // download, email, database, clipboard.
+                              // download, email, save, clipboard.
     var fullScreen = false;   // Full Screen mode.
     var lastup = new Date();  // Time of last mouse up event.
     var moveMode = 'none';    // none, dragging, zoom.
@@ -237,7 +230,7 @@
      * If enabled show the Information popup, if already showing update the contents
      */
     var showInfo = function showInfo() {
-      if (localStorage.imagerShowInfo === 'true') {
+      if (localStorage.imagerShowInfo === 'TRUE') {
         $('#view-info').addClass('checked');
         if (Popups.info.dialogIsOpen()) {
           Popups.info.dialogUpdate();
@@ -426,7 +419,7 @@
      */
     var scale = function scale(factor, checkScale) {
       // Check to see scaling will shrink image smaller than canvas.
-      if (checkScale && factor < 1 && localStorage.imagerBoundsEnable === 'true') {
+      if (checkScale && factor < 1 && localStorage.imagerBoundsEnable === 'TRUE') {
         if (cscale * factor < initScale) {
           factor = initScale / cscale;
         }
@@ -435,8 +428,7 @@
       ctx.translate(pt_now.getTxPt().x, pt_now.getTxPt().y);
       ctx.scale(factor, factor);
       ctx.translate(-pt_now.getTxPt().x, -pt_now.getTxPt().y);
-      var npt;
-      npt = outOfBounds();
+      var npt = outOfBounds();
       if (npt) {
         ctx.translate(npt.x, npt.y);
       }
@@ -455,7 +447,7 @@
         x: 0,
         y: 0
       };
-      if (localStorage.imagerBoundsEnable === 'false') {
+      if (fullScreen || localStorage.imagerBoundsEnable === 'FALSE') {
         return npt;
       }
       var pw;
@@ -662,7 +654,7 @@
     function mouseWheel(evt) {
       setEditMode('view');
       var delta = -evt.detail ? evt.detail : 0;
-      delta = evt.wheelDelta ? evt.wheelDelta / 50 : delta;
+      delta = evt.wheelDelta ? evt.wheelDelta / 25 : delta;
       var y;
       var x = evt.offsetX || (evt.pageX - $canvas[0].offsetLeft);
       // @todo - pageY works intermittently
@@ -807,9 +799,9 @@
           case 'rotate':
             break;
 
-          case 'database':
+          case 'save':
             Popups.filesave.dialogClose();
-            $('#file-database').removeClass('checked');
+            $('#file-save').removeClass('checked');
             break;
 
           case 'email':
@@ -853,9 +845,9 @@
         case 'rotate':
           break;
 
-        case 'database':
-          Popups.filesave.dialogOpen({saveMode: 'database'});
-          $('#file-database').addClass('checked');
+        case 'save':
+          Popups.filesave.dialogOpen({saveMode: 'save'});
+          $('#file-save').addClass('checked');
           break;
 
         case 'email':
@@ -955,15 +947,15 @@
     function showPopups() {
       popup.dialogOpen();
       showInfo();
-      if (localStorage.imagerDebugStatus === 'true') {
+      if (localStorage.imagerDebugStatus === 'TRUE') {
         $('#debug-status').addClass('checked');
         Popups.status.dialogOpen();
       }
-      if (localStorage.imagerDebugMessages === 'true') {
+      if (localStorage.imagerDebugMessages === 'TRUE') {
         $('#debug-messages').addClass('checked');
         // Popups.messages.dialogOpen();
       }
-      if (localStorage.imagerShowMap === 'true') {
+      if (localStorage.imagerShowMap === 'TRUE') {
         $('#view-map').addClass('checked');
         Popups.map.dialogOpen();
       }
@@ -1054,8 +1046,8 @@
       Popups.initDialog('filesave', '', null);
 
       // File Buttons.
-      $('#file-database').click(function () {
-        setEditMode('database', true);
+      $('#file-save').click(function () {
+        setEditMode('save', true);
         Popups.filesave.setSelectButton($(this));
       });
 
@@ -1138,7 +1130,6 @@
       $('#image-exit').click(function () {
         if (fullScreen) {
           screenfull.exit();
-//        setFullScreen(false);
         }
         else {
           hidePopups();
@@ -1158,9 +1149,7 @@
       // Mode Buttons.
       $('#mode-fullscreen').click(function () {
         if (screenfull.enabled) {
-          var $viewer = $('#imager-viewer');
-          screenfull.toggle($viewer[0]);
-//        setFullScreen(!fullScreen);
+          screenfull.toggle($('#imager-wrapper')[0]);
         }
       });
 

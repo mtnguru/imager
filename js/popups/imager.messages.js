@@ -14,8 +14,8 @@
 (function ($) {
   'use strict';
 
-  if (localStorage.getItem('imagerDebugMessages') === null) {
-    localStorage.setItem('imagerDebugMessages', false);
+  if (localStorage.imagerDebugMessages === null) {
+    localStorage.imagerDebugMessages = 'FALSE';
   }
 
   /**
@@ -60,12 +60,12 @@
     };
 
     popup.dialogOnOpen = function dialogOnOpen() {
-      localStorage.imagerDebugMessages = 'true';
+      localStorage.imagerDebugMessages = 'TRUE';
       popup.dialogInit();
     };
 
     popup.dialogOnClose = function dialogOnClose() {
-      localStorage.imagerDebugMessages = 'false';
+      localStorage.imagerDebugMessages = 'FALSE';
     };
 
     popup.dialogInit = function dialogInit() {

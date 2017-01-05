@@ -89,20 +89,14 @@
   };
 
   Drupal.imager.popups.baseC = function baseC(spec) {
-    var popup = {};
-    popup.settings = {};
-    spec = spec || {};
-
-    var $selectButton = spec.$selectButton || null;
-    // The button that was clicked to popup this dialog.
-    popup.spec = spec || {};
-    popup.spec.name = popup.spec.name || 'unknown';
-    popup.spec.dialogClass = popup.spec.dialogClass || '';
-    popup.spec.$elem = popup.spec.$elem || null;
+    var popup = {
+      settings: {},
+      spec: spec || {},
+    };
 
     // Return if popup is loaded.
     popup.dialogHave = function dialogHave() {
-      return (popup.spec.$elem) ? true : false;
+      return (popup.$elem) ? true : false;
     };
 
     // Load the dialog using AJAX.
@@ -116,33 +110,93 @@
         popup.dialogCreate);
     };
 
-    // Load the popup using AJAX.
+    // Create popup from AJAX response.
     popup.dialogCreate = function dialogCreate(response, $callingElement) {
-      Drupal.imager.$wrapper.html(response['popupHtml']);
+      // Create the popup wrapper.
+      popup.$wrapper = $(document.createElement('DIV'))
+        .attr('id', popup.spec.cssId)
+        .addClass('imager-popup');
+      Drupal.imager.$wrapper.append(popup.$wrapper);
 
-      popup.spec.$elem = $('#' + popup.spec.cssId);
-      if (popup.spec.cssIdFinal) {
-        popup.spec.$elem.removeClass(popup.spec.cssId).addClass(popup.spec.cssIdFinal);
+      // Create the popup title
+      if (popup.spec.title) {
+        popup.$title = $(document.createElement('DIV'))
+                         .addClass('imager-title')
+                         .html(popup.spec.title);
+        popup.$wrapper.append(popup.$title);
       }
-      var $elem = popup.spec.$elem;
-      var $popup = $elem.dialog(popup.spec);
-      $popup.dialog('option', 'draggable', true);
+
+      // Create the popup content
+      popup.$content = $(document.createElement('DIV'))
+        .addClass('imager-content')
+        .html(response.content);
+      popup.$wrapper.append(popup.$content);
+
+
+      if (response.buttonpane) {
+        // Create the popup buttonpane
+        popup.$buttonpane = $(document.createElement('DIV'))
+          .addClass('imager-buttonpane')
+          .html(response.buttonpane);
+        popup.$wrapper.append(popup.$buttonpane);
+        popup.$buttonpane.find('input').click(function (event) {
+          popup.onButtonClick(event.target.id);
+        });
+      }
+
+      popup.$elem = $('#' + popup.spec.cssId);
+
+      // Make the popup resizable.
+      if (popup.spec.resizable) {
+        popup.$elem.resizable();
+      }
+
+      // Make the popup draggable.
+      if (popup.spec.draggable) {
+        popup.$wrapper.draggable();
+      }
+
+      // Set the zIndex.
+      if (popup.spec.zIndex) {
+        popup.$wrapper.zIndex(popup.spec.zIndex);
+      }
+
+      // Position the popup.
+      if (popup.spec.position) {
+        popup.$wrapper.css(popup.spec.position);
+      }
+      else {
+        popup.$wrapper.css({left: '75px', bottom: '100px'})
+      }
+
       // Create the popup.
       popup.dialogOnCreate();
     };
 
+    function onButtonClick(event) {
+      return;
+    }
+
+    /**
+     * Actions to take when the dialog is opened.
+     *
+     * @returns {boolean}
+     */
     popup.dialogIsOpen = function dialogIsOpen() {
-      return (popup.spec.$elem && popup.spec.$elem.dialog('isOpen')) ? true : false;
+      return (popup.$elem && popup.isOpen) ? true : false;
     };
 
-    // Close the dialog if it's open.
+    /**
+     * If the dialog is open then close it.
+     */
     popup.dialogClose = function dialogClose() {
-      if (popup.spec.$elem) {
-        if ($selectButton) {
-          $selectButton.removeClass('checked');
+      if (popup.$elem) {
+        if (popup.spec.$selectButton) {
+          popup.spec.$selectButton.removeClass('checked');
         }
-        if (popup.spec.$elem.dialog('isOpen')) {
-          popup.spec.$elem.dialog('close');
+        if (popup.isOpen) {
+          popup.isOpen = false;
+          popup.$elem.hide();
         }
         popup.dialogOnClose();
         popup.settings = {};
@@ -151,12 +205,13 @@
     // Open the popup if it exists, otherwise create it.
     popup.dialogOpen = function dialogOpen(settings) {
       $.extend(popup.settings, settings);
-      if (popup.spec.$elem) {
-        if ($selectButton) {
-          $selectButton.addClass('checked');
+      if (popup.$elem) {
+        if (popup.spec.$selectButton) {
+          popup.spec.$selectButton.addClass('checked');
         }
-        if (!popup.spec.$elem.dialog('isOpen')) {
-          popup.spec.$elem.dialog('open');
+        if (!popup.isOpen) {
+          popup.isOpen = true;
+          popup.$elem.show();
           popup.dialogOnOpen();
         }
       }
@@ -183,15 +238,14 @@
     popup.setSelectButton = function setSelectButton($elem) {
       popup.spec.$selectButton = $elem;
       if (popup.dialogHave()) {
-        popup.spec.$elem.dialog({
-          position: {
-            my: 'left',
-            at: 'right',
-            of: $elem
-          }
-        });
+//      popup.$elem.dialog({
+//        position: {
+//          my: 'left',
+//          at: 'right',
+//          of: $elem
+//        }
+//      });
       }
-
     };
 
     popup.dialogUpdate = function dialogUpdate() {

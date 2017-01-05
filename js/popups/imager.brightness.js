@@ -32,22 +32,42 @@
 
     var dspec = $.extend({
       name: 'Brightness',
-      autoOpen: false,
       title: 'Brightness/Contrast',
       zIndex: 1015,
-      width: 'auto',
-      dialogClass: 'imager-dialog imager-brightness-dialog imager-noclose',
       cssId: 'imager-brightness',
-      height: 'auto',
+      draggable: true,
       resizable: false,
       position: {
-        my: 'left',
-        at: 'right',
-        of: spec.$selectButton
+        left: '50px',
+        top: '150px'
       }
     }, spec);
 
     var popup = Popups.baseC(dspec);
+
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-brightness-apply':
+          Viewer.applyFilter(adjustBrightness);
+          break;
+
+        case 'imager-brightness-reset':
+          init();
+          if (popup.dialogIsOpen()) {
+            $('#slider-brightness').val(0);
+            $('#slider-contrast').val(0);
+            adjustBrightness(Viewer.$canvas2, Viewer.$canvas);
+          }
+          break;
+
+        case 'imager-brightness-cancel':
+          Viewer.setEditMode('view');
+          Viewer.redraw();
+          popup.dialogClose();
+          popup.updateStatus();
+          break;
+      }
+    };
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
@@ -63,17 +83,22 @@
     popup.dialogOnClose = function dialogOnClose() {
     };
 
+    function init() {
+      brightness = 0;
+      contrast = 0;
+      popup.updateStatus();
+    }
+
     /**
      * Initialize checkboxes from localStorage
      */
     popup.dialogInit = function dialogInit() {
-      brightness = 0;
-      contrast = 0;
+      init();
       $('#slider-brightness').change(function () {
-        popup.adjustBrightness(Viewer.$canvas2, Viewer.$canvas);
+        adjustBrightness(Viewer.$canvas2, Viewer.$canvas);
       });
       $('#slider-contrast').change(function () {
-        popup.adjustBrightness(Viewer.$canvas2, Viewer.$canvas);
+        adjustBrightness(Viewer.$canvas2, Viewer.$canvas);
       });
       $('#slider-brightness').val(brightness);
       $('#slider-contrast').val(contrast);
@@ -82,7 +107,7 @@
     /*
      * adjustBrightness($cvssrc,$cvsdst)
      */
-    popup.adjustBrightness = function adjustBrightness($cvssrc, $cvsdst) {
+    function adjustBrightness($cvssrc, $cvsdst) {
       brightness = parseInt($('#slider-brightness').val());
       contrast = parseInt($('#slider-contrast').val()) / 100;
       popup.updateStatus();
@@ -158,17 +183,7 @@
       }
       ctxdst.putImageData(dataDesc, 0, 0);
     };
-
     popup.dialogReset = function dialogReset() {
-      brightness = 0;
-      contrast = 0;
-      $('#slider-brightness').val(brightness);
-      $('#slider-contrast').val(contrast);
-      popup.adjustBrightness(Viewer.$canvas2, Viewer.$canvas);
-    };
-
-    popup.dialogApply = function dialogApply() {
-      Viewer.applyFilter(popup.adjustBrightness);
     };
 
     popup.dialogUpdate = function dialogUpdate() {
