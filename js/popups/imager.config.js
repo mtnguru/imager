@@ -33,6 +33,8 @@
     var Popups = Drupal.imager.popups;
     var popup;
 
+    var $interval = $('#imager-slideshow-interval');
+
     var dspec = $.extend({
       name: 'Config',
       title: 'Imager Configuration',
@@ -50,6 +52,8 @@
     popup.onButtonClick = function onButtonClick(buttonName) {
       switch (buttonName) {
         case 'imager-config-apply':
+          popup.dialogSave();
+          popup.dialogClose();
           break;
 
         case 'imager-config-cancel':
@@ -76,6 +80,9 @@
       if (localStorage.imagerBoundsEnable === 'TRUE') {
         $('#imager-bounds-enable').attr('checked', 'checked');
       }
+
+      $interval.val(localStorage.imagerSlideshowInterval || 5);
+
       if (localStorage.imagerDebugStatus === 'TRUE') {
         $('#imager-debug-status').attr('checked', 'checked');
       }
@@ -106,6 +113,7 @@
         Popups.messages.dialogClose();
       }
 
+      localStorage.imagerSlideshowInterval = $interval.val();
       localStorage.imagerBoundsEnable = ($('#imager-bounds-enable').checked) ? 'TRUE' : 'FALSE';
 
       localStorage.imagerPrinter = $('#imager-printer-select option:selected').text();

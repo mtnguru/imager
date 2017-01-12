@@ -7,7 +7,7 @@ $color-viewer-bg: #3d4e78;
 $color-table-bg: #f1f1f0;
 $color-table-header-bg: #3d4e78;
 $color-button-bg: #f1f1f0;
-$color-button-checked-bg: #acacff;
+$color-button-checked-bg: #bcccff;
 $color-title-bg: #c1d0e7;
 $color-buttonpane-bg: #c1d0e7;
 $color-table-header-bg: #5f80b6;
@@ -91,7 +91,7 @@ $radius-button: 2px;
       background-color: $color-button-bg;
       a {
         img {
-          border-radius: $radius-outer;
+          border-radius: $radius-inner;
         }
         &.checked {
           img {
@@ -116,6 +116,11 @@ $radius-button: 2px;
 }
 
 #imager-config {
+  fieldset {
+    > div {
+      margin-left: 2em;
+    }
+  }
 }
 
 #imager-status {

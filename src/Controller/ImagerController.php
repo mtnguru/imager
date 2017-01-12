@@ -8,6 +8,7 @@ use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\imager\ImagerPopups;
 use Drupal\imager\Ajax\ImagerCommand;
+use Drupal\Core\DrupalKernel;
 
 use Drupal\file\Entity\File;
 
@@ -41,7 +42,7 @@ class ImagerController extends ControllerBase {
    * @return object $ps
    *   Array of paths for this image.
    */
-  private function getFileParts($uri) {
+  private function getFileParts($uri, $makeNew) {
     $fp = pathinfo($uri);
 
     // Create newfilename - append _1 or increment if already counting.
@@ -53,13 +54,15 @@ class ImagerController extends ControllerBase {
     else {
       $n = 0;
     }
-    do {
-      $newfilename = $filename . '_' . ++$n . '.' . $fp['extension'];
-      $newpath = DRUPAL_ROOT . $fp['dirname'] . '/' . $newfilename;
-    } while (file_exists($newpath));
+    if ($makeNew) {
+      do {
+        $newfilename = $filename . '_' . ++$n . '.' . $fp['extension'];
+        $newpath = DRUPAL_ROOT . $fp['dirname'] . '/' . $newfilename;
+      } while (file_exists($newpath));
 
-    $fp['newfilename'] = $newfilename;
-    $fp['newpath'] = $newpath;
+      $fp['newfilename'] = $newfilename;
+      $fp['newpath'] = $newpath;
+    }
 
     return $fp;
   }
@@ -119,7 +122,7 @@ class ImagerController extends ControllerBase {
     // Load the media entity.
     $media = \Drupal::entityTypeManager()->getStorage('media')->load($data['mid']);
 
-    $fp = $this->getFileParts(urldecode($data['uri']));
+    $fp = $this->getFileParts(urldecode($data['uri']), true);
 
     // Save the image, process through 'convert' command to reduce file size (quality).
     $tmpPath = file_directory_temp() . '/' . $fp['newfilename'] . '.' . $fp['extension'];
@@ -208,6 +211,56 @@ class ImagerController extends ControllerBase {
       $data['buttonpane'] = render($dialog['buttonpane']);
     }
     $data['id'] = $dialog['id'];
+
+    $response = new AjaxResponse();
+    $response->addCommand(new ImagerCommand($data));
+    return $response;
+  }
+  /**
+   * Save the image so it can be displayed in a new tab in the browser.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   */
+  public function viewBrowser() {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    // Load the media entity.
+    $media = \Drupal::entityTypeManager()->getStorage('media')->load($data['mid']);
+
+
+    // Directory where images and temporary html files are stored.
+    $uri = urldecode($data['uri']);
+    $fp = pathinfo($uri);
+
+    $base_url = $GLOBALS['base_url'] . $GLOBALS['base_path'];
+    $urlDir = 'public://imager';
+    $fullDir = \Drupal::service('file_system')->realpath($urlDir);
+    $dir = str_replace(DRUPAL_ROOT . '/', '', $fullDir);
+    $path = \Drupal::service('file_system')->tempnam($fullDir);
+    $np = pathinfo($path);
+    $tmpImagePath = $path . '_tmp.' . $fp['extension'];
+    $imagePath    = $path . '.' . $fp['extension'];
+    $htmlPath     = $path . '.html';
+
+    $np = pathinfo($path);
+    $imageUrl = '/' . $dir . '/' . $np['basename'] . '.' . $fp['extension'];
+    $htmlUrl = $base_url . $dir . '/' . $np['basename'] . '.html';
+
+    file_prepare_directory($fullDir, FILE_CREATE_DIRECTORY);
+
+    // Save the image, process through 'convert' command to reduce file size (quality).
+    $this->writeImage($tmpImagePath, $data['imgBase64']);
+    $this->convertImage($tmpImagePath, $imagePath);
+    chmod($imagePath, 0744);
+
+    $body = '<img src="' . $imageUrl . '" />';
+    $page = '<html><head><title>' . 'Imager Page' . '</title></head><body>' . $body . '</body></html>';
+    $fp = fopen($htmlPath, 'w');
+    fwrite($fp, $page);
+    fclose($fp);
+    chmod($htmlPath, 0744);
+
+    $data['url'] = $htmlUrl;
 
     $response = new AjaxResponse();
     $response->addCommand(new ImagerCommand($data));

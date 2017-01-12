@@ -71,6 +71,14 @@ imager.loadDialog:
   requirements:
     _permission: 'access content'
 
+imager.viewBrowser:
+  path: 'imager/ajax/view_browser'
+  defaults:
+    _controller: '\Drupal\imager\Controller\ImagerController::viewBrowser'
+    _title: 'View image in a new browser tab.'
+  requirements:
+    _permission: 'access content'
+
 #imager.admin:
 #  path: 'admin/config/media/imager'
 #  defaults:

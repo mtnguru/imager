@@ -46,6 +46,7 @@
 
     var popup = Popups.baseC(dspec); // Initialize viewerC from baseC.
     var image;                       // Current image of imageC.
+    var $canvasWrapper;
     var img = document.createElement('IMG'); // Storage for current image.
     var $imgOverlay;                 // Image that overlays the canvas.
     var clearOverlay = false;        // Clear the overlay with transparent image.
@@ -70,6 +71,8 @@
     var moveMode = 'none';    // none, dragging, zoom.
     var elapsed = 0;          // Time between mouse up events.
     var distance = 0;         // Distance image dragged since mouse down.
+
+    var slideshowInterval;
 
     // Points of interest
     // Location of last mouse down event.
@@ -141,7 +144,7 @@
      * @TODO - When calculating the canvas dimensions the borders and padding must be
      * accounted for.  Currently these are constants are made to look good with my theme.
      */
-    var initializeImage = function initializeImage() {
+    var initializeImage = function initializeImage(width, height) {
       var hscale;
       var vscale;
       rotation = 0;
@@ -158,17 +161,31 @@
         cscale = (hscale < vscale) ? hscale : vscale;
       }
       else {
-        // Maximum canvas width and height.
-        mw = $(window).width() - 95;
-        mh = $(window).height() - 40;
-        calcCanvasDims(image.iw, image.ih);
-        cscale = cw / image.iw;
+        if (width) {
+          mw = width;
+          mh = height;
+          cw = $canvasWrapper.width();
+          ch = $canvasWrapper.height();
+          hscale = ch / image.ih;
+          vscale = cw / image.iw;
+          cscale = (hscale < vscale) ? hscale : vscale;
+        }
+        else {
+          // Maximum canvas width and height.
+          mw = $(window).width() - 95;
+          mh = $(window).height() - 40;
+          calcCanvasDims(image.iw, image.ih);
+          cscale = cw / image.iw;
+        }
       }
       initScale = cscale; // Save scaling where image fits canvas.
       $canvas.attr({width: cw, height: ch});
       $imgOverlay.width(cw).height(ch);
-      $('#imager-canvas-wrapper').width(cw).height(ch);
-      setEditMode('view');
+      $canvasWrapper.width(cw).height(ch);
+      if (editMode !== 'slideshow') {
+        setEditMode('view');
+      }
+
       // Set transform matrix to identity matrix.
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // Clear the canvas.
@@ -278,7 +295,7 @@
       // ctx2.drawImage(img, 0, 0); .
     };
 
-    Drupal.imager.viewer.getImage = function () {
+    Drupal.imager.viewer.getImage = function getImage() {
       return image;
     };
 
@@ -323,7 +340,7 @@
         calcCanvasDims(image.iw, image.ih);
         $canvas.attr({width: cw, height: ch});
         $imgOverlay.width(cw).height(ch);
-        $('#imager-canvas-wrapper').width(cw).height(ch);
+        $canvasWrapper.width(cw).height(ch);
         cscale = cw / image.iw;
         pt_now.setPt(cw / 2, cw / 2, ctx);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -340,7 +357,7 @@
       else {
         calcCanvasDims(image.ih, image.iw);
         $imgOverlay.width(cw).height(ch);
-        $('#imager-canvas-wrapper').width(cw).height(ch);
+        $canvasWrapper.width(cw).height(ch);
         $canvas.attr({width: cw, height: ch});
         cscale = cw / image.ih;
         pt_now.setPt(cw / 2, cw / 2, ctx);
@@ -371,11 +388,7 @@
       var niw = pt_crop_lr.getTxPt().x - pt_crop_ul.getTxPt().x;
       var nih = pt_crop_lr.getTxPt().y - pt_crop_ul.getTxPt().y;
 
-      $canvas.attr({
-        width: niw,
-        // Make canvas same size as the image.
-        height: nih
-      });
+      $canvas.attr({ width: niw, height: nih });
       ctx.clearRect(0, 0, cw, ch);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(img,
@@ -389,7 +402,7 @@
       // Calculate maximum size of canvas.
       $canvas.attr({width: cw, height: ch});
       $imgOverlay.width(cw).height(ch);
-      $('#imager-canvas-wrapper').width(cw).height(ch);
+      $canvasWrapper.width(cw).height(ch);
       ctx.scale(cw / niw, ch / nih);
       // Scale image to fit canvas.
       updateStatusGeometries();
@@ -783,6 +796,12 @@
           case 'view':
             break;
 
+          case 'slideshow':
+            $('#view-slideshow').removeClass('checked');
+            clearInterval(slideshowInterval);
+            slideshowInterval = null;
+            break;
+
           case 'crop':
             enablePanZoom();
             $('#mode-crop').removeClass('checked');
@@ -827,6 +846,13 @@
       switch (editMode) {
         case 'view':
           // No editing.
+          break;
+
+        case 'slideshow':
+          $('#view-slideshow').addClass('checked');
+          slideshowInterval = setInterval(function() {
+            changeImage(Drupal.imager.findNextImage(image, 1));
+          }, localStorage.imagerSlideshowInterval || 5 * 1000);
           break;
 
         case 'crop':
@@ -1002,6 +1028,7 @@
       Popups.busy = Drupal.imager.popups.busyC();
 
       Drupal.imager.viewer.$canvas = $canvas = $('#imager-canvas');
+      $canvasWrapper = $('#imager-canvas-wrapper');
       Drupal.imager.viewer.ctx = ctx = $canvas[0].getContext('2d');
       ias = $canvas.imgAreaSelect({
         // Attach handler to create cropping area.
@@ -1018,7 +1045,7 @@
       Drupal.imager.viewer.ctx2 = ctx2 = $canvas2[0].getContext('2d');
       $canvas2.hide();
 
-      // Initialize Dialogs.
+      // Initialize Dialogs.  @TODO there has to be a better way, rework this.
       Popups.initDialog('color', '#edit-color', function () {
         setEditMode('color', true);
       });
@@ -1051,12 +1078,6 @@
         Popups.filesave.setSelectButton($(this));
       });
 
-      /*
-        $('#file-email').click(function () {
-        setEditMode('email', true);
-        Popups.filesave.setSelectButton($(this));
-      }); */
-
       $('#file-download').click(function () {
         setEditMode('download', true);
         Popups.filesave.setSelectButton($(this));
@@ -1078,24 +1099,6 @@
 
       $imgOverlay = $('#imager-image');
       $imgOverlay.on('contextmenu', fillOverlayImg);
-
-      /* $imgOverlay.click(vun);
-         $imgOverlay.mousedown(function (evt) { $canvas.mousedown(); return false; });
-         $imgOverlay.mousemove(function (evt) { $canvas.mousemove(); return false; });
-         $imgOverlay.mouseup(  function (evt) { $canvas.mouseup(); return false; });
-         $imgOverlay[0].addEventListener('DOMMouseScroll', function (evt) { $canvas.DOMMouseScroll(evt); }, false);
-         $imgOverlay[0].addEventListener('mousewheel', function (evt) { $canvas.mousewheel(); }, false);
-
-         Popups.initDialog('image', '#file-image', function () {
-           var dataurl = Drupal.imager.core.getImage('image-cropped', false);
-           Popups.image.dialogToggle({
-             'attr': {
-               'src': Drupal.imager.core.getImage('image-cropped', false),
-               'width': cw,
-               'height': ch
-             }
-           });
-         }); */
 
       // Edit Buttons.
       $('#mode-crop').click(function () {
@@ -1136,14 +1139,11 @@
         }
       });
 
+      // If a full screen event happens - resize the image to fit.
       ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(function (e) {
         document.addEventListener(e, function(event) {
           setFullScreen((document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) ? true : false);
         });
-      });
-
-      window.addEventListener('resize', function (event) {
-
       });
 
       // Mode Buttons.
@@ -1154,18 +1154,30 @@
       });
 
       // View Buttons.
+      $('#view-slideshow').click(function () {
+        if (slideshowInterval) {
+          setEditMode('view');
+        }
+        else {
+          $(this).addClass('checked');
+          setEditMode('slideshow');
+        }
+      });
+
       $('#view-browser').click(function () {
         Popups.busy.hide();
-        var img = Drupal.imager.core.getImage('image-cropped', false);
+//      var img = Drupal.imager.core.getImage('image-cropped', false);
+        var img = Drupal.imager.core.getImage('screen', false);
         Drupal.imager.core.ajaxProcess(
           this,
           Drupal.imager.settings.actions.viewBrowser.url,
           {
             action: 'view-browser',
             uri: image.src,
+            mid: image.mid,
             imgBase64: img
           }, function (response) {
-            var path = response['data']['uri'];
+            var path = response['url'];
             window.open(path, '_blank');
           }
         );
@@ -1231,11 +1243,11 @@
     function setFullScreen(newMode) {
       fullScreen = newMode;
       if (fullScreen) {
-        $('#imager-canvas-wrapper').addClass('fullscreen');
+        $canvasWrapper.addClass('fullscreen');
         $('#mode-fullscreen').addClass('checked');
       }
       else {
-        $('#imager-canvas-wrapper').removeClass('fullscreen');
+        $canvasWrapper.removeClass('fullscreen');
         $('#mode-fullscreen').removeClass('checked');
       }
       initializeImage();
@@ -1278,6 +1290,19 @@
     popup.dialogOnClose = function dialogOnClose() {
       return popup;
     };
+
+    /**
+     *
+     * @param event
+     * @param ui
+     */
+    popup.dialogOnResize = function dialogOnResize(event, ui) {
+      initializeImage(event.target.offsetWidth, event.target.offsetHeight);
+      doInit = false;
+      redraw();
+      showInfo();
+      return popup;
+    }
 
     /**
      * Request to update the Viewer dialog.

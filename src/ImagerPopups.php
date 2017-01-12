@@ -52,9 +52,10 @@ class ImagerPopups {
             '#suffix' => '</div>',
             '#weight' => 0,
           ],
-//        'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'view.png', t('View image alone in Browser, useful when printing'), TRUE),
+          'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'newtab.png', t('View image alone in Browser, useful when printing'), TRUE),
 //        'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
 //        'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+          'view_slideshow' => ImagerComponents::buildButton(2, 'view-slideshow', 'slideshow.png', t('View images in slideshow')),
           'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
           'view_zoom_in' => ImagerComponents::buildButton(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
           'view_zoom_out' => ImagerComponents::buildButton(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
@@ -565,12 +566,6 @@ class ImagerPopups {
    *    Render array for configuration dialog.
    */
   function buildConfig() {
-//  $printers = array();
-//  $handle = popen(variable_get('imager_printer_search'), 'r');
-//  while (($line = fgets($handle)) !== FALSE) {
-//    $printers[] = rtrim($line, "\n");
-//  }
-//  pclose($handle);
     $id = 'imager-config';
     $content = [
       '#weight' => 1,
@@ -582,6 +577,19 @@ class ImagerPopups {
           '#title' => t('Enable Bounds limiting'),
           '#description' => t('Prevents image from zooming smaller than the viewing area and from being panned (dragged) offscreen.'),
           '#attributes' => ['id' => 'imager-bounds-enable'],
+        ],
+      ],
+      'slideshow' => [
+        '#type' => 'fieldset',
+        '#title' => 'Slideshow',
+        'imager_slideshow-interval' => [
+          '#type' => 'number',
+          '#title' => t('Interval'),
+          '#min' => 0,
+          '#max' => 60,
+          '#default_value' => 5,
+          '#description' => t('Number of seconds between image changes.'),
+          '#attributes' => ['id' => 'imager-slideshow-interval'],
         ],
       ],
       'debug' => [

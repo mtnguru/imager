@@ -148,7 +148,11 @@
 
       // Make the popup resizable.
       if (popup.spec.resizable) {
-        popup.$elem.resizable();
+        popup.$elem.resizable({
+          resize: function (event, ui) {
+            if (popup.dialogOnResize) popup.dialogOnResize(event, ui);
+          }
+        });
       }
 
       // Make the popup draggable.
@@ -169,7 +173,7 @@
         popup.$wrapper.css({left: '75px', bottom: '100px'})
       }
 
-      // Create the popup.
+      // Let inheriting class make any final changes.
       popup.dialogOnCreate();
     };
 

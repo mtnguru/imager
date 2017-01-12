@@ -230,40 +230,30 @@
                 g = (m + ((v - m) * (h_ - sextant))) * 255;
                 b = m * 255;
               }
-              else {
-                if (sextant === 1) {
-                  r = (v - ((v - m) * (h_ - sextant))) * 255;
-                  g = v * 255;
-                  b = m * 255;
-                }
-                else {
-                  if (sextant === 2) {
-                    r = m * 255;
-                    g = v * 255;
-                    b = (m + ((v - m) * (h_ - sextant))) * 255;
-                  }
-                  else {
-                    if (sextant === 3) {
-                      r = m * 255;
-                      g = (v - ((v - m) * (h_ - sextant))) * 255;
-                      b = v * 255;
-                    }
-                    else {
-                      if (sextant === 4) {
-                        r = (m + ((v - m) * (h_ - sextant))) * 255;
-                        g = m * 255;
-                        b = v * 255;
-                      }
-                      else {
-                        if (sextant === 5) {
-                          r = v * 255;
-                          g = m * 255;
-                          b = (v - ((v - m) * (h_ - sextant))) * 255;
-                        }
-                      }
-                    }
-                  }
-                }
+              else if (sextant === 1) {
+                r = (v - ((v - m) * (h_ - sextant))) * 255;
+                g = v * 255;
+                b = m * 255;
+              }
+              else if (sextant === 2) {
+                r = m * 255;
+                g = v * 255;
+                b = (m + ((v - m) * (h_ - sextant))) * 255;
+              }
+              else if (sextant === 3) {
+                r = m * 255;
+                g = (v - ((v - m) * (h_ - sextant))) * 255;
+                b = v * 255;
+              }
+              else if (sextant === 4) {
+                r = (m + ((v - m) * (h_ - sextant))) * 255;
+                g = m * 255;
+                b = v * 255;
+              }
+              else if (sextant === 5) {
+                r = v * 255;
+                g = m * 255;
+                b = (v - ((v - m) * (h_ - sextant))) * 255;
               }
             }
           }
