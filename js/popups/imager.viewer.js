@@ -850,9 +850,10 @@
 
         case 'slideshow':
           $('#view-slideshow').addClass('checked');
+          var interval = (localStorage.imagerSlideshowInterval == 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
           slideshowInterval = setInterval(function() {
             changeImage(Drupal.imager.findNextImage(image, 1));
-          }, localStorage.imagerSlideshowInterval || 5 * 1000);
+          }, interval * 1000);
           break;
 
         case 'crop':

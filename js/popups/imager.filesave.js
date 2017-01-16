@@ -49,6 +49,29 @@
     // Initialize the popup.
     var popup = Drupal.imager.popups.baseC(dspec);
 
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-filesave-new-image':
+          database(false);
+          popup.dialogClose();
+          break;
+
+        case 'imager-filesave-overwrite':
+          database(true);
+          popup.dialogClose();
+          break;
+
+        case 'imager-filesave-download-image-image':
+          download();
+          popup.dialogClose();
+          break;
+
+        case 'imager-filesave-cancel':
+          popup.dialogClose();
+          break;
+      }
+    };
+
     var database = function database(overwrite) {
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
@@ -93,7 +116,6 @@
         }
       );
       Popups.$busy.hide();
-      popup.dialogClose();
     };
 
     var download = function download() {
@@ -102,7 +124,6 @@
       window.location.href = dataurl;
       window.location.download = 'downloadit.jpg';
       Popups.$busy.hide();
-      popup.dialogClose();
 
       /*    var img = document.createElement('img');
        img.src = dataurl;
@@ -133,44 +154,6 @@
       );
       Popups.$busy.hide();
       popup.dialogClose();
-    };
-
-    popup.onButtonClick = function onButtonClick(buttonName) {
-      switch (buttonName) {
-        case 'imager-color-apply':
-          break;
-
-        case 'imager-color-reset':
-          popup.init();
-          if (popup.dialogIsOpen()) {
-            $('#slider-hue').val(0);
-            $('#slider-saturation').val(0);
-            $('#slider-lightness').val(0);
-            adjustColor(Viewer.$canvas2, Viewer.$canvas);
-          }
-          break;
-
-        case 'imager-color-cancel':
-          popup.dialogClose();
-          break;
-      }
-    };
-
-    popup.onButtonClick = function onButtonClick(buttonName) {
-      switch (buttonName) {
-        case 'imager-filesave-new-image':
-          break;
-
-        case 'imager-filesave-overwrite':
-          break;
-
-        case 'imager-filesave-download-image-image':
-          break;
-
-        case 'imager-filesave-cancel':
-          popup.dialogClose();
-          break;
-      }
     };
 
     popup.dialogOnCreate = function dialogOnCreate() {

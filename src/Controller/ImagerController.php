@@ -3,14 +3,17 @@
 namespace Drupal\imager\Controller;
 
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\OpenModalDialogCommand;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\imager\ImagerPopups;
 use Drupal\imager\Ajax\ImagerCommand;
-use Drupal\Core\DrupalKernel;
-
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\file\Entity\File;
+
+use Drupal\Core\File\FileSystemInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+
 
 /**
  * Class ImagerController.
@@ -18,6 +21,51 @@ use Drupal\file\Entity\File;
  * @package Drupal\imager\Controller
  */
 class ImagerController extends ControllerBase {
+
+  /**
+   * The Entity Manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * The File system.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
+   * Constructs a \Drupal\system\ConfigFormBase object.
+   *
+   * @param Client $client
+   *   Acquia Client.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, FileSystemInterface $file_system) {
+    $this->configFactory = $config_factory;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->fileSystem = $file_system;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('entity.manager'),
+      $container->get('file_system')
+    );
+  }
+
 
   /**
    * Load a File.
@@ -120,7 +168,7 @@ class ImagerController extends ControllerBase {
     $data = json_decode(file_get_contents("php://input"), true);
 
     // Load the media entity.
-    $media = \Drupal::entityTypeManager()->getStorage('media')->load($data['mid']);
+    $media = $this->entityTypeManager->getStorage('media')->load($data['mid']);
 
     $fp = $this->getFileParts(urldecode($data['uri']), true);
 
@@ -225,7 +273,7 @@ class ImagerController extends ControllerBase {
     $data = json_decode(file_get_contents("php://input"), true);
 
     // Load the media entity.
-    $media = \Drupal::entityTypeManager()->getStorage('media')->load($data['mid']);
+    $media = $this->entityTypeManager->getStorage('media')->load($data['mid']);
 
 
     // Directory where images and temporary html files are stored.
@@ -234,9 +282,9 @@ class ImagerController extends ControllerBase {
 
     $base_url = $GLOBALS['base_url'] . $GLOBALS['base_path'];
     $urlDir = 'public://imager';
-    $fullDir = \Drupal::service('file_system')->realpath($urlDir);
+    $fullDir = $this->entityTypeManager->realpath($urlDir);
     $dir = str_replace(DRUPAL_ROOT . '/', '', $fullDir);
-    $path = \Drupal::service('file_system')->tempnam($fullDir);
+    $path = $this->fileSystem->tempnam($fullDir);
     $np = pathinfo($path);
     $tmpImagePath = $path . '_tmp.' . $fp['extension'];
     $imagePath    = $path . '.' . $fp['extension'];
@@ -266,5 +314,23 @@ class ImagerController extends ControllerBase {
     $response->addCommand(new ImagerCommand($data));
     return $response;
   }
+
+  public function displayEntity() {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $config = $this->configFactory->get('imager.settings');
+
+    // Load the media entity.
+    $media = $this->entityTypeManager->getStorage('media')->load($data['mid']);
+
+    $view_mode = explode('.', $config->get('view_mode_info'))[1];
+//  $view_mode = $config->get('view_mode_info');
+    $data['html'] = render($this->entityTypeManager->getViewBuilder('media')->view($media, $view_mode));
+
+    $response = new AjaxResponse();
+    $response->addCommand(new ImagerCommand($data));
+    return $response;
+  }
 }
+
+
 

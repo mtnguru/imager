@@ -28,19 +28,6 @@ class ImagerPopups {
           'image_left' => ImagerComponents::buildButton(3, 'image-left', 'left_arrow.png', t('View image to the left')),
           'image_right' => ImagerComponents::buildButton(4, 'image-right', 'right_arrow.png', t('View image to the right')),
         ],
-/*      'mode_buttons' => [
-          '#prefix' => '<div id="mode-buttons" class="imager-buttons">',
-          '#suffix' => '</div>',
-          '#weight' => 2,
-          'title' => [
-            '#type' => 'markup',
-            '#markup' => t('Mode'),
-            '#prefix' => '<div>',
-            '#suffix' => '</div>',
-            '#weight' => 0,
-          ],
-          'mode_view' => ImagerComponents::buildButton(1, 'mode-view', 'eye.png', t('Enable/Disable quick image viewing - view on hover')),
-        ], */
         'view_buttons' => [
           '#prefix' => '<div id="view-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
@@ -53,7 +40,7 @@ class ImagerPopups {
             '#weight' => 0,
           ],
           'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'newtab.png', t('View image alone in Browser, useful when printing'), TRUE),
-//        'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
+          'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
 //        'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
           'view_slideshow' => ImagerComponents::buildButton(2, 'view-slideshow', 'slideshow.png', t('View images in slideshow')),
           'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
@@ -142,6 +129,31 @@ class ImagerPopups {
   }
 
   /**
+   * Build render array for information dialog - displays rendered file_entity.
+   *
+   * @return array
+   */
+  private function buildInfo($config) {
+    $id = 'imager-info';
+    $content = [
+      '#prefix' => '<div id="imager-info">',
+      '#suffix' => '</div>',
+      'content' => [
+        '#prefix' => '<div id="imager-info-content" class="imager-content">',
+        '#suffix' => '</div>',
+        '#weight' => 1,
+        '#type' => 'markup',
+        '#markup' => t('Placeholder for information popup'),
+      ],
+    ];
+    return [
+      'content' => $content,
+      'buttons' => ['Close'],
+      'id' => $id,
+    ];
+  }
+
+  /**
    * Build render array for HSL slider popup.
    *
    * @return array
@@ -197,7 +209,6 @@ class ImagerPopups {
       'id' => $id,
     ];
   }
-
 
 /**
  * Build render array for brightness/contrast slidebar popup.

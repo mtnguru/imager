@@ -5,9 +5,26 @@
  * Provides full image viewing and editing capability from a page of thumbnails.
  */
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+
+/**
+ * Implements hook_help().
+ */
+function imager_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the imager module.
+    case 'help.page.imager':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Displays images at full resolution in a popup.  Users can pan, zoom, rotate, crop and change brightness/contrast and hue/saturation/lightness.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
 
 /**
  * Implements hook_theme().

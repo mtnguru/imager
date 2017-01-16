@@ -42,18 +42,14 @@
 
     var dspec = $.extend({
       name: 'Info',
-      autoOpen: false,
-      title: 'File Information',
+      title: 'Information',
       zIndex: 1015,
-      width: 'auto',
-      height: 'auto',
-      dialogClass: 'imager-dialog imager-info-dialog',
       cssId: 'imager-info',
-      resizable: true,
+      resizable: false,
+      draggable: true,
       position: {
-        my: 'left',
-        at: 'right',
-        of: spec.$selectButton
+        left: '50px',
+        top: '150px'
       },
       open: function () {
         var closeBtn = $('.ui-dialog-titlebar-close');
@@ -71,13 +67,20 @@
     // Initialize the popup.
     popup = Popups.baseC(dspec);
 
+    popup.onButtonClick = function onButtonClick(buttonName) {
+      switch (buttonName) {
+        case 'imager-info-close':
+          popup.dialogClose();
+          break;
+      }
+    };
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();
     };
 
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
-      focalStorage.imagerShowInfo = 'TRUE';
+      localStorage.imagerShowInfo = 'TRUE';
     };
 
     popup.dialogOnClose = function dialogOnClose() {
@@ -92,16 +95,18 @@
 
     popup.dialogUpdate = function dialogUpdate() {
       Popups.$busy.show();
-      Drupal.imager.core.ajaxProcess(this,
+      Drupal.imager.core.ajaxProcess(
+        this,
         Drupal.imager.settings.actions.displayEntity.url,
         {
-          action: 'display-entity',
-          uri: Viewer.getImage().src
+          action: 'view-info',
+          uri: Viewer.getImage().src,
+          mid: Viewer.getImage().mid,
         }, function (response) {
           Popups.$busy.hide();
-          popup.spec.$elem.removeClass('error').show();
-          if (response['data']) {
-            $('#imager-info-content').html(response['data']);
+          popup.$elem.removeClass('error').show();
+          if (response['html']) {
+            $('#imager-info-content').html(response['html']);
             $('.imager-info-edit').click(function (evt) {
               editField = this.id.replace('imager-', '');
               Popups.edit.dialogSelect({
@@ -110,7 +115,8 @@
               });
             });
           }
-        });
+        }
+      );
     };
 
     return popup;
