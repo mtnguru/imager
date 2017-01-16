@@ -163,8 +163,12 @@ $spacing: 10px;
 }
 
 #imager-info {
-  min-width: 20em;
+  min-width: 22em;
   max-width: 35em;
+  .field--name-name {
+    font-size: 120%;
+    margin-bottom: 8px;
+  }
 }
 
 #imager-status {
