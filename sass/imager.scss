@@ -162,6 +162,11 @@ $spacing: 10px;
   }
 }
 
+#imager-info {
+  min-width: 20em;
+  max-width: 35em;
+}
+
 #imager-status {
   .imager-status-col {
     display: inline-block;

@@ -49,7 +49,7 @@
       draggable: true,
       position: {
         left: '50px',
-        top: '150px'
+        top: '20px'
       },
       open: function () {
         var closeBtn = $('.ui-dialog-titlebar-close');
