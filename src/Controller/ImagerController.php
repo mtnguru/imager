@@ -3,16 +3,14 @@
 namespace Drupal\imager\Controller;
 
 use Drupal\Core\Ajax\AjaxResponse;
-
-use Drupal\Core\Controller\ControllerBase;
-use Drupal\imager\ImagerPopups;
-use Drupal\imager\Ajax\ImagerCommand;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\file\Entity\File;
-
-use Drupal\Core\File\FileSystemInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\file\Entity\File;
+use Drupal\imager\Ajax\ImagerCommand;
+use Drupal\imager\ImagerPopups;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
 /**
@@ -282,7 +280,7 @@ class ImagerController extends ControllerBase {
 
     $base_url = $GLOBALS['base_url'] . $GLOBALS['base_path'];
     $urlDir = 'public://imager';
-    $fullDir = $this->entityTypeManager->realpath($urlDir);
+    $fullDir = $this->fileSystem->realpath($urlDir);
     $dir = str_replace(DRUPAL_ROOT . '/', '', $fullDir);
     $path = $this->fileSystem->tempnam($fullDir);
     $np = pathinfo($path);

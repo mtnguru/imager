@@ -33,7 +33,7 @@
     var Popups = Drupal.imager.popups;
     var popup;
 
-    var $interval = $('#imager-slideshow-interval');
+    var $interval;
 
     var dspec = $.extend({
       name: 'Config',
@@ -63,6 +63,7 @@
     };
 
     popup.dialogOnCreate = function dialogOnCreate() {
+      $interval = $('#imager-slideshow-interval');
       popup.dialogOpen();
     };
 
@@ -81,7 +82,8 @@
         $('#imager-bounds-enable').attr('checked', 'checked');
       }
 
-      $interval.val(localStorage.imagerSlideshowInterval || 5);
+      var intval = (localStorage.imagerSlideshowInterval == 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
+      $interval.val(intval);
 
       if (localStorage.imagerDebugStatus === 'TRUE') {
         $('#imager-debug-status').attr('checked', 'checked');

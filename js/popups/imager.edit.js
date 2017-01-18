@@ -34,7 +34,6 @@
     var Popups = Drupal.imager.popups;
     var Viewer = Drupal.imager.viewer;
     var popup;
-
     var dspec = $.extend({
       name: 'Edit',
       autoOpen: false,

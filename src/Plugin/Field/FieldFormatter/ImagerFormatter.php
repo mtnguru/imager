@@ -8,22 +8,20 @@
 namespace Drupal\imager\Plugin\Field\FieldFormatter;
 
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\image\Entity\ImageStyle;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatterBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Cache\Cache;
-
-
 use Drupal\imager\ImagerFiles;
 use Drupal\imager\ImagerInit;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 
 /**
  * Plugin implementation of the 'imager_mode' formatter.
@@ -150,6 +148,9 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
     return $summary;
   }
 
+  /**
+   * @var bool
+   */
   static $libraries_attached = false;
 
 

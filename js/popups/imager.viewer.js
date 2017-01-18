@@ -850,7 +850,7 @@
 
         case 'slideshow':
           $('#view-slideshow').addClass('checked');
-          var interval = (localStorage.imagerSlideshowInterval == 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
+          var interval = (localStorage.imagerSlideshowInterval == undefined) ? 5 : localStorage.imagerSlideshowInterval;
           slideshowInterval = setInterval(function() {
             changeImage(Drupal.imager.findNextImage(image, 1));
           }, interval * 1000);

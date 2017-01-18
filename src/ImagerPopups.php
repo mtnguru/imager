@@ -593,12 +593,12 @@ class ImagerPopups {
       'slideshow' => [
         '#type' => 'fieldset',
         '#title' => 'Slideshow',
-        'imager_slideshow-interval' => [
+        'imager_slideshow_interval' => [
           '#type' => 'number',
           '#title' => t('Interval'),
           '#min' => 0,
           '#max' => 60,
-          '#default_value' => 5,
+          '#default_value' => '93',
           '#description' => t('Number of seconds between image changes.'),
           '#attributes' => ['id' => 'imager-slideshow-interval'],
         ],
