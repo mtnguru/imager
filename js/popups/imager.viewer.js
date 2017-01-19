@@ -152,6 +152,7 @@
       image.ih = img.height;
       if (fullScreen) {
         // Maximum canvas width and height.
+        var $wrapper = $('#button-wrapper');
         mw = $(window).width() - 45;
         mh = $(window).height() - 10;
         cw = mw;
@@ -190,6 +191,28 @@
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // Clear the canvas.
       ctx.clearRect(0, 0, cw, ch);
+
+      // Center the image.
+      if (fullScreen) {
+        var move;
+        if (hscale > vscale) {       // Center vertically
+          if (image.ih > ch) {
+            move = (image.ih - ch) / 2;
+          } else {
+            move = (ch - image.ih) / 2;
+          }
+          ctx.translate(0, move);
+        }
+        else if (hscale < vscale) {  // Center horizontally
+          if (image.iw > cw) {
+            move = (image.iw - cw) / 2;
+          } else {
+            move = (cw - image.iw) / 2;
+            move = 250;
+          }
+          ctx.translate(move, 0);
+        }
+      }
 
       pt_down.setPt(cw / 2, ch / 2, ctx);
       // Initialize last mouse down event to center.
@@ -1140,6 +1163,53 @@
         }
       });
 
+      $("#imager-wrapper").hover(function() {
+        var x = window.scrollX, y = window.scrollY;
+        this.focus();
+        window.scrollTo(x, y);
+      }, function() {
+        this.blur();
+      }).keyup(function(event) {
+        switch (event.keyCode) {
+          case 70: // F
+            screenfull.toggle($('#imager-wrapper')[0]);
+            event.preventDefault;
+            break;
+
+          case 88: // X
+          case 27: // escape
+            if (fullScreen) {
+              screenfull.toggle($('#imager-wrapper')[0]);
+              hidePopups();
+            }
+            else {
+              hidePopups();
+            }
+            event.preventDefault();
+            break;
+
+          case 74: // J
+          case 37: // left arrow
+//        case 38: // up arrow
+            event.stopPropagation();
+            event.preventDefault();
+            changeImage(Drupal.imager.findNextImage(image, -1));
+            break;
+
+          case 75: // K
+          case 39: // right arrow
+//        case 40: // down arrow
+            event.stopPropagation();
+            changeImage(Drupal.imager.findNextImage(image, 1));
+            break;
+
+          case 82: // R
+            setEditMode('view');
+            changeImage(image);
+            break;
+        }
+      });
+
       // If a full screen event happens - resize the image to fit.
       ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(function (e) {
         document.addEventListener(e, function(event) {
@@ -1280,6 +1350,9 @@
      */
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
+      var x = window.scrollX, y = window.scrollY;  // Get current scroll location
+      $('#imager-wrapper').focus();                // Set focus to imager-wrapper
+      window.scrollTo(x, y);                       // Restore scroll
       return popup;
     };
 
