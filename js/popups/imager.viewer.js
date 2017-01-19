@@ -196,21 +196,10 @@
       if (fullScreen) {
         var move;
         if (hscale > vscale) {       // Center vertically
-          if (image.ih > ch) {
-            move = (image.ih - ch) / 2;
-          } else {
-            move = (ch - image.ih) / 2;
-          }
-          ctx.translate(0, move);
+          ctx.translate(0, ((ch * image.iw / cw - image.ih) / 2));
         }
         else if (hscale < vscale) {  // Center horizontally
-          if (image.iw > cw) {
-            move = (image.iw - cw) / 2;
-          } else {
-            move = (cw - image.iw) / 2;
-            move = 250;
-          }
-          ctx.translate(move, 0);
+          ctx.translate(((cw * image.ih / ch - image.iw) / 2), 0);
         }
       }
 
