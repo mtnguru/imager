@@ -40,8 +40,8 @@
       draggable: false,
       position: {
         left: 0,
-        top: 0,
-      },
+        top: 0
+      }
     }, spec);
 
     var popup = Popups.baseC(dspec); // Initialize viewerC from baseC.
@@ -127,7 +127,7 @@
     /**
      * Upon completion of image loading, initialize and draw the image to canvas.
      */
-    img.addEventListener('load', function() {
+    img.addEventListener('load', function () {
       if (doInit) {
         initializeImage();
         doInit = false;
@@ -143,6 +143,9 @@
      *
      * @TODO - When calculating the canvas dimensions the borders and padding must be
      * accounted for.  Currently these are constants are made to look good with my theme.
+     *
+     * @param width
+     * @param height
      */
     var initializeImage = function initializeImage(width, height) {
       var hscale;
@@ -152,7 +155,6 @@
       image.ih = img.height;
       if (fullScreen) {
         // Maximum canvas width and height.
-        var $wrapper = $('#button-wrapper');
         mw = $(window).width() - 45;
         mh = $(window).height() - 10;
         cw = mw;
@@ -194,7 +196,6 @@
 
       // Center the image.
       if (fullScreen) {
-        var move;
         if (hscale > vscale) {       // Center vertically
           ctx.translate(0, ((ch * image.iw / cw - image.ih) / 2));
         }
@@ -400,7 +401,7 @@
       var niw = pt_crop_lr.getTxPt().x - pt_crop_ul.getTxPt().x;
       var nih = pt_crop_lr.getTxPt().y - pt_crop_ul.getTxPt().y;
 
-      $canvas.attr({ width: niw, height: nih });
+      $canvas.attr({width: niw, height: nih});
       ctx.clearRect(0, 0, cw, ch);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(img,
@@ -862,8 +863,8 @@
 
         case 'slideshow':
           $('#view-slideshow').addClass('checked');
-          var interval = (localStorage.imagerSlideshowInterval == undefined) ? 5 : localStorage.imagerSlideshowInterval;
-          slideshowInterval = setInterval(function() {
+          var interval = (localStorage.imagerSlideshowInterval === 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
+          slideshowInterval = setInterval(function () {
             changeImage(Drupal.imager.findNextImage(image, 1));
           }, interval * 1000);
           break;
@@ -1156,17 +1157,18 @@
         }
       });
 
-      $("#imager-wrapper").hover(function() {
-        var x = window.scrollX, y = window.scrollY;
+      $('#imager-wrapper').hover(function () {
+        var x = window.scrollX;
+        var y = window.scrollY;
         this.focus();
         window.scrollTo(x, y);
       }, function() {
         this.blur();
-      }).keyup(function(event) {
+      }).keyup(function (event) {
         switch (event.keyCode) {
           case 70: // F
             screenfull.toggle($('#imager-wrapper')[0]);
-            event.preventDefault;
+            event.preventDefault();
             break;
 
           case 88: // X
@@ -1205,7 +1207,7 @@
 
       // If a full screen event happens - resize the image to fit.
       ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(function (e) {
-        document.addEventListener(e, function(event) {
+        document.addEventListener(e, function (event) {
           setFullScreen((document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) ? true : false);
         });
       });
@@ -1343,7 +1345,8 @@
      */
     popup.dialogOnOpen = function dialogOnOpen() {
       popup.dialogUpdate();
-      var x = window.scrollX, y = window.scrollY;  // Get current scroll location
+      var x = window.scrollX;
+      var y = window.scrollY;
       $('#imager-wrapper').focus();                // Set focus to imager-wrapper
       window.scrollTo(x, y);                       // Restore scroll
       return popup;
@@ -1362,6 +1365,7 @@
      *
      * @param event
      * @param ui
+     * @return popup
      */
     popup.dialogOnResize = function dialogOnResize(event, ui) {
       initializeImage(event.target.offsetWidth, event.target.offsetHeight);
@@ -1369,7 +1373,7 @@
       redraw();
       showInfo();
       return popup;
-    }
+    };
 
     /**
      * Request to update the Viewer dialog.

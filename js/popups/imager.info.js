@@ -101,7 +101,7 @@
         {
           action: 'view-info',
           uri: Viewer.getImage().src,
-          mid: Viewer.getImage().mid,
+          mid: Viewer.getImage().mid
         }, function (response) {
           Popups.$busy.hide();
           popup.$elem.removeClass('error').show();

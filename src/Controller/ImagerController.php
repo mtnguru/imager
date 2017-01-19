@@ -12,7 +12,6 @@ use Drupal\imager\Ajax\ImagerCommand;
 use Drupal\imager\ImagerPopups;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 /**
  * Class ImagerController.
  *
@@ -42,10 +41,11 @@ class ImagerController extends ControllerBase {
   protected $fileSystem;
 
   /**
-   * Constructs a \Drupal\system\ConfigFormBase object.
+   * ImagerController constructor.
    *
-   * @param Client $client
-   *   Acquia Client.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, FileSystemInterface $file_system) {
     $this->configFactory = $config_factory;
@@ -64,28 +64,24 @@ class ImagerController extends ControllerBase {
     );
   }
 
-
   /**
    * Load a File.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function loadFile() {
-
-    $response = new AjaxResponse();
-
     $data['needamessageorsomething'] = 'nada';
     return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
 
   /**
-   * Create drupal public or private path and a unique image filename.
+   * Separate a file path into it's parts.
    *
-   * @param string $uri
-   *   URI of file.
+   * @TODO this can probably be replaced with pathinfo().
    *
-   * @return object $ps
-   *   Array of paths for this image.
+   * @param $uri
+   * @param $makeNew
+   * @return mixed
    */
   private function getFileParts($uri, $makeNew) {
     $fp = pathinfo($uri);
@@ -162,12 +158,12 @@ class ImagerController extends ControllerBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function saveFile() {
-    $data = json_decode(file_get_contents("php://input"), true);
+    $data = json_decode(file_get_contents("php://input"), TRUE);
 
     // Load the media entity.
     $media = $this->entityTypeManager->getStorage('media')->load($data['mid']);
 
-    $fp = $this->getFileParts(urldecode($data['uri']), true);
+    $fp = $this->getFileParts(urldecode($data['uri']), TRUE);
 
     // Save the image, process through 'convert' command to reduce file size (quality).
     $tmpPath = file_directory_temp() . '/' . $fp['newfilename'] . '.' . $fp['extension'];
@@ -181,7 +177,7 @@ class ImagerController extends ControllerBase {
     $image = $media->get('image')->getValue();
     $thumb = $media->get('thumbnail')->getValue();
 
-    $media = ($data['overwrite'] == "true") ? $media : $media->createDuplicate();
+    $media = ($data['overwrite'] == "TRUE") ? $media : $media->createDuplicate();
 
     // Set the primary image.
     $image[0]['target_id'] = $file->id();
@@ -191,10 +187,10 @@ class ImagerController extends ControllerBase {
     $thumb[0]['target_id'] = $file->id();
     $media->get('thumbnail')->setValue($thumb);
 
-    // Set the changed time to current time
+    // Set the changed time to current time.
     $media->get('changed')->setValue(REQUEST_TIME);
 
-    // Save the media entity
+    // Save the media entity.
     $media->save();
 
     // @TODO - return confirmation message.
@@ -204,6 +200,7 @@ class ImagerController extends ControllerBase {
 
   /**
    * Delete a file.
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function deleteFile() {
@@ -213,6 +210,7 @@ class ImagerController extends ControllerBase {
 
   /**
    * Load a map
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function loadMap() {
@@ -222,6 +220,7 @@ class ImagerController extends ControllerBase {
 
   /**
    * Load the Image Edit form.
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function loadImageForm() {
@@ -231,6 +230,7 @@ class ImagerController extends ControllerBase {
 
   /**
    * Load a field from the Image Edit form.
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function loadImageFieldForm() {
@@ -239,12 +239,19 @@ class ImagerController extends ControllerBase {
   }
 
   /**
+   * List of popups which have been created.
+   *
+   * @var null
+   */
+  static private $popups = NULL;
+
+  /**
    * Load one of the Imager dialogs.
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
-  static $popups = null;
   public function loadDialog() {
-    $data = json_decode(file_get_contents("php://input"), true);
+    $data = json_decode(file_get_contents("php://input"), TRUE);
 
     if (empty(self::$popups)) {
       self::$popups = new ImagerPopups();
@@ -259,13 +266,14 @@ class ImagerController extends ControllerBase {
 
     return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
+
   /**
    * Save the image so it can be displayed in a new tab in the browser.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
   public function viewBrowser() {
-    $data = json_decode(file_get_contents("php://input"), true);
+    $data = json_decode(file_get_contents("php://input"), TRUE);
 
     $fp = pathinfo(urldecode($data['uri']));
 
@@ -289,8 +297,13 @@ class ImagerController extends ControllerBase {
     return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
 
+  /**
+   * Render the current entity using the configured information view_mode.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   */
   public function displayEntity() {
-    $data = json_decode(file_get_contents("php://input"), true);
+    $data = json_decode(file_get_contents("php://input"), TRUE);
     $config = $this->configFactory->get('imager.settings');
 
     // Load the media entity.
@@ -302,7 +315,6 @@ class ImagerController extends ControllerBase {
 
     return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
+
 }
-
-
 

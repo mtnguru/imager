@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\imager\Plugin\Field\FieldFormatter\ImagerFormatter.
- */
-
 namespace Drupal\imager\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
@@ -17,10 +12,8 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatterBase;
-use Drupal\imager\ImagerFiles;
 use Drupal\imager\ImagerInit;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 
 /**
  * Plugin implementation of the 'imager_mode' formatter.
@@ -30,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   label = @Translation("Imager"),
  *   description = @Translation("Display an image in an imager viewer window."),
  *   field_types = {
- *     "image", 
+ *     "image",
  *   }
  * )
  */
@@ -76,8 +69,14 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
     $this->imageStyleStorage = $image_style_storage;
   }
 
- /**
-   * {@inheritdoc}
+  /**
+   * Create function.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param array $configuration
+   * @param string $plugin_id
+   * @param mixed $plugin_definition
+   * @return static
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
@@ -120,7 +119,7 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
       '#empty_option' => t('None (original image)'),
       '#options' => $image_styles,
       '#description' => $description_link->toRenderable() + [
-        '#access' => $this->currentUser->hasPermission('administer image styles')
+        '#access' => $this->currentUser->hasPermission('administer image styles'),
       ],
     ];
 
@@ -148,13 +147,18 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
   }
 
   /**
+   * Flag to prevent loading libraries more than one time.
+   *
    * @var bool
    */
-  static $libraries_attached = false;
-
+  private static $librariesAttached = FALSE;
 
   /**
-   * {@inheritdoc}
+   * Create render array for field formatter.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param string $langcode
+   * @return array
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
@@ -173,7 +177,6 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
       $image_style = $this->imageStyleStorage->load($image_style_setting);
       $base_cache_tags = $image_style->getCacheTags();
     }
-
 
     foreach ($files as $delta => $file) {
       $cache_contexts = [];
@@ -199,8 +202,8 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
         ),
       );
 
-      if (self::$libraries_attached == false) {
-        self::$libraries_attached = true;
+      if (self::$librariesAttached == FALSE) {
+        self::$librariesAttached = TRUE;
         $imager = ImagerInit::start([
           'atom_id' => 1,
           'imager_id' => 'Imager Viewer',
@@ -215,20 +218,7 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
       }
     }
 
-    /***
-    $elements = array();
-
-    foreach ($items as $delta => $item) {
-    // Read in the config/imager file
-
-    $mid = $items->getEntity()->mid->value;
-    $config = [
-    ];
-
-    $elements[$delta] = ImagerInit::start($config);
-    }
-    **/
-
     return $elements;
   }
+
 }

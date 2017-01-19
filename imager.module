@@ -8,8 +8,7 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\imager\ImagerHelp;
-use Drupal\user\UserInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_help().
@@ -21,7 +20,7 @@ function imager_help($route_name, RouteMatchInterface $route_match) {
       return ImagerHelp::content();
 
     default:
-      return null;
+      return NULL;
 
   }
 }
@@ -33,10 +32,11 @@ function imager_theme() {
   return array(
     'imager_formatter' => array(
       'variables' => array(
-        'item' => null,
-        'item_attributes' => null,
-        'url' => null,
-        'image_style' => null),
+        'item' => NULL,
+        'item_attributes' => NULL,
+        'url' => NULL,
+        'image_style' => NULL
+      ),
       'file' => 'imager.field.inc',
     ),
   );
@@ -50,6 +50,5 @@ function imager_theme() {
  */
 function imager_form_media_image_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form['field_photographer']['widget'][0]['target_id']['#default_value'] =
-    \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+    User::load(\Drupal::currentUser()->id());
 }
-

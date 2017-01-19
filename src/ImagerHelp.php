@@ -1,15 +1,15 @@
 <?php
 
-/**
- * @file
- * @Contains \Drupal\imager\ImagerHelp
- */
-
 namespace Drupal\imager;
 
 class ImagerHelp {
 
-  static function content() {
+  /**
+   * Define help page html using heredoc.
+   *
+   * @return string
+   */
+  static public function content() {
 
     $path = '/' . drupal_get_path('module', 'imager') . '/icons';
 
@@ -83,4 +83,5 @@ EOT;
 
     return $output;
   }
+
 }

@@ -2,16 +2,19 @@
 
 namespace Drupal\imager;
 
-use Drupal\Component\Serialization\Yaml;
-use Drupal\Component\Utility\Xss;
-
 /**
  * Class ImagerInit
+ *
  * @package Drupal\imager
  */
 class ImagerInit {
-  static $js_loaded = false;
 
+  /**
+   * Create render array to attach necessary libraries and settings.
+   *
+   * @param $config
+   * @return array
+   */
   static public function start($config) {
     $build = array(
       '#attached' => array(
@@ -28,5 +31,5 @@ class ImagerInit {
     );
     return $build;
   }
-}
 
+}

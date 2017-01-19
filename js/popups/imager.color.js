@@ -311,7 +311,7 @@
       }
       ctxdst.putImageData(dataDesc, 0, 0);
       Popups.busy.hide();
-    };
+    }
 
     popup.dialogUpdate = function dialogUpdate() {
     };

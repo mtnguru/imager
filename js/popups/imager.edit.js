@@ -118,7 +118,6 @@
     };
 
     popup.save = function save() {
-      var out = '';
       var value = '';
       var format = '';
       var $elems;

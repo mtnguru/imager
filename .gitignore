@@ -1,6 +1,6 @@
 nbproject
 *.swp
-*.map
+*.css.map
 .sass-cache
 js/ui-lightness
 .idea

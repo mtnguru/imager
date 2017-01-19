@@ -4,9 +4,18 @@ namespace Drupal\imager;
 
 use Drupal\imager\ImagerComponents;
 
+/**
+ * Class ImagerPopups
+ * @package Drupal\imager
+ */
 class ImagerPopups {
 
-  private function buildViewer($config) {
+  /**
+   * @param array $config
+   *   Array to configure popup.
+   * @return array
+   */
+  private function buildViewer(array $config) {
     $id = 'imager-viewer';
     $content = [
       'button_wrapper' => [
@@ -42,7 +51,8 @@ class ImagerPopups {
           'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
           'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'newtab.png', t('View image in new tab, useful when printing'), TRUE),
           'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
-//        'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
+          // 'view_map' => ImagerComponents::buildButton(3, 'view-map',
+          //   'map.png', t('View map showing image locations for page')),
           'view_slideshow' => ImagerComponents::buildButton(2, 'view-slideshow', 'slideshow.png', t('View images in slideshow')),
           'view_zoom_in' => ImagerComponents::buildButton(5, 'view-zoom-in', 'zoomin.png', t('Zoom into the image')),
           'view_zoom_out' => ImagerComponents::buildButton(6, 'view-zoom-out', 'zoomout.png', t('Zoom out of the image')),
@@ -79,7 +89,8 @@ class ImagerPopups {
           'file_save' => ImagerComponents::buildButton(1, 'file-save',
             'database_go.png', t('Save edited image to database')),
           // @TODO Don't display if doesn't have permissions.
-          // 'file_delete' => ImagerComponents::buildButton(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
+          // 'file_delete' => ImagerComponents::buildButton(2, 'file-delete',
+          //   'database_delete.png', t('Delete image from database')),
           'file_download' => ImagerComponents::buildButton(3, 'file-download',
             'download.png', t('Download image to local file system'), TRUE),
           // @TODO Don't display if not at appropriate IP addresses.
@@ -92,8 +103,10 @@ class ImagerPopups {
           '#prefix' => '<div id="debug-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => -5,
-          'debug_status' => ImagerComponents::buildButton(1, 'debug-status', 'bug.png', t('Toggle status output')),
-//        'debug_messages' => ImagerComponents::buildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
+          'debug_status' => ImagerComponents::buildButton(1, 'debug-status',
+            'bug.png', t('Toggle status output')),
+          // 'debug_messages' => ImagerComponents::buildButton(2, 'debug-messages',
+          //   'bug2.png', t('Toggle debug messages')),
         ],
       ],
       'imager_canvas_wrapper' => [
@@ -108,9 +121,9 @@ class ImagerPopups {
         'imager_image' => [
           '#type' => 'markup',
           '#weight' => 2,
-          '#markup' => '<img id="imager-image" src="'
-            . $GLOBALS["base_url"] . '/' . drupal_get_path('module', 'imager') . '/icons/transparent.png'
-            . '" alt="" title="" />',
+          '#markup' => '<img id="imager-image" src="' .
+            $GLOBALS["base_url"] . '/' . drupal_get_path('module', 'imager') . '/icons/transparent.png' .
+            '" alt="" title="" />',
         ],
         'imager_canvas2' => [
           '#weight' => 3,
@@ -728,10 +741,15 @@ class ImagerPopups {
   /**
    * Build all popups.
    *
-   * @param $config
+   * @param array $config
+   *   Configuration which define popup.
+   * @return mixed
+   *   Return the render array for all popups.
+   */
+  /**
    * @return mixed
    */
-  public function build($config) {
+  public function build(array $config) {
     $func = 'build' . $config['popupName'];
 
     // Define the dialog contents.

@@ -182,7 +182,8 @@
         }
       }
       ctxdst.putImageData(dataDesc, 0, 0);
-    };
+    }
+
     popup.dialogReset = function dialogReset() {
     };
 

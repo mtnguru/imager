@@ -17,7 +17,6 @@
    *   Return the color dialog.
    */
   Drupal.imager.popups.busyC = function busyC() {
-    var Popups = Drupal.imager.popups;
     var $busy;
     var basepath = drupalSettings.path.baseUrl;
 

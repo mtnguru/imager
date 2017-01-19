@@ -5,16 +5,19 @@ namespace Drupal\imager\Ajax;
 use Drupal\Core\Ajax\CommandInterface;
 
 /**
- * Class ImagerCommand
+ * Class ImagerCommand.
+ *
  * @package Drupal\imager\Ajax
  */
 class ImagerCommand implements CommandInterface {
 
   /**
    * ImagerCommand constructor.
-   * @param $data
+   *
+   * @param array $data
+   *   Data array.
    */
-  public function __construct($data) {
+  public function __construct(array $data) {
     $this->data = $data;
   }
 
@@ -22,6 +25,7 @@ class ImagerCommand implements CommandInterface {
    * Create the command array.
    *
    * @return array
+   *   Render array for command.
    */
   public function render() {
     return array(

@@ -140,7 +140,7 @@
        //    w.document.body.appendChild(a); */
     };
 
-    var clipboard = function clipboard() {
+    function clipboard() {
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
       Core.ajaxProcess(this,

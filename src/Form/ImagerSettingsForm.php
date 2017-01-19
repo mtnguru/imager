@@ -26,6 +26,7 @@ class ImagerSettingsForm extends ConfigFormBase implements ContainerInjectionInt
 
   /**
    * ImagerSettingsForm constructor.
+   *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
    */
   public function __construct(EntityTypeManagerInterface $entityManager) {

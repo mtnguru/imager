@@ -20,13 +20,12 @@
   Drupal.imager.coreM = function () {
     var Popups = Drupal.imager.popups;
     var Viewer = Drupal.imager.viewer;
-    var messageTimeout;
 
     var displayMessage = function displayMessage(msg) {
       // $imagerMessages.show();
       $('#imager-messages-content').html(msg);
       if (localStorage.imagerDebugMessages === 'FALSE') {
-        messageTimeout = setTimeout(function () {
+        setTimeout(function () {
           // $imagerMessages.hide();
         }, 5000);
       }

@@ -43,7 +43,7 @@
       cssId: 'imager-config',
       position: {
         left: '50px',
-        top: '200px',
+        top: '200px'
       }
     }, spec);
     // Initialize the dialog.
@@ -82,7 +82,7 @@
         $('#imager-bounds-enable').attr('checked', 'checked');
       }
 
-      var intval = (localStorage.imagerSlideshowInterval == 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
+      var intval = (localStorage.imagerSlideshowInterval === 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
       $interval.val(intval);
 
       if (localStorage.imagerDebugStatus === 'TRUE') {

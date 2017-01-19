@@ -91,7 +91,7 @@
   Drupal.imager.popups.baseC = function baseC(spec) {
     var popup = {
       settings: {},
-      spec: spec || {},
+      spec: spec || {}
     };
 
     // Return if popup is loaded.
@@ -150,7 +150,9 @@
       if (popup.spec.resizable) {
         popup.$elem.resizable({
           resize: function (event, ui) {
-            if (popup.dialogOnResize) popup.dialogOnResize(event, ui);
+            if (popup.dialogOnResize) {
+              popup.dialogOnResize(event, ui);
+            }
           }
         });
       }
@@ -170,21 +172,18 @@
         popup.$wrapper.css(popup.spec.position);
       }
       else {
-        popup.$wrapper.css({left: '75px', bottom: '100px'})
+        popup.$wrapper.css({left: '75px', bottom: '100px'});
       }
 
       // Let inheriting class make any final changes.
       popup.dialogOnCreate();
     };
 
-    function onButtonClick(event) {
-      return;
-    }
-
     /**
      * Actions to take when the dialog is opened.
      *
      * @returns {boolean}
+     *   True if open, False if closed.
      */
     popup.dialogIsOpen = function dialogIsOpen() {
       return (popup.$elem && popup.isOpen) ? true : false;
