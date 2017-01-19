@@ -1121,6 +1121,10 @@
         $imgOverlay.triggerHandler(evt);
       });
 
+      $('#imager-help').click(function (evt) {
+        window.open('/admin/help/imager', '_blank');
+      });
+
       $imgOverlay = $('#imager-image');
       $imgOverlay.on('contextmenu', fillOverlayImg);
 

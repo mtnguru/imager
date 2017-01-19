@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -70,6 +71,12 @@ class ImagerSettingsForm extends ConfigFormBase implements ContainerInjectionInt
     foreach ($view_modes as $key => $mode) {
       $options[$mode['id']] = $mode['label'];
     }
+
+    $form['help'] = [
+      '#type' => 'link',
+      '#title' => t('Click here for help'),
+      '#url' => Url::fromUri('internal:/admin/help/imager'),
+    ];
 
     $form['view_modes'] = [
       '#type' => 'fieldset',
