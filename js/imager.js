@@ -126,8 +126,9 @@
      *
      * @param srcThumb
      *   Thumbnail the user has selected.
-     * @returns {*}
-     *   Return the image class.
+     *
+     * @return {*}
+     *   Return the image class for the thumbnail.
      */
     function findImageFromThumbSrc(srcThumb) {
       var i;

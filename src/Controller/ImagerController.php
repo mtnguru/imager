@@ -43,9 +43,12 @@ class ImagerController extends ControllerBase {
   /**
    * ImagerController constructor.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   * @param FileSystemInterface $file_system
+   *   The file system service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, FileSystemInterface $file_system) {
     $this->configFactory = $config_factory;
@@ -77,11 +80,15 @@ class ImagerController extends ControllerBase {
   /**
    * Separate a file path into it's parts.
    *
-   * @TODO this can probably be replaced with pathinfo().
-   *
    * @param $uri
+   *   Path to analyze.
    * @param $makeNew
+   *   Should we make a temporary path for a new image.
+   *
    * @return mixed
+   *   Array containing file path parts.
+   *
+   * @TODO this can probably be replaced with pathinfo().
    */
   private function getFileParts($uri, $makeNew) {
     $fp = pathinfo($uri);
@@ -156,6 +163,7 @@ class ImagerController extends ControllerBase {
    * Save an edited image into the current media entity or a new one.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function saveFile() {
     $data = json_decode(file_get_contents("php://input"), TRUE);
@@ -202,6 +210,7 @@ class ImagerController extends ControllerBase {
    * Delete a file.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function deleteFile() {
     $response = new AjaxResponse();
@@ -212,6 +221,7 @@ class ImagerController extends ControllerBase {
    * Load a map
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function loadMap() {
     $response = new AjaxResponse();
@@ -222,6 +232,7 @@ class ImagerController extends ControllerBase {
    * Load the Image Edit form.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function loadImageForm() {
     $response = new AjaxResponse();
@@ -232,6 +243,7 @@ class ImagerController extends ControllerBase {
    * Load a field from the Image Edit form.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function loadImageFieldForm() {
     $response = new AjaxResponse();
@@ -249,6 +261,7 @@ class ImagerController extends ControllerBase {
    * Load one of the Imager dialogs.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function loadDialog() {
     $data = json_decode(file_get_contents("php://input"), TRUE);
@@ -271,6 +284,7 @@ class ImagerController extends ControllerBase {
    * Save the image so it can be displayed in a new tab in the browser.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function viewBrowser() {
     $data = json_decode(file_get_contents("php://input"), TRUE);
@@ -301,6 +315,7 @@ class ImagerController extends ControllerBase {
    * Render the current entity using the configured information view_mode.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax response.
    */
   public function displayEntity() {
     $data = json_decode(file_get_contents("php://input"), TRUE);
@@ -310,11 +325,9 @@ class ImagerController extends ControllerBase {
     $media = $this->entityTypeManager->getStorage('media')->load($data['mid']);
 
     $view_mode = explode('.', $config->get('view_mode_info'))[1];
-//  $view_mode = $config->get('view_mode_info');
     $data['html'] = render($this->entityTypeManager->getViewBuilder('media')->view($media, $view_mode));
 
     return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
 
 }
-

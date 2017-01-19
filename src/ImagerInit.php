@@ -3,7 +3,7 @@
 namespace Drupal\imager;
 
 /**
- * Class ImagerInit
+ * Class ImagerInit.
  *
  * @package Drupal\imager
  */
@@ -13,7 +13,10 @@ class ImagerInit {
    * Create render array to attach necessary libraries and settings.
    *
    * @param $config
+   *   Configuration array.  Not used.
+   *
    * @return array
+   *   Render array.
    */
   static public function start($config) {
     $build = array(

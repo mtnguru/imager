@@ -45,7 +45,7 @@
       dialogClass: 'imager-dialog imager-status-dialog',
       cssId: 'imager-status',
       resizable: false,
-      draggable: true,
+      draggable: true
     }, spec);
     // Initialize the popup.
     popup = Popups.baseC(dspec);
@@ -81,8 +81,9 @@
       if (popup.dialogIsOpen()) {
         var key;
         for (key in status) {
-          // @TODO Pareview wants an if here, it should check for properties.
-          $('#imager-status-' + key).html(status[key]);
+          if (status.hasOwnProperty(key)) {
+            $('#imager-status-' + key).html(status[key]);
+          }
         }
       }
     };

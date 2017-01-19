@@ -140,6 +140,9 @@
        //    w.document.body.appendChild(a); */
     };
 
+    /**
+     * Send the image to the clipboard - isn't used currently.
+     */
     function clipboard() {
       Popups.$busy.show();
       var img = Drupal.imager.core.getImage($('input[name="resolution"]:checked').val(), false);
@@ -154,7 +157,7 @@
       );
       Popups.$busy.hide();
       popup.dialogClose();
-    };
+    }
 
     popup.dialogOnCreate = function dialogOnCreate() {
       popup.dialogOpen();

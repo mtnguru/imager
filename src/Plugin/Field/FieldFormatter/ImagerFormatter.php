@@ -72,10 +72,15 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
   /**
    * Create function.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
+   *   Service container.
    * @param array $configuration
+   *   Configuration array.
    * @param string $plugin_id
+   *   Plugin ID.
    * @param mixed $plugin_definition
+   *   Definition.
+   *
    * @return static
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -157,8 +162,12 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
    * Create render array for field formatter.
    *
    * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   Items to display.
    * @param string $langcode
+   *   Language code.
+   *
    * @return array
+   *   Render array.
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();

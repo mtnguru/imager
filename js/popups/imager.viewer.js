@@ -137,7 +137,6 @@
       Popups.busy.hide();
     }, false);
 
-
     /**
      * Calculate canvas and image dimensions, reset variables, initialize transforms
      *
@@ -145,7 +144,9 @@
      * accounted for.  Currently these are constants are made to look good with my theme.
      *
      * @param width
+     *   Maximum possible canvas width.
      * @param height
+     *   Maximum possible canvas height.
      */
     var initializeImage = function initializeImage(width, height) {
       var hscale;
@@ -1162,7 +1163,7 @@
         var y = window.scrollY;
         this.focus();
         window.scrollTo(x, y);
-      }, function() {
+      }, function () {
         this.blur();
       }).keyup(function (event) {
         switch (event.keyCode) {
@@ -1362,12 +1363,15 @@
     };
 
     /**
+     * User has resized the dialog.
      *
      * @param event
-     * @param ui
+     *   The event.
+     *
      * @return popup
+     *   The popup.
      */
-    popup.dialogOnResize = function dialogOnResize(event, ui) {
+    popup.dialogOnResize = function dialogOnResize(event) {
       initializeImage(event.target.offsetWidth, event.target.offsetHeight);
       doInit = false;
       redraw();

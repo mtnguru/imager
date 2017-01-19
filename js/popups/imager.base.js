@@ -182,7 +182,7 @@
     /**
      * Actions to take when the dialog is opened.
      *
-     * @returns {boolean}
+     * @return {boolean}
      *   True if open, False if closed.
      */
     popup.dialogIsOpen = function dialogIsOpen() {

@@ -35,7 +35,7 @@ function imager_theme() {
         'item' => NULL,
         'item_attributes' => NULL,
         'url' => NULL,
-        'image_style' => NULL
+        'image_style' => NULL,
       ),
       'file' => 'imager.field.inc',
     ),

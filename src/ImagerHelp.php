@@ -2,12 +2,17 @@
 
 namespace Drupal\imager;
 
+/**
+ * Class ImagerHelp
+ * @package Drupal\imager
+ */
 class ImagerHelp {
 
   /**
    * Define help page html using heredoc.
    *
    * @return string
+   *   Html for the help text.
    */
   static public function content() {
 
