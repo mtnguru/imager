@@ -3,7 +3,6 @@ nbproject
 *.map
 .sass-cache
 js/ui-lightness
-icons
 .idea
 js/vendor
 node_modules

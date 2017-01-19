@@ -14,44 +14,48 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
  * Implements hook_help().
  */
 function imager_help($route_name, RouteMatchInterface $route_match) {
+  $path = '/' . drupal_get_path('module', 'imager') . '/icons';
   switch ($route_name) {
     // Main module help for the imager module.
     case 'help.page.imager':
       $output = <<<EOT
 <h3><strong>Overview</strong></h3>
 
-<p>The Imager module implements a Field Formatter that displays media entity images using the standard Drupal image styles.&nbsp; When a user clicks on an image a full screen viewer is popped up which displays the image in full resolution.&nbsp; The user can zoom in and out, pan around the image, and edit the image.&nbsp; Edits include rotation, cropping, changing the brightness/contrast and the hue/saturation/lightness.&nbsp; An edited image can then be stored back to Drupal overwriting an existing media entity or by creating a new one.</p>
+<p>The Imager module works with the media_entity and media_entity_image module. &nbsp;
+It implements a Field Formatter that displays media entity images using Drupal image styles.&nbsp; When a user clicks on an image a viewer popup is displayed displays the image in full resolution.&nbsp; The user can zoom in and out, pan around the image, and edit the image.&nbsp; Edits include rotation, cropping, changing the brightness/contrast and the hue/saturation/lightness.&nbsp; An edited image can then be stored back to Drupal overwriting an existing media entity or by creating a new one.</p>
 
+<h3>Configuration</h3>
+<p>Configure Imager by <a href="/admin/config/media/imager">clicking here</a>.</p>
 <h3><strong>User Instructions</strong></h3>
 
 <ul>
 	<li>Click on an image to display it full resolution in the&nbsp;imager viewer/editor.</li>
-	<li>Press ESCAPE, 'X' or double click in the imager viewer to close the viewer.</li>
+	<li>To close the imager viewer press ESCAPE, or 'X' or double click in the imager viewer.</li>
 	<li>Hold down the left mouse button and drag to pan around the image.</li>
 	<li>Use the mouse thumbwheel to zoom in and out. &nbsp;Or hold down the SHIFT key and left mouse button and then drag the mouse to zoom.<br />&nbsp;</li>
 	<li>Press the left or right arrow keys to view the previous or next image.</li>
 	<li>Press the 'R' key to reset the image and clear all edits.</li>
 	<li>Press the 'F' key to toggle full screen mode.<br />&nbsp;</li>
-	<li><img alt="" src="/images/redx.png" /> Close the Viewer popup.</li>
-	<li><img alt="" src="/images/left_arrow.png" />&nbsp;<img alt="" src="/images/right_arrow.png" /> Select the previous or next image from the source page - You can also press the left and right arrow keys.<br />
+	<li><img alt="" src="{$path}/redx.png" /> Close the Viewer popup.</li>
+	<li><img alt="" src="{$path}/left_arrow.png" />&nbsp;<img alt="" src="{$path}/right_arrow.png" /> Select the previous or next image from the source page - You can also press the left and right arrow keys.<br />
 	&nbsp;</li>
-	<li><img alt="" src="/images/newtab.png" /> View image in a new tab - Useful for printing just the image.</li>
-	<li><img alt="" src="/images/information.png" /> View information about this image.</li>
-	<li><img alt="" src="/images/slideshow.png" /> View images in a slideshow.</li>
-	<li><img alt="" src="/images/fullscreen.png" />&nbsp;Toggle fullscreen mode.&nbsp; You can also press the \'F\' key</li>
-	<li><img alt="" src="/images/zoomin.png" />&nbsp;<img alt="" src="/images/zoomout.png" /> Zoom in and out.<br />
+	<li><img alt="" src="{$path}/newtab.png" /> View image in a new tab - Useful for printing just the image.</li>
+	<li><img alt="" src="{$path}/information.png" /> View information about this image.</li>
+	<li><img alt="" src="{$path}/slideshow.png" /> View images in a slideshow.</li>
+	<li><img alt="" src="{$path}/fullscreen.png" />&nbsp;Toggle fullscreen mode.&nbsp; You can also press the \'F\' key</li>
+	<li><img alt="" src="{$path}/zoomin.png" />&nbsp;<img alt="" src="{$path}/zoomout.png" /> Zoom in and out.<br />
 	&nbsp;</li>
-	<li><img alt="" src="/images/frame.png" /> Click on the frame to select an area to crop. Click on the <img alt="" src="/images/scissors.png" /> scissors to complete the crop.</li>
-	<li><img alt="" src="/images/color_wheel.png" /> Change the Hue/Saturation/Lightness.</li>
-	<li><img alt="" src="/images/contrast.png" /> Change the Brightness/Contrast.</li>
-	<li><img alt="" src="/images/rotate-left.png" />&nbsp;<img alt="" src="/images/rotate-right.png" /> Rotate the image right or left 90 degrees.</li>
-	<li><img alt="" src="/images/reset.png" />&nbsp;Reset image back the the original. &nbsp;All edits, cropping, panning and zooming are cleared. &nbsp;<br />
+	<li><img alt="" src="{$path}/frame.png" /> Click on the frame to select an area to crop. Click on the <img alt="" src="{$path}/scissors.png" /> scissors to complete the crop.</li>
+	<li><img alt="" src="{$path}/color_wheel.png" /> Change the Hue/Saturation/Lightness.</li>
+	<li><img alt="" src="{$path}/contrast.png" /> Change the Brightness/Contrast.</li>
+	<li><img alt="" src="{$path}/rotate-left.png" />&nbsp;<img alt="" src="{$path}/rotate-right.png" /> Rotate the image right or left 90 degrees.</li>
+	<li><img alt="" src="{$path}/reset.png" />&nbsp;Reset image back the the original. &nbsp;All edits, cropping, panning and zooming are cleared. &nbsp;<br />
 	&nbsp;</li>
-	<li><img alt="" src="/images/db_add.png" /> Save the edited image back to Drupal.</li>
-	<li><img alt="" src="/images/download.png" /> Download the image to your local PC.</li>
-	<li><img alt="" src="/images/configure.png" /> Configure local settings for the Imager Viewer<br />
+	<li><img alt="" src="{$path}/db_add.png" /> Save the edited image back to Drupal.</li>
+	<li><img alt="" src="{$path}/download.png" /> Download the image to your local PC.</li>
+	<li><img alt="" src="{$path}/configure.png" /> Configure local settings for the Imager Viewer<br />
 	&nbsp;</li>
-	<li><img alt="" src="/images/bug.png" /> View the status of the viewer - used for debugging.</li>
+	<li><img alt="" src="{$path}/bug.png" /> View the status of the viewer - used for debugging.</li>
 </ul>
 
 <h3><strong>Future Plans</strong></h3>
@@ -80,8 +84,6 @@ Lines of PHP - 1500</p>
 
 <p>The Imager dialog allows users to view, delete, and edit images for all images on a page without ever loading a new page.</p>';
 EOT;
-//    $output .= '<h3>' . t('About') . '</h3>';
-//    $output .= '<p>' . t('Displays images at full resolution in a popup.  Users can pan, zoom, rotate, crop and change brightness/contrast and hue/saturation/lightness.') . '</p>';
       return $output;
 
     default:
