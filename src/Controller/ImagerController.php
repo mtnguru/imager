@@ -83,7 +83,7 @@ class ImagerController extends ControllerBase {
    *
    * @param string $uri
    *   Path to analyze.
-   * @param boolean $makeNew
+   * @param bool $makeNew
    *   Should we make a temporary path for a new image.
    *
    * @return mixed

@@ -145,7 +145,7 @@
      *
      * @param integer width
      *   Maximum possible canvas width.
-     * @param integer height
+     * @param height
      *   Maximum possible canvas height.
      */
     var initializeImage = function initializeImage(width, height) {
