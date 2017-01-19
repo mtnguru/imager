@@ -59,7 +59,7 @@ imager.loadImageFieldForm:
   path: 'imager/ajax/edit_form_field_load'
   defaults:
     _controller: '\Drupal\imager\Controller\ImagerController::loadImageFieldForm'
-    _title: 'Load a field from teh Image edit form'
+    _title: 'Load a field from the Image edit form'
   requirements:
     _permission: 'access content'
 

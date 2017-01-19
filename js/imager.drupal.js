@@ -79,7 +79,7 @@
         imager.attach();
         Drupal.imager.$wrapper = $(document.createElement('div')).attr('id', 'imager-wrapper').attr('tabindex', 1);
         $('body').append(Drupal.imager.$wrapper);
-      };
+      }
 
       // Build thumbnail list and initializes event handlers on thumbnails.
     }

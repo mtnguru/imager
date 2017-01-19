@@ -6,4 +6,3 @@ administer imager:
   title: 'Administer Imager settings'
   description: 'Change the Imager settings on the admin/config/media/imager configuration page.'
   restrict access: TRUE
-

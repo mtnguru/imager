@@ -2,9 +2,6 @@
 
 namespace Drupal\imager;
 
-use Drupal\Component\Serialization\Yaml;
-use Drupal\Component\Utility\Xss;
-
 /**
  * Class AtomizerFiles.
  *
@@ -34,15 +31,7 @@ class ImagerComponents {
    *   Render array for button
    */
   static public function buildButton($weight, $id, $image, $title, $wraplink = FALSE) {
-//  $item = array(
-//    '#id' => $id,
-//    '#weight' => $weight,
-//    // $title is a string literal being passed into this function.
-//    '#title' => $title,
-//    '#image' => $image,
-//    '#theme' => 'imager_add_button',
-//    '#wraplink' => $wraplink,
-//  );
+
     $item = [
       '#markup' => '<a href="#" id="' . $id . '"><img src="' .
         $GLOBALS["base_url"] . '/' . drupal_get_path('module', 'imager') . '/icons/' .
@@ -52,5 +41,5 @@ class ImagerComponents {
     return $item;
 
   }
-}
 
+}

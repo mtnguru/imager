@@ -73,10 +73,9 @@ class ImagerController extends ControllerBase {
   public function loadFile() {
 
     $response = new AjaxResponse();
-//  $ymlContents = Yaml::decode(file_get_contents(drupal_get_path('module', 'imager') . '/' . $data['filepath']));
-//  $response->addCommand(new LoadYmlCommand($data, $ymlContents));
 
-    return $response;
+    $data['needamessageorsomething'] = 'nada';
+    return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
 
   /**
@@ -258,9 +257,7 @@ class ImagerController extends ControllerBase {
     }
     $data['id'] = $dialog['id'];
 
-    $response = new AjaxResponse();
-    $response->addCommand(new ImagerCommand($data));
-    return $response;
+    return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
   /**
    * Save the image so it can be displayed in a new tab in the browser.
@@ -270,47 +267,26 @@ class ImagerController extends ControllerBase {
   public function viewBrowser() {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Load the media entity.
-    $media = $this->entityTypeManager->getStorage('media')->load($data['mid']);
+    $fp = pathinfo(urldecode($data['uri']));
 
+    $tmpDir = $this->fileSystem->realpath('public://imager');
+    file_prepare_directory($tmpDir, FILE_CREATE_DIRECTORY);
 
-    // Directory where images and temporary html files are stored.
-    $uri = urldecode($data['uri']);
-    $fp = pathinfo($uri);
-
-    $base_url = $GLOBALS['base_url'] . $GLOBALS['base_path'];
-    $urlDir = 'public://imager';
-    $fullDir = $this->fileSystem->realpath($urlDir);
-    $dir = str_replace(DRUPAL_ROOT . '/', '', $fullDir);
-    $path = $this->fileSystem->tempnam($fullDir);
-    $np = pathinfo($path);
+    $path = $this->fileSystem->tempnam($tmpDir, 'imager_');
     $tmpImagePath = $path . '_tmp.' . $fp['extension'];
     $imagePath    = $path . '.' . $fp['extension'];
-    $htmlPath     = $path . '.html';
 
     $np = pathinfo($path);
-    $imageUrl = '/' . $dir . '/' . $np['basename'] . '.' . $fp['extension'];
-    $htmlUrl = $base_url . $dir . '/' . $np['basename'] . '.html';
 
-    file_prepare_directory($fullDir, FILE_CREATE_DIRECTORY);
+    $data['url'] = $GLOBALS['base_url'] . $GLOBALS['base_path'] .
+                   str_replace(DRUPAL_ROOT . '/', '', $tmpDir) . '/' .
+                   $np['basename'] . '.' . $fp['extension'];
 
-    // Save the image, process through 'convert' command to reduce file size (quality).
     $this->writeImage($tmpImagePath, $data['imgBase64']);
     $this->convertImage($tmpImagePath, $imagePath);
     chmod($imagePath, 0744);
 
-    $body = '<img src="' . $imageUrl . '" />';
-    $page = '<html><head><title>' . 'Imager Page' . '</title></head><body>' . $body . '</body></html>';
-    $fp = fopen($htmlPath, 'w');
-    fwrite($fp, $page);
-    fclose($fp);
-    chmod($htmlPath, 0744);
-
-    $data['url'] = $htmlUrl;
-
-    $response = new AjaxResponse();
-    $response->addCommand(new ImagerCommand($data));
-    return $response;
+    return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
 
   public function displayEntity() {
@@ -324,9 +300,7 @@ class ImagerController extends ControllerBase {
 //  $view_mode = $config->get('view_mode_info');
     $data['html'] = render($this->entityTypeManager->getViewBuilder('media')->view($media, $view_mode));
 
-    $response = new AjaxResponse();
-    $response->addCommand(new ImagerCommand($data));
-    return $response;
+    return (new AjaxResponse())->addCommand(new ImagerCommand($data));
   }
 }
 

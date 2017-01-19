@@ -10,7 +10,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 /**
  * Implements the GeolocationGoogleMapAPIkey form controller.
  *
@@ -26,10 +25,8 @@ class ImagerSettingsForm extends ConfigFormBase implements ContainerInjectionInt
   protected $entityManager;
 
   /**
-   * Constructs the ExifSettingsForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity manager.
+   * ImagerSettingsForm constructor.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
    */
   public function __construct(EntityTypeManagerInterface $entityManager) {
     $this->entityManager = $entityManager;
@@ -68,19 +65,19 @@ class ImagerSettingsForm extends ConfigFormBase implements ContainerInjectionInt
     $view_modes = $this->entityManager->getViewModes('media');
 
     $options = [];
-    foreach ($view_modes as $key => $mode) {
+    foreach ($view_modes as $mode) {
       $options[$mode['id']] = $mode['label'];
     }
 
     $form['help'] = [
       '#type' => 'link',
-      '#title' => t('Click here for help'),
+      '#title' => $this->t('Click here for help'),
       '#url' => Url::fromUri('internal:/admin/help/imager'),
     ];
 
     $form['view_modes'] = [
       '#type' => 'fieldset',
-      '#title' => t('View Modes'),
+      '#title' => $this->t('View Modes'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       'view_mode_info' => [

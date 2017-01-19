@@ -31,4 +31,3 @@ imager-editor:
     js/popups/imager.confirm.js: {}
     js/popups/imager.filesave.js: {}
     js/popups/imager.image.js: {}
-

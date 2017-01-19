@@ -40,7 +40,7 @@ class ImagerPopups {
             '#weight' => 0,
           ],
           'mode_fullscreen' => ImagerComponents::buildButton(2, 'mode-fullscreen', 'fullscreen.png', t('View image full screen')),
-          'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'newtab.png', t('View image alone in Browser, useful when printing'), TRUE),
+          'view_browser' => ImagerComponents::buildButton(1, 'view-browser', 'newtab.png', t('View image in new tab, useful when printing'), TRUE),
           'view_info' => ImagerComponents::buildButton(2, 'view-info', 'information.png', t('View Image information')),
 //        'view_map' => ImagerComponents::buildButton(3, 'view-map', 'map.png', t('View map showing image locations for page')),
           'view_slideshow' => ImagerComponents::buildButton(2, 'view-slideshow', 'slideshow.png', t('View images in slideshow')),
@@ -63,7 +63,6 @@ class ImagerPopups {
           'edit_color' => ImagerComponents::buildButton(4, 'edit-color', 'color_wheel.png', t('Edit hue, saturation and lightness')),
           'edit_ccw' => ImagerComponents::buildButton(5, 'edit-ccw', 'rotate-left.png', t('Rotate image 90 degrees counter-clockwise')),
           'edit_cw' => ImagerComponents::buildButton(6, 'edit-cw', 'rotate-right.png', t('Rotate image 90 degrees clockwise')),
-//        'edit-reset' does not work.  It must be used by another program.
           'view_reset' => ImagerComponents::buildButton(7, 'view-reset', 'reset.png', t('Reset the image back to the original')),
         ],
         'file_buttons' => [
@@ -77,25 +76,22 @@ class ImagerPopups {
             '#suffix' => '</div>',
           ],
           // @TODO don't display if doesn't have permissions.
-          'file_save' => ImagerComponents::buildButton(1, 'file-save', 'database_go.png', t('Save edited image to database')),
+          'file_save' => ImagerComponents::buildButton(1, 'file-save',
+            'database_go.png', t('Save edited image to database')),
           // @TODO Don't display if doesn't have permissions.
-//        'file_delete' => ImagerComponents::buildButton(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
-          'file_download' => ImagerComponents::buildButton(3, 'file-download', 'download.png', t('Download image to local file system'), TRUE),
+          // 'file_delete' => ImagerComponents::buildButton(2, 'file-delete', 'database_delete.png', t('Delete image from database')),
+          'file_download' => ImagerComponents::buildButton(3, 'file-download',
+            'download.png', t('Download image to local file system'), TRUE),
           // @TODO Don't display if not at appropriate IP addresses.
-//        'file_print' => ImagerComponents::buildButton(4, 'file-print', 'print.png', t('Print Image')),
-          'mode_configure' => ImagerComponents::buildButton(4, 'mode-configure', 'configure.png', t('Configure settings')),
-          'help' => ImagerComponents::buildButton(4, 'imager-help', 'help.png', t('Display Imager help')),
+          'mode_configure' => ImagerComponents::buildButton(4, 'mode-configure',
+            'configure.png', t('Configure settings')),
+          'help' => ImagerComponents::buildButton(4, 'imager-help',
+            'help.png', t('Display Imager help')),
         ],
         'debug_buttons' => [
           '#prefix' => '<div id="debug-buttons" class="imager-buttons">',
           '#suffix' => '</div>',
           '#weight' => -5,
-//        'title' => [
-//          '#type' => 'markup',
-//          '#markup' => t('Debug'),
-//          '#prefix' => '<div>',
-//          '#suffix' => '</div>',
-//        ],
           'debug_status' => ImagerComponents::buildButton(1, 'debug-status', 'bug.png', t('Toggle status output')),
 //        'debug_messages' => ImagerComponents::buildButton(2, 'debug-messages', 'bug2.png', t('Toggle debug messages')),
         ],
@@ -133,6 +129,7 @@ class ImagerPopups {
    * Build render array for information dialog - displays rendered file_entity.
    *
    * @return array
+   *   Render array for Information dialog.
    */
   private function buildInfo($config) {
     $id = 'imager-info';
@@ -211,12 +208,12 @@ class ImagerPopups {
     ];
   }
 
-/**
- * Build render array for brightness/contrast slidebar popup.
- *
- * @return array
- *   Render array for brightness/contrast slider.
- */
+  /**
+   * Build render array for brightness/contrast slidebar popup.
+   *
+   * @return array
+   *   Render array for brightness/contrast slider.
+   */
   private function buildBrightness($config) {
     $id = 'imager-brightness';
     $content = [
@@ -577,7 +574,7 @@ class ImagerPopups {
    * @return array
    *    Render array for configuration dialog.
    */
-  function buildConfig() {
+  private function buildConfig() {
     $id = 'imager-config';
     $content = [
       '#weight' => 1,
@@ -674,11 +671,10 @@ class ImagerPopups {
       '#attributes' => ['class' => ['table-no-striping']],
       '#theme' => 'table',
       '#header' => [
-        t(''),
-        t('Image'),
-        t('Resolution'),
-        t('Geometry'),
-//      t('Ratio'),
+        '',
+        $this->t('Image'),
+        $this->t('Resolution'),
+        $this->t('Geometry'),
       ],
       '#sticky' => FALSE,
       '#rows' => [
@@ -691,10 +687,9 @@ class ImagerPopups {
                 '#allowed_tags' => ['input'],
               ],
             ],
-            t('Displayed'),
-            t('Screen'),
+            $this->t('Displayed'),
+            $this->t('Screen'),
             ['id' => 'canvas-resolution'],
-//          ['id' => 'scale', 'rowspan' => 2],
           ],
         ],
         [
@@ -706,8 +701,8 @@ class ImagerPopups {
                 '#allowed_tags' => ['input'],
               ],
             ],
-            t('Displayed'),
-            t('Image'),
+            $this->t('Displayed'),
+            $this->t('Image'),
             ['id' => 'image-display-resolution'],
           ],
         ],
@@ -720,8 +715,8 @@ class ImagerPopups {
                 '#allowed_tags' => ['input'],
               ],
             ],
-            t('Full'),
-            t('Image'),
+            $this->t('Full'),
+            $this->t('Image'),
             ['id' => 'image-full-resolution'],
           ],
         ],
@@ -730,10 +725,16 @@ class ImagerPopups {
     return $build;
   }
 
+  /**
+   * Build all popups.
+   *
+   * @param $config
+   * @return mixed
+   */
   public function build($config) {
     $func = 'build' . $config['popupName'];
 
-    // Define the dialog contents
+    // Define the dialog contents.
     $build = $this->$func($config);
 
     // If the dialog has buttons than create them.
@@ -755,5 +756,5 @@ class ImagerPopups {
 
     return $build;
   }
-}
 
+}

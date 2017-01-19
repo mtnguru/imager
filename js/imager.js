@@ -89,7 +89,6 @@
           return false;
         });
       });
-      return;
     }
 
     /**
@@ -120,14 +119,15 @@
           return images[i];
         }
       }
-      return;
     };
 
     /**
      * Search thumbnail list for image with matching thumbnail path.
      *
      * @param srcThumb
+     *   Thumbnail the user has selected.
      * @returns {*}
+     *   Return the image class.
      */
     function findImageFromThumbSrc(srcThumb) {
       var i;

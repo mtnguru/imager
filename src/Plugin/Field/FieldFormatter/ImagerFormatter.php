@@ -2,11 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\imager\Plugin\Field\FieldFormatter\ImagerFormatter 
+ * Contains \Drupal\imager\Plugin\Field\FieldFormatter\ImagerFormatter.
  */
 
 namespace Drupal\imager\Plugin\Field\FieldFormatter;
-
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -128,8 +127,8 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
     $mode = $this->getSetting('imager_mode');
     $elements['imager_mode'] = array(
       '#type' => 'select',
-      '#options' => array("popup" => 'Popup', 'inplace' => 'In place'),
-      '#title' => t('Imager mode'),
+      '#options' => array("popup" => $this->t('Popup'), 'inplace' => $this->t('In place')),
+      '#title' => $this->t('Imager mode'),
       '#default_value' => ($mode) ? $mode : $this->defaultSettings()['imager_mode'],
       '#required' => TRUE,
     );

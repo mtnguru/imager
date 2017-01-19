@@ -7,7 +7,6 @@
 
 use Drupal\Component\Utility\Unicode;
 
-
 /**
  * Prepares variables for imager formatter templates.
  *
@@ -21,7 +20,7 @@ use Drupal\Component\Utility\Unicode;
  *   - image_style: An optional image style.
  *   - url: An optional \Drupal\Core\Url object.
  */
-function template_preprocess_imager_formatter(&$variables) {
+function template_preprocess_imager_formatter(array &$variables) {
   if ($variables['image_style']) {
     $variables['image'] = array(
       '#theme' => 'image_style',

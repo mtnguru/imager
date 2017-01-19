@@ -7,10 +7,9 @@
   'use strict';
 
 
-  Drupal.AjaxCommands.prototype.imagerCommand = function(ajax, response, status) {
+  Drupal.AjaxCommands.prototype.imagerCommand = function (ajax, response, status) {
     Drupal.imager[response.component].imagerCommand(response);
-  } 
-
+  };
 
   // Create the Drupal.imager namespace and subspaces.
   Drupal.imager = {
@@ -169,7 +168,7 @@
         data: JSON.stringify(postData),
         success: function (response) {
           for (var i = 0; i < response.length; i++) {
-            if (response[i].command == 'ImagerCommand') {
+            if (response[i].command === 'ImagerCommand') {
               if (processFunc) {
                 processFunc.call($callingElement, response[i].data);
               }
@@ -209,22 +208,7 @@
           Popups.$busy.hide();
         },
         error: function (evt) {
-/**       Popups.$busy.hide();
-          clearTimeout(messageTimeout);
-          Popups.messages.dialogOpen();
-          $('#imager-messages-content').html('<p class="error">Error: ' + evt.status + ': ' + evt.statusText +
-          '<br>Action: ' + postData.action + '</p>');
-          if (processFunc) {
-            processFunc('error', evt);
-          }   // Execute users error function
-          if (localStorage.imagerDebugMessages === 'FALSE') {
-            setTimeout(function () {
-              Popups.messages.dialogClose();
-            }, 10000);
-          }
-**/
-          return;
-        },
+        }
       });
     }; // ajaxProcess()
 
@@ -284,9 +268,10 @@
       // If the image has '/styles/' in it's path
       // then extract the large image path by modifying the thumbnail path
       // Kludgy but it works - any better ideas.
-      if (tsrc.indexOf('/styles/') == -1) {
+      if (tsrc.indexOf('/styles/') === -1) {
         src = tsrc;
-      } else {
+      }
+      else {
         var sindex = tsrc.indexOf('styles');
         var index = sindex;
         var slashes = 0;
