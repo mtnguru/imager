@@ -12,6 +12,8 @@ use Drupal\imager\ImagerComponents;
 class ImagerPopups {
 
   /**
+   * Build render array for the imager viewer.
+   *
    * @param array $config
    *   Array to configure popup.
    *

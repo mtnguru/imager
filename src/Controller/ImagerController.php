@@ -71,6 +71,7 @@ class ImagerController extends ControllerBase {
    * Load a File.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   Ajax Response.
    */
   public function loadFile() {
     $data['needamessageorsomething'] = 'nada';
@@ -80,9 +81,9 @@ class ImagerController extends ControllerBase {
   /**
    * Separate a file path into it's parts.
    *
-   * @param $uri
+   * @param string $uri
    *   Path to analyze.
-   * @param $makeNew
+   * @param boolean $makeNew
    *   Should we make a temporary path for a new image.
    *
    * @return mixed
@@ -173,7 +174,7 @@ class ImagerController extends ControllerBase {
 
     $fp = $this->getFileParts(urldecode($data['uri']), TRUE);
 
-    // Save the image, process through 'convert' command to reduce file size (quality).
+    // Save image, process through 'convert' command to reduce file size.
     $tmpPath = file_directory_temp() . '/' . $fp['newfilename'] . '.' . $fp['extension'];
     $this->writeImage($tmpPath, $data['imgBase64']);
     $this->convertImage($tmpPath, $fp['newpath']);
@@ -218,7 +219,7 @@ class ImagerController extends ControllerBase {
   }
 
   /**
-   * Load a map
+   * Load a map.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   Ajax response.

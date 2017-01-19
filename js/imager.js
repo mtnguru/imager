@@ -124,7 +124,7 @@
     /**
      * Search thumbnail list for image with matching thumbnail path.
      *
-     * @param srcThumb
+     * @param {string} srcThumb
      *   Thumbnail the user has selected.
      *
      * @return {*}

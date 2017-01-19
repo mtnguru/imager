@@ -143,9 +143,9 @@
      * @TODO - When calculating the canvas dimensions the borders and padding must be
      * accounted for.  Currently these are constants are made to look good with my theme.
      *
-     * @param width
+     * @param integer width
      *   Maximum possible canvas width.
-     * @param height
+     * @param integer height
      *   Maximum possible canvas height.
      */
     var initializeImage = function initializeImage(width, height) {
@@ -1365,10 +1365,10 @@
     /**
      * User has resized the dialog.
      *
-     * @param event
+     * @param Event event
      *   The event.
      *
-     * @return popup
+     * @return array popup
      *   The popup.
      */
     popup.dialogOnResize = function dialogOnResize(event) {

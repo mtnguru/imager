@@ -3,7 +3,8 @@
 namespace Drupal\imager;
 
 /**
- * Class ImagerHelp
+ * Class ImagerHelp.
+ *
  * @package Drupal\imager
  */
 class ImagerHelp {

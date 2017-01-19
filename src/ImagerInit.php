@@ -12,13 +12,13 @@ class ImagerInit {
   /**
    * Create render array to attach necessary libraries and settings.
    *
-   * @param $config
+   * @param array $config
    *   Configuration array.  Not used.
    *
    * @return array
    *   Render array.
    */
-  static public function start($config) {
+  static public function start(array $config) {
     $build = array(
       '#attached' => array(
         'drupalSettings' => array(
