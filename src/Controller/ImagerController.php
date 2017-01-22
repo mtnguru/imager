@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file\Entity\File;
 use Drupal\imager\Ajax\ImagerCommand;
-use Drupal\imager\ImagerPopups;
+use Drupal\imager\Popups\ImagerPopups;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -271,7 +271,7 @@ class ImagerController extends ControllerBase {
       self::$popups = new ImagerPopups();
     }
 
-    $dialog = self::$popups->build($data);
+    $dialog = self::$popups->buildPopup($data);
     $data['content'] = render($dialog['content']);
     if (!empty($dialog['buttonpane'])) {
       $data['buttonpane'] = render($dialog['buttonpane']);

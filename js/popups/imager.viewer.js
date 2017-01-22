@@ -66,7 +66,6 @@
     var rotation = 0;         // Current rotation.
     var editMode = 'init';    // init, view, crop, brightness, hsl,
                               // download, email, save, clipboard.
-    var fullScreen = false;   // Full Screen mode.
     var lastup = new Date();  // Time of last mouse up event.
     var moveMode = 'none';    // none, dragging, zoom.
     var elapsed = 0;          // Time between mouse up events.
@@ -87,6 +86,10 @@
     // Make these points accessible globally.
     Drupal.imager.viewer.pt_canvas_lr = pt_canvas_lr;
     Drupal.imager.viewer.pt_canvas_ul = pt_canvas_ul;
+
+    if (localStorage.imagerFullScreen === 'undefined') {
+      localStorage.imagerFullScreen = 'FALSE';
+    }
 
     /**
      * Get current status of imager Viewer
@@ -154,7 +157,7 @@
       rotation = 0;
       image.iw = img.width;
       image.ih = img.height;
-      if (fullScreen) {
+      if (localStorage.imagerFullScreen === 'TRUE') {
         // Maximum canvas width and height.
         mw = $(window).width() - 45;
         mh = $(window).height() - 10;
@@ -196,7 +199,7 @@
       ctx.clearRect(0, 0, cw, ch);
 
       // Center the image.
-      if (fullScreen) {
+      if (localStorage.imagerFullScreen === 'TRUE') {
         if (hscale > vscale) {       // Center vertically
           ctx.translate(0, ((ch * image.iw / cw - image.ih) / 2));
         }
@@ -474,7 +477,7 @@
         x: 0,
         y: 0
       };
-      if (fullScreen || localStorage.imagerBoundsEnable === 'FALSE') {
+      if (localStorage.imagerFullScreen === 'TRUE' || localStorage.imagerBoundsEnable === 'FALSE') {
         return npt;
       }
       var pw;
@@ -657,9 +660,9 @@
         else {
           if (elapsed < 500) {
             // If double click.
-            if (fullScreen) {
+            if (localStorage.imagerFullScreen === 'TRUE') {
               screenfull.exit();
-              setFullScreen(false);
+              hidePopups();
             }
             else {
               hidePopups();
@@ -742,7 +745,7 @@
     var updateStatusModes = function updateStatusModes() {
       Popups.status.dialogUpdate({
         'edit-mode': editMode,
-        'full-screen': fullScreen
+        'full-screen': localStorage.imagerFullScreen
       });
     };
 
@@ -1150,8 +1153,9 @@
         changeImage(Drupal.imager.findNextImage(image, 1));
       });
       $('#image-exit').click(function () {
-        if (fullScreen) {
+        if (localStorage.imagerFullScreen === 'TRUE') {
           screenfull.exit();
+          hidePopups();
         }
         else {
           hidePopups();
@@ -1168,14 +1172,15 @@
       }).keyup(function (event) {
         switch (event.keyCode) {
           case 70: // F
+            localStorage.imagerFullScreen = (localStorage.imagerFullScreen === 'TRUE') ? 'FALSE' : 'TRUE';
             screenfull.toggle($('#imager-wrapper')[0]);
             event.preventDefault();
             break;
 
           case 88: // X
           case 27: // escape
-            if (fullScreen) {
-              screenfull.toggle($('#imager-wrapper')[0]);
+            if (localStorage.imagerFullScreen === 'TRUE') {
+              screenfull.exit();
               hidePopups();
             }
             else {
@@ -1216,7 +1221,14 @@
       // Mode Buttons.
       $('#mode-fullscreen').click(function () {
         if (screenfull.enabled) {
-          screenfull.toggle($('#imager-wrapper')[0]);
+          if (localStorage.imagerFullScreen === 'TRUE') {
+            localStorage.imagerFullScreen = 'FALSE';
+            screenfull.exit();
+          }
+          else {
+            localStorage.imagerFullScreen = 'TRUE';
+            screenfull.request($('#imager-wrapper')[0]);
+          }
         }
       });
 
@@ -1307,9 +1319,8 @@
      * @param {type} newMode
      *   The new mode.
      */
-    function setFullScreen(newMode) {
-      fullScreen = newMode;
-      if (fullScreen) {
+    function setFullScreen() {
+      if (localStorage.imagerFullScreen === 'TRUE') {
         $canvasWrapper.addClass('fullscreen');
         $('#mode-fullscreen').addClass('checked');
       }
@@ -1388,6 +1399,10 @@
      * @return {viewerC} popup
      */
     popup.dialogUpdate = function dialogUpdate(settings) {
+      if (localStorage.imagerFullScreen === 'TRUE') {
+        $('#image-exit').addClass('checked');
+        screenfull.request($('#imager-wrapper')[0]);
+      }
       $.extend(popup.settings, settings);
       changeImage(popup.settings.image);
       return popup;
