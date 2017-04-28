@@ -184,7 +184,9 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
     $base_cache_tags = [];
     if (!empty($image_style_setting)) {
       $image_style = $this->imageStyleStorage->load($image_style_setting);
-      $base_cache_tags = $image_style->getCacheTags();
+      if ($image_style) {
+        $base_cache_tags = $image_style->getCacheTags();
+      }
     }
 
     foreach ($files as $delta => $file) {
