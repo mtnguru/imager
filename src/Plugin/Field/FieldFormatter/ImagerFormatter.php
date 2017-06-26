@@ -199,8 +199,11 @@ class ImagerFormatter extends ImageFormatterBase implements ContainerFactoryPlug
       $item_attributes = $item->_attributes;
       unset($item->_attributes);
 
-      $item_attributes['class'][] = 'im-image';
-      $item_attributes['data-mid'] = $items->getEntity()->mid->value;
+      $item_attributes['class'][] = 'imager-image';    // Identifies this as an imager image
+      $item_attributes['data-fid'] = $file->id();
+      if ($this->fieldDefinition->getTargetEntityTypeId() == 'media') { // image is attached to media entity
+        $item_attributes['data-mid'] = $items->getEntity()->mid->value;
+      }
 
       $elements[$delta] = array(
         '#theme' => 'imager_formatter',

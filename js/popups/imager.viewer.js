@@ -132,7 +132,7 @@
      */
     img.addEventListener('load', function () {
       if (doInit) {
-        initializeImage();
+        initializeImage($(window).width() - 95, $(window).height() - 40);
         doInit = false;
       }
       redraw();
@@ -171,8 +171,10 @@
         if (width) {
           mw = width;
           mh = height;
-          cw = $canvasWrapper.width();
-          ch = $canvasWrapper.height();
+//        cw = $canvasWrapper.width();
+//        ch = $canvasWrapper.height();
+          cw = mw;
+          ch = mh;
           hscale = ch / image.ih;
           vscale = cw / image.iw;
           cscale = (hscale < vscale) ? hscale : vscale;
@@ -181,7 +183,6 @@
           // Maximum canvas width and height.
           mw = $(window).width() - 95;
           mh = $(window).height() - 40;
-          calcCanvasDims(image.iw, image.ih);
           cscale = cw / image.iw;
         }
       }

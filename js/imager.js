@@ -53,7 +53,7 @@
     function _attach() {
       images = [];
 
-      $thumbnails = $('.im-image');
+      $thumbnails = $('.imager-image');
       if ($thumbnails.length === 0) { return; } // No thumbnails found, exit
 
       $thumbnails.each(function (index, value) {
