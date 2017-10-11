@@ -24,6 +24,7 @@ $spacing: 10px;
 
   .imager-popup {
     position: fixed;
+    z-index:100;
   }
 
   .imager-title {

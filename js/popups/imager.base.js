@@ -164,7 +164,7 @@
 
       // Set the zIndex.
       if (popup.spec.zIndex) {
-        popup.$wrapper.zIndex(popup.spec.zIndex);
+        popup.$wrapper.css('zindex', popup.spec.zIndex);
       }
 
       // Position the popup.
