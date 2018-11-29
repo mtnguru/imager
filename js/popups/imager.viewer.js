@@ -76,7 +76,7 @@
     // Points of interest
     // Location of last mouse down event.
     var pt_down = Core.pointC({name: 'down'});           // Last mouse down event.
-    var pt_last = Core.pointC({name: 'down'});           // Last mouse move event.
+    var pt_last = Core.pointC({name: 'last'});           // Last mouse move event.
     var pt_now = Core.pointC({name: 'now'});             // Mouse currently.
     var pt_crop_ul = Core.pointC({name: 'crop-ul'});     // Upper left crop point.
     var pt_crop_lr = Core.pointC({name: 'crop-lr'});     // Lower right crop point.
