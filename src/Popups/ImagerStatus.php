@@ -211,7 +211,33 @@ class ImagerStatus implements ImagerPopupsInterface {
             ],
             '#rows' => [
               [
-                'Upper Left Canvas',
+                'Image Offset',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-offset-x',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-offset-y',
+                ],
+              ],
+              [
+                'Image Offset tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-offset-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-offset-y-ty',
+                ],
+              ],
+              [
+                'Mouse Now',
                 [
                   'data' => '',
                   'class' => 'imager-text-right',
