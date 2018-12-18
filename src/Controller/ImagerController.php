@@ -124,9 +124,17 @@ class ImagerController extends ControllerBase {
    */
   private function writeImage($path, $base64Img) {
     $filtered_data = explode(',', $base64Img);
-    $fp = fopen($path, 'w');
-    fwrite($fp, base64_decode($filtered_data[1]));
-    fclose($fp);
+    $filtered_data[1] = str_replace(' ', '+', $filtered_data[1]);
+    if (!$fp = fopen($path, 'w')) {
+      $error = error_get_last();
+      return 'open_failed: ' . error_get_last();
+    }
+    if (!fwrite($fp, base64_decode($filtered_data[1]))) {
+      return 'write_failed: ' . error_get_last();
+    }
+    if (!fclose($fp)) {
+      return 'close_failed: ' . error_get_last();
+    };
   }
 
   /**
@@ -175,10 +183,11 @@ class ImagerController extends ControllerBase {
     $fp = $this->getFileParts(urldecode($data['uri']), TRUE);
 
     // Save image, process through 'convert' command to reduce file size.
-    $tmpPath = file_directory_temp() . '/' . $fp['newfilename'] . '.' . $fp['extension'];
-    $this->writeImage($tmpPath, $data['imgBase64']);
+    $tmpPath = file_directory_temp() . '/' . $fp['newfilename'];
+    $retcode = $this->writeImage($tmpPath, $data['imgBase64']);
     $this->convertImage($tmpPath, $fp['newpath']);
-    $file = File::create(['uri' => 'public://' . $fp['newfilename']]);
+    $directory = str_replace('sites/default/files/', '', $fp['dirname']);
+    $file = File::create(['uri' => 'public://' . $directory . '/' . $fp['newfilename']]);
     $file->save();
 
     // Initialize some variables.

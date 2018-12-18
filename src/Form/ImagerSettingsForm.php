@@ -87,15 +87,15 @@ class ImagerSettingsForm extends ConfigFormBase implements ContainerInjectionInt
         '#title' => $this->t('Information popup'),
         '#default_value' => $config->get('view_mode_info'),
         '#options' => $options,
-        '#description' => $this->t('View mode when displaying media fields in a popup'),
+        '#description' => $this->t('View mode for displaying media entity in information popup.'),
       ],
-      'view_mode_map' => [
-        '#type' => 'select',
-        '#title' => $this->t('Map marker popup'),
-        '#default_value' => $config->get('view_mode_map'),
-        '#options' => $options,
-        '#description' => $this->t('View mode when user hovers over a map marker'),
-      ],
+//    'view_mode_map' => [
+//      '#type' => 'select',
+//      '#title' => $this->t('Map marker popup'),
+//      '#default_value' => $config->get('view_mode_map'),
+//      '#options' => $options,
+//      '#description' => $this->t('View mode when user hovers over a map marker'),
+//    ],
     ];
 
     return parent::buildForm($form, $form_state);
@@ -108,7 +108,7 @@ class ImagerSettingsForm extends ConfigFormBase implements ContainerInjectionInt
     $config = $this->configFactory()->getEditable('imager.settings');
 
     $config->set('view_mode_info', $form_state->getValue('view_mode_info'));
-    $config->set('view_mode_map', $form_state->getValue('view_mode_map'));
+//  $config->set('view_mode_map', $form_state->getValue('view_mode_map'));
     $config->save();
 
     parent::submitForm($form, $form_state);

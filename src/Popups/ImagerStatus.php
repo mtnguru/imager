@@ -211,6 +211,110 @@ class ImagerStatus implements ImagerPopupsInterface {
             ],
             '#rows' => [
               [
+                'Upper Left Canvas',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-ul-x',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-ul-y',
+                ],
+              ],
+              [
+                'Lower Right Canvas',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-lr-x',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-lr-y',
+                ],
+              ],
+              [
+                'Upper Left Canvas Tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-ul-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-ul-y-tx',
+                ],
+              ],
+              [
+                'Lower Right Canvas Tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-lr-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-canvas-lr-y-tx',
+                ],
+              ],
+/*            [
+                'Image Offset UL',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-ul-x',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-ul-y',
+                ],
+              ],
+              [
+                'Image Offset LR',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-x',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-y',
+                ],
+              ],
+              [
+                'Image Offset UL Tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-ul-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-ul-y-tx',
+                ],
+              ],
+              [
+                'Image Offset LR Tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-y-tx',
+                ],
+              ], */
+              [
                 'Mouse Now',
                 [
                   'data' => '',
@@ -286,32 +390,6 @@ class ImagerStatus implements ImagerPopupsInterface {
                   'data' => '',
                   'class' => 'imager-text-right',
                   'id' => 'imager-status-crop-lr-y',
-                ],
-              ],
-              [
-                'Upper Left Canvas',
-                [
-                  'data' => '',
-                  'class' => 'imager-text-right',
-                  'id' => 'imager-status-canvas-ul-x',
-                ],
-                [
-                  'data' => '',
-                  'class' => 'imager-text-right',
-                  'id' => 'imager-status-canvas-ul-y',
-                ],
-              ],
-              [
-                'Lower Right Canvas',
-                [
-                  'data' => '',
-                  'class' => 'imager-text-right',
-                  'id' => 'imager-status-canvas-lr-x',
-                ],
-                [
-                  'data' => '',
-                  'class' => 'imager-text-right',
-                  'id' => 'imager-status-canvas-lr-y',
                 ],
               ],
             ],
