@@ -89,6 +89,8 @@
     var pt_crop_lr = Core.pointC({name: 'crop-lr'});     // Lower right crop point.
     var pt_canvas_ul = Core.pointC({name: 'canvas-ul'}); // Upper left corner of canvas.
     var pt_canvas_lr = Core.pointC({name: 'canvas-lr'}); // Lower right corner of canvas.
+    var pt_image_ul = Core.pointC({name: 'image-ul'}); // Upper left corner of canvas.
+    var pt_image_lr = Core.pointC({name: 'image-lr'}); // Lower right corner of canvas.
 
     // Make these points accessible globally.
     Drupal.imager.viewer.pt_canvas_lr = pt_canvas_lr;
@@ -204,10 +206,8 @@
       }
       initScale = cscale; // Save scaling where image fits canvas.
       $canvas.attr({width: cw, height: ch});
-//    $canvas.width(cw).height(ch);
       $imgOverlay.width(cw).height(ch);
       $canvasWrapper.width(cw).height(ch);
-//    $('#imager-viewer').height(dh).width(dw);
 
       if (editMode !== 'slideshow') {
         setEditMode('view');
@@ -760,15 +760,15 @@
     Drupal.imager.viewer.calculateDisplayedImage = function calculateDisplayedImage() {
       var ul = pt_canvas_ul.getTxPt();
       var lr = pt_canvas_lr.getTxPt();
-      var ulx = (ul.x < 0) ? 0 : ul.x;
-      var uly = (ul.y < 0) ? 0 : ul.y;
-      var lrx = (lr.x > img.width) ? img.width : lr.x;
-      var lry = (lr.y > img.height) ? img.height : lr.y;
+      var ulx = parseInt((ul.x < 0) ? 0 : ul.x);
+      var uly = parseInt((ul.y < 0) ? 0 : ul.y);
+      var lrx = parseInt((lr.x > img.width) ? img.width : lr.x);
+      var lry = parseInt((lr.y > img.height) ? img.height : lr.y);
+      pt_image_ul.setPt(ulx, uly, ctx);
+      pt_image_lr.setPt(lrx, lry, ctx);
       return {
-        width: Math.abs(parseInt(lrx - ulx)),
-        height: Math.abs(parseInt(lry - uly)),
-        offsetx: parseInt(ulx),
-        offsety: parseInt(uly)
+        width: Math.abs(lrx - ulx),
+        height: Math.abs(lry - uly),
       };
     };
 
@@ -785,7 +785,7 @@
         'disp-image-width': parseInt(imageSize.width),
         'disp-image-height': parseInt(imageSize.height),
         'full-image-width': parseInt(image.iw),
-        'full-image-height': parseInt(image.ih)
+        'full-image-height': parseInt(image.ih),
       });
     };
 
@@ -1066,7 +1066,7 @@
 
       var buttons = $viewerWrapper.find('#button-wrapper')[0].getBoundingClientRect();
       widthMargin  = buttons.width + buttons.left * 2 + 3;
-      heightMargin = buttons.top * 2 + 6;
+      heightMargin = buttons.top * 2;
 
       Drupal.imager.viewer.ctx = ctx = $canvas[0].getContext('2d');
       ias = $canvas.imgAreaSelect({

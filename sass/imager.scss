@@ -2,17 +2,6 @@
  * imager.sass
  */
 
-$red: #c00;
-$white: #fff;
-$lightestgrey: #f0f0f0;
-$lightergrey: #e0e0e0;
-$lightgrey: #cacaca;
-$grey: #aaa;
-$greyer: #888;
-$darkgrey: #666;
-$darkergrey: #444;
-$black: #000;
-
 $spacing: 10px;
 
 .imager-image {
@@ -20,9 +9,9 @@ $spacing: 10px;
 }
 
 #imager-wrapper {
-  color: black;
 
   .imager-popup {
+    background-color: #bbb;
     position: fixed;
     z-index:600;
   }
@@ -30,24 +19,20 @@ $spacing: 10px;
   .imager-title {
     font-size: 120%;
     font-weight: bold;
-    background: $lightgrey;
     padding: $spacing;
   }
 
   .imager-content {
-    background: $lightergrey;
     padding: $spacing;
   }
 
   .imager-buttonpane {
-    background: $lightgrey;
     width: 100%;
     height: 2.7em;
     input.button {
-      background: $lightestgrey;
       display: inline-block;
       float: right;
-      padding: 3px 8px;
+      padding: 8px 12px;
       margin: 5px 5px 0 0;
       &:first-child {
       }
@@ -82,13 +67,13 @@ $spacing: 10px;
     width: 100%;
   }
   .imager-content {
-    background: $grey;
+//  background: $grey;
     padding: 3px;
   }
   #imager-canvas-wrapper {
     display: inline-flex;
     position: relative;
-    padding-bottom: 0px;  // WTF, I can't find anything that works!!!!
+    vertical-align: bottom;
     margin-bottom: 0px;
     #imager-image,
     #imager-canvas {
@@ -105,12 +90,12 @@ $spacing: 10px;
     vertical-align: top;
     display: inline-block;
     margin-right: 3px;
+    background-color: #bbb;
     div {
       text-align: center;
     }
     .imager-buttons {
       width: 28px;
-      background-color: $lightergrey;
       padding: 2px 0;
       margin: 0 0 2px;
       text-align: center;
@@ -121,14 +106,6 @@ $spacing: 10px;
           margin: 0 auto;
           padding: 3px;
         }
-        &.checked {
-          img {
-            background-color: $grey;
-          }
-        }
-      }
-      .disabled {
-        background-color: $grey;
       }
       &#debug-buttons {
         z-index: 1009;
@@ -147,7 +124,7 @@ $spacing: 10px;
     background-repeat: no-repeat;
   }
   #slider-brightness {
-    background: linear-gradient(to right, $black, $white);
+    background: linear-gradient(to right, #000000, #ffffff);
   }
 }
 
@@ -159,7 +136,7 @@ $spacing: 10px;
     background-image: linear-gradient(to right, rgba(200, 200, 200, 1), rgba(200, 200, 200, 0.4), rgba(200, 200, 200, 0)), linear-gradient(red, yellow, #008888);
   }
   #slider-lightness {
-    background: linear-gradient(to right, $black, $white);
+    background: linear-gradient(to right, #000000, #ffffff);
   }
 }
 

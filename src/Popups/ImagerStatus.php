@@ -211,33 +211,59 @@ class ImagerStatus implements ImagerPopupsInterface {
             ],
             '#rows' => [
               [
-                'Image Offset',
+                'Image Offset UL',
                 [
                   'data' => '',
                   'class' => 'imager-text-right',
-                  'id' => 'imager-status-image-offset-x',
+                  'id' => 'imager-status-image-ul-x',
                 ],
                 [
                   'data' => '',
                   'class' => 'imager-text-right',
-                  'id' => 'imager-status-image-offset-y',
-                ],
-              ],
-              [
-                'Image Offset tx',
-                [
-                  'data' => '',
-                  'class' => 'imager-text-right',
-                  'id' => 'imager-status-image-offset-x-tx',
-                ],
-                [
-                  'data' => '',
-                  'class' => 'imager-text-right',
-                  'id' => 'imager-status-image-offset-y-ty',
+                  'id' => 'imager-status-image-ul-y',
                 ],
               ],
               [
-                'Mouse Now',
+                'Image Offset LR',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-x',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-y',
+                ],
+              ],
+              [
+                'Image Offset UL tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-ul-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-ul-y-tx',
+                ],
+              ],
+              [
+                'Image Offset LR tx',
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-x-tx',
+                ],
+                [
+                  'data' => '',
+                  'class' => 'imager-text-right',
+                  'id' => 'imager-status-image-lr-y-tx',
+                ],
+              ],
+              [
+                'Upper Left Canvas',
                 [
                   'data' => '',
                   'class' => 'imager-text-right',
