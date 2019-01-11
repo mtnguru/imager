@@ -37,7 +37,7 @@
  * Note: Variables ending with capital C or M designate Classes and Modules.
  * They can be found in their own files using the following convention:
  *   i.e. Drupal.imager.coreM is in file imager/js/imager.core.js
- *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.base.js.
+ *        Drupal.imager.popups.baseC is in file imager/js/popups/imager.dialog_base.js.
  */
 
 /**

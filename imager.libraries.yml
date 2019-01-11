@@ -16,7 +16,6 @@ imager-base:
   css:
     component:
       css/imager.css: {}
-      css/imager_custom.css: {}
       css/imgareaselect-animated.css: {}
   dependencies:
     - core/drupal.ajax
