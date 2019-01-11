@@ -213,10 +213,9 @@
     var initTable = function initTable() {
       var status = Viewer.getStatus();
       var image = Viewer.getImage();
+      var imageSize = Viewer.calculateDisplayedImage();
       $('#canvas-resolution').html(status.cw + 'x' + status.ch);
-      $('#image-display-resolution').html(
-        parseInt(Viewer.pt_canvas_lr.getTxPt().x - Viewer.pt_canvas_ul.getTxPt().x) + 'x' +
-        parseInt(Viewer.pt_canvas_lr.getTxPt().y - Viewer.pt_canvas_ul.getTxPt().y));
+      $('#image-display-resolution').html(imageSize.width + 'x' + imageSize.height);
       $('#image-full-resolution').html(image.iw + 'x' + image.ih);
       $('#scale').html(parseInt(status.cscale * 100) / 100);
     };

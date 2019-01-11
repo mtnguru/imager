@@ -47,6 +47,20 @@
     // Initialize the popup.
     popup = Popups.baseC(dspec);
 
+    /**
+     * Initialize the slider settings to 0
+     */
+    function init() {
+      hue = 0;
+      saturation = 0;
+      lightness = 0;
+      popup.updateStatus();
+    }
+
+    /**
+     * When a user clicks the apply, reset or cancel button
+     * @param buttonName
+     */
     popup.onButtonClick = function onButtonClick(buttonName) {
       switch (buttonName) {
         case 'imager-color-apply':
@@ -81,13 +95,6 @@
 
     popup.dialogOnClose = function dialogOnClose() {
     };
-
-    function init() {
-      hue = 0;
-      saturation = 0;
-      lightness = 0;
-      popup.updateStatus();
-    }
 
     popup.dialogInit = function dialogInit() {
       init();

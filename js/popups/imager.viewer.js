@@ -15,6 +15,9 @@
 
   Drupal.imager.viewer = {};
 
+  var widthMargin;
+  var heightMargin;
+
   if (localStorage.imagerBoundsEnable === null) {
     localStorage.imagerBoundsEnable = 'TRUE';
   }
@@ -46,17 +49,21 @@
 
     var popup = Popups.baseC(dspec); // Initialize viewerC from baseC.
     var image;                       // Current image of imageC.
+    var $viewerWrapper;
     var $canvasWrapper;
-    var img = document.createElement('IMG'); // Storage for current image.
+//  var oimg = document.createElement('IMG'); // Original image
+    var img = document.createElement('IMG');  // Image being edited.
     var $imgOverlay;                 // Image that overlays the canvas.
     var clearOverlay = false;        // Clear the overlay with transparent image.
-    var $canvas;
-    var $canvas2;
-    var ctx;
-    var ctx2;
+    var $canvas;              // Primary canvas
+    var $canvas2;             // Canvas used in
+    var ctx;                  // Context for the $canvas
+    var ctx2;                 // Context for the $canvas2
     var ias;                  // Image area select object.
     var cw;                   // Canvas width.
     var ch;                   // Canvas height.
+    var dw;                   // Viewer dialog width.
+    var dh;                   // Viewer dialog height.
     var mw;                   // Maximum canvas width.
     var mh;                   // Maximum canvas height.
     var doInit;               // After loading should we reinitialize.
@@ -71,7 +78,7 @@
     var elapsed = 0;          // Time between mouse up events.
     var distance = 0;         // Distance image dragged since mouse down.
 
-    var slideshowInterval;
+    var slideshowInterval = 5;
 
     // Points of interest
     // Location of last mouse down event.
@@ -80,8 +87,10 @@
     var pt_now = Core.pointC({name: 'now'});             // Mouse currently.
     var pt_crop_ul = Core.pointC({name: 'crop-ul'});     // Upper left crop point.
     var pt_crop_lr = Core.pointC({name: 'crop-lr'});     // Lower right crop point.
-    var pt_canvas_ul = Core.pointC({name: 'canvas-ul'}); // Upper left corner of image.
-    var pt_canvas_lr = Core.pointC({name: 'canvas-lr'}); // Lower right corner of image.
+    var pt_canvas_ul = Core.pointC({name: 'canvas-ul'}); // Upper left corner of canvas.
+    var pt_canvas_lr = Core.pointC({name: 'canvas-lr'}); // Lower right corner of canvas.
+    var pt_image_ul = Core.pointC({name: 'image-ul'}); // Upper left corner of canvas.
+    var pt_image_lr = Core.pointC({name: 'image-lr'}); // Lower right corner of canvas.
 
     // Make these points accessible globally.
     Drupal.imager.viewer.pt_canvas_lr = pt_canvas_lr;
@@ -109,7 +118,7 @@
     /**
      * Change the current image to a new image.
      *
-     * The line -- img.src = image.src -- starts the loading of an image.
+     * The line -- img.src = image.src -- starts asynchronous loading of an image.
      * Upon completion of loading the 'load' Event Listener is fired.
      *
      * @param {Object} newImage
@@ -123,8 +132,11 @@
       ctx.clearRect(0, 0, cw, ch);
       image = newImage;
       doInit = true;
-      // Start loading image - 'load' event listener (immediataely below) is fired on completion.
+      // Start loading image - 'load' event listener (immediately below) is fired on completion.
+//    img.width = null;
+//    img.height = null;
       img.src = image.src;
+      doInit = true;
     };
 
     /**
@@ -132,7 +144,7 @@
      */
     img.addEventListener('load', function () {
       if (doInit) {
-        initializeImage($(window).width() - 95, $(window).height() - 40);
+        initializeImage();
         doInit = false;
       }
       redraw();
@@ -151,16 +163,25 @@
      * @param height
      *   Maximum possible canvas height.
      */
-    var initializeImage = function initializeImage(width, height) {
+    var initializeImage = function initializeImage(width, height, iwidth, iheight) {
       var hscale;
       var vscale;
       rotation = 0;
-      image.iw = img.width;
-      image.ih = img.height;
+      if (iwidth) {
+        image.iw = iwidth;
+        image.ih = iheight;
+      } else {
+        image.iw = img.width;
+        image.ih = img.height;
+
+      }
+      console.log('initializeImage  ' + img.width + 'x' + img.height);
       if (localStorage.imagerFullScreen === 'TRUE') {
         // Maximum canvas width and height.
-        mw = $(window).width() - 45;
-        mh = $(window).height() - 10;
+        dw = $(window).width();
+        dh = $(window).height();
+        mw = $(window).width() - widthMargin;
+        mh = $(window).height() - heightMargin;
         cw = mw;
         ch = mh;
         hscale = ch / image.ih;
@@ -169,27 +190,25 @@
       }
       else {
         if (width) {
-          mw = width;
-          mh = height;
-//        cw = $canvasWrapper.width();
-//        ch = $canvasWrapper.height();
-          cw = mw;
-          ch = mh;
-          hscale = ch / image.ih;
-          vscale = cw / image.iw;
-          cscale = (hscale < vscale) ? hscale : vscale;
+          dw = width;
+          dh = height;
+        } else {
+          dw = $(window).width();
+          dh = $(window).height();
         }
-        else {
-          // Maximum canvas width and height.
-          mw = $(window).width() - 95;
-          mh = $(window).height() - 40;
-          cscale = cw / image.iw;
-        }
+        mw = dw - widthMargin;
+        mh = dh - heightMargin;
+        cw = mw;
+        ch = mh;
+        hscale = ch / image.ih;
+        vscale = cw / image.iw;
+        cscale = (hscale < vscale) ? hscale : vscale;
       }
       initScale = cscale; // Save scaling where image fits canvas.
       $canvas.attr({width: cw, height: ch});
       $imgOverlay.width(cw).height(ch);
       $canvasWrapper.width(cw).height(ch);
+
       if (editMode !== 'slideshow') {
         setEditMode('view');
       }
@@ -197,16 +216,13 @@
       // Set transform matrix to identity matrix.
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       // Clear the canvas.
-      ctx.clearRect(0, 0, cw, ch);
 
       // Center the image.
-      if (localStorage.imagerFullScreen === 'TRUE') {
-        if (hscale > vscale) {       // Center vertically
-          ctx.translate(0, ((ch * image.iw / cw - image.ih) / 2));
-        }
-        else if (hscale < vscale) {  // Center horizontally
-          ctx.translate(((cw * image.ih / ch - image.iw) / 2), 0);
-        }
+      if (hscale > vscale) {       // Center vertically
+        ctx.translate(0, ((ch * image.iw / cw - image.ih) / 2));
+      }
+      else if (hscale < vscale) {  // Center horizontally
+        ctx.translate(((cw * image.ih / ch - image.iw) / 2), 0);
       }
 
       pt_down.setPt(cw / 2, ch / 2, ctx);
@@ -291,7 +307,7 @@
           printer: localStorage.imagerPrinter,
           imgBase64: img
         }, function (response) {
-          var path = response['data']['uri'];
+          var path = response.data.uri;
           window.open(path, '_blank');
         }
       );
@@ -299,7 +315,7 @@
     };
 
     /**
-     * Copy the primary canvas into a second offscreen canvas.
+     * Copy the current image into a second offscreen canvas.
      */
     Drupal.imager.viewer.setInitialImage = function setInitialImage() {
       $canvas2.attr({
@@ -313,19 +329,28 @@
       // ctx2.drawImage(img, 0, 0); .
     };
 
+    /**
+     * Return the current image
+     * @returns {*}
+     */
     Drupal.imager.viewer.getImage = function getImage() {
       return image;
     };
 
+    /**
+     * Apply the HSL or Contrast/Brightness filter.
+     *
+     * @param filterFunction
+     */
     Drupal.imager.viewer.applyFilter = function applyFilter(filterFunction) {
       Popups.busy.show();
       var $canvas3 = $(document.createElement('CANVAS'));
 
-      $canvas2.attr({width: image.iw, height: image.ih});
+      $canvas2.attr({width: img.width, height: img.height});
       ctx2.setTransform(1, 0, 0, 1, 0, 0);
       ctx2.drawImage(img, 0, 0);
 
-      $canvas3.attr({width: image.iw, height: image.ih});
+      $canvas3.attr({width: img.width, height: img.height});
       // Colorize while transferring from canvas2 to canvas3.
       filterFunction($canvas2, $canvas3);
       img.src = $canvas3[0].toDataURL();
@@ -338,61 +363,30 @@
     /**
      * Rotate the image.
      *
+     * It's too complicated right now. Using the transform matrix makes it
+     * difficult to calculate later.
+     *
      * @param {number} deg - Number of degrees to rotate - 0, 90, 180, 270
      */
     var rotate = function rotate(deg) {
-      // Determine maximum canvas width and height
-      mw = $(window).width() - 200;
-      mh = $(window).height() - 20;
-      image.iw = img.width;
-      image.ih = img.height;
-      if (deg === 90) {
-        rotation = (rotation === 270) ? 0 : rotation + 90;
-      }
-      else if (deg === -90) {
-        rotation = (rotation === 0) ? 270 : rotation - 90;
-      }
-      ctx.clearHistory();
-      Popups.status.dialogUpdate({rotation: rotation});
-      if (rotation === 0 || rotation === 180) {
-        calcCanvasDims(image.iw, image.ih);
-        $canvas.attr({width: cw, height: ch});
-        $imgOverlay.width(cw).height(ch);
-        $canvasWrapper.width(cw).height(ch);
-        cscale = cw / image.iw;
-        pt_now.setPt(cw / 2, cw / 2, ctx);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
-        if (rotation === 180) {
-          ctx.translate(cw, ch);
-          ctx.rotate(Core.angleInRadians(rotation));
-        }
-        else {
-          // ctx.translate(-cw, -ch);
-          // ctx.rotate(Core.angleInRadians(rotation));
-        }
-      }
-      else {
-        calcCanvasDims(image.ih, image.iw);
-        $imgOverlay.width(cw).height(ch);
-        $canvasWrapper.width(cw).height(ch);
-        $canvas.attr({width: cw, height: ch});
-        cscale = cw / image.ih;
-        pt_now.setPt(cw / 2, cw / 2, ctx);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
-        if (rotation === 90) {
-          ctx.translate(cw, 0);
-        }
-        else {
-          ctx.translate(0, ch);
-        }
-        ctx.rotate(Core.angleInRadians(rotation));
-      }
-      initScale = cscale;
-      ctx.scale(cscale, cscale);
+      var width = img.width;
+      var height = img.height;
+
+      $canvas2.attr({width: height, height: width});
+      $canvas2.width(height).height(width);
+      ctx2.setTransform(1,0,0,1,0,0);
+      ctx2.translate(height/2, width/2);
+      ctx2.rotate(Core.angleInRadians(deg));
+      ctx2.translate(-width/2, -height/2);
+      ctx2.drawImage(img, 0, 0);
+
+      ctx.setTransform(1,0,0,1,0,0);
+      img.src = $canvas2[0].toDataURL();
+
+      initializeImage(null, null, height, width);
       redraw();
       showPopups();
+
     };
 
     /**
@@ -403,8 +397,8 @@
       var selection = ias.getSelection();
       pt_crop_ul.setPt(selection.x1, selection.y1, ctx);
       pt_crop_lr.setPt(selection.x2, selection.y2, ctx);
-      var niw = pt_crop_lr.getTxPt().x - pt_crop_ul.getTxPt().x;
-      var nih = pt_crop_lr.getTxPt().y - pt_crop_ul.getTxPt().y;
+      var niw = parseInt(pt_crop_lr.getTxPt().x - pt_crop_ul.getTxPt().x);
+      var nih = parseInt(pt_crop_lr.getTxPt().y - pt_crop_ul.getTxPt().y);
 
       $canvas.attr({width: niw, height: nih});
       ctx.clearRect(0, 0, cw, ch);
@@ -415,14 +409,17 @@
         niw, nih, 0, 0, niw, nih);
       // Copy cropped area from img into canvas.
       img.src = $canvas[0].toDataURL();
+      initializeImage(null, null, niw, nih);
+      redraw();
       // Copy canvas image back into img.
-      calcCanvasDims(niw, nih);
+//    calcCanvasDims(niw, nih);
       // Calculate maximum size of canvas.
-      $canvas.attr({width: cw, height: ch});
-      $imgOverlay.width(cw).height(ch);
-      $canvasWrapper.width(cw).height(ch);
-      ctx.scale(cw / niw, ch / nih);
+//    $canvas.attr({width: cw, height: ch});
+//    $imgOverlay.width(cw).height(ch);
+//    $canvasWrapper.width(cw).height(ch);
+//    $('#imager-viewer').width(cw + widthMargin).height(cw + heightMargin);
       // Scale image to fit canvas.
+//    ctx.scale(cw / niw, ch / nih);
       updateStatusGeometries();
       Popups.busy.hide();
     };
@@ -459,10 +456,10 @@
       ctx.translate(pt_now.getTxPt().x, pt_now.getTxPt().y);
       ctx.scale(factor, factor);
       ctx.translate(-pt_now.getTxPt().x, -pt_now.getTxPt().y);
-      var npt = outOfBounds();
-      if (npt) {
-        ctx.translate(npt.x, npt.y);
-      }
+//    var npt = outOfBounds();
+//    if (npt) {
+//      ctx.translate(npt.x, npt.y);
+//    }
     };
 
     /**
@@ -551,7 +548,7 @@
      *  The event.
      */
     function mouseDown(evt) {
-      if (evt.which !== 1) {
+      if (evt.which !== 1) { // Ignore mouse buttons 2 and 3
         return;
       }
       evt.preventDefault();
@@ -620,12 +617,12 @@
             pt_now.getTxPt().y - pt_down.getTxPt().y);
           var npt;
           // Recommended x and y motions that won't go out of bounds.
-          npt = outOfBounds();
-          if (npt !== null) {
-            ctx.restore();
-            ctx.translate(pt_now.getTxPt().x - pt_down.getTxPt().x + npt.x,
-              pt_now.getTxPt().y - pt_down.getTxPt().y + npt.y);
-          }
+//        npt = outOfBounds();
+//        if (npt !== null) {
+//          ctx.restore();
+//          ctx.translate(pt_now.getTxPt().x - pt_down.getTxPt().x + npt.x,
+//            pt_now.getTxPt().y - pt_down.getTxPt().y + npt.y);
+//        }
           redraw();
           break;
 
@@ -674,7 +671,7 @@
     }
 
     /**
-     * Mouse Wheel event handler
+     * Mouse Wheel event handler - zoom the image
      *
      * @param {type} evt
      *   The event.
@@ -760,19 +757,35 @@
       });
     };
 
+    Drupal.imager.viewer.calculateDisplayedImage = function calculateDisplayedImage() {
+      var ul = pt_canvas_ul.getTxPt();
+      var lr = pt_canvas_lr.getTxPt();
+      var ulx = parseInt((ul.x < 0) ? 0 : ul.x);
+      var uly = parseInt((ul.y < 0) ? 0 : ul.y);
+      var lrx = parseInt((lr.x > img.width) ? img.width : lr.x);
+      var lry = parseInt((lr.y > img.height) ? img.height : lr.y);
+      pt_image_ul.setPt(ulx, uly, ctx);
+      pt_image_lr.setPt(lrx, lry, ctx);
+      return {
+        width: Math.abs(lrx - ulx),
+        height: Math.abs(lry - uly),
+      };
+    };
+
     /**
      * Update Geometries of screen, canvas, image and portion of image displayed.
      */
     var updateStatusGeometries = function updateStatusGeometries() {
+      var imageSize = Drupal.imager.viewer.calculateDisplayedImage();
       Popups.status.dialogUpdate({
         'max-canvas-width': parseInt(mw),
         'max-canvas-height': parseInt(mh),
         'actual-canvas-width': parseInt(cw),
         'actual-canvas-height': parseInt(ch),
-        'disp-image-width': parseInt(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x),
-        'disp-image-height': parseInt(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y),
+        'disp-image-width': parseInt(imageSize.width),
+        'disp-image-height': parseInt(imageSize.height),
         'full-image-width': parseInt(image.iw),
-        'full-image-height': parseInt(image.ih)
+        'full-image-height': parseInt(image.ih),
       });
     };
 
@@ -868,6 +881,7 @@
 
         case 'slideshow':
           $('#view-slideshow').addClass('checked');
+          changeImage(Drupal.imager.findNextImage(image, 1));
           var interval = (localStorage.imagerSlideshowInterval === 'undefined') ? 5 : localStorage.imagerSlideshowInterval;
           slideshowInterval = setInterval(function () {
             changeImage(Drupal.imager.findNextImage(image, 1));
@@ -1047,7 +1061,13 @@
       Popups.busy = Drupal.imager.popups.busyC();
 
       Drupal.imager.viewer.$canvas = $canvas = $('#imager-canvas');
+      $viewerWrapper = $('#imager-viewer');
       $canvasWrapper = $('#imager-canvas-wrapper');
+
+      var buttons = $viewerWrapper.find('#button-wrapper')[0].getBoundingClientRect();
+      widthMargin  = buttons.width + buttons.left * 2 + 3;
+      heightMargin = buttons.top * 2;
+
       Drupal.imager.viewer.ctx = ctx = $canvas[0].getContext('2d');
       ias = $canvas.imgAreaSelect({
         // Attach handler to create cropping area.
@@ -1116,7 +1136,7 @@
         $imgOverlay.triggerHandler(evt);
       });
 
-      $('#imager-help').click(function (evt) {
+      $('#imager-help').click(function () {
         window.open('/admin/help/imager', '_blank');
       });
 
@@ -1214,12 +1234,14 @@
 
       // If a full screen event happens - resize the image to fit.
       ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(function (e) {
+//    ['fullscreenchange'].forEach(function (e) {
         document.addEventListener(e, function (event) {
           setFullScreen((document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement) ? true : false);
+//        setFullScreen();
         });
       });
 
-      // Mode Buttons.
+      // Full Screen button.
       $('#mode-fullscreen').click(function () {
         if (screenfull.enabled) {
           if (localStorage.imagerFullScreen === 'TRUE') {
@@ -1233,10 +1255,11 @@
         }
       });
 
-      // View Buttons.
+      // View Slideshow buttons.
       $('#view-slideshow').click(function () {
-        if (slideshowInterval) {
+        if ($(this).hasClass('checked')) {
           setEditMode('view');
+          $(this).removeClass('checked');
         }
         else {
           $(this).addClass('checked');
@@ -1244,6 +1267,7 @@
         }
       });
 
+      // View image alone in a new browser window.  Good for printing
       $('#view-browser').click(function () {
         Popups.busy.hide();
 //      var img = Drupal.imager.core.getImage('image-cropped', false);
@@ -1262,25 +1286,33 @@
           }
         );
       });
+
+      // Zoom image to fit canvas button
       $('#view-zoom-fit').click(function () {
         pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y, ctx);
         zoom(0);
       });
+
+      // Zoom to 1:1 button
       $('#view-zoom-1').click(function () {
         pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y, ctx);
         zoom(0);
       });
+
+      // Zoom in button
       $('#view-zoom-in').click(function () {
         pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y, ctx);
         zoom(1);
       });
+
+      // Zoom out button
       $('#view-zoom-out').click(function () {
         pt_now.setPt(pt_down.getPt().x, pt_down.getPt().y, ctx);
         zoom(-1);
       });
 
-      // div#debug-buttons event handlers.
-      $('#debug-status').click(function (evt) {
+      // Debug status buttons event handlers.
+      $('#debug-status').click(function () {
         if (localStorage.imagerShowStatus === 'FALSE') {
           localStorage.imagerShowStatus = 'TRUE';
           $(this).addClass('checked');
@@ -1294,7 +1326,8 @@
         updateStatus();
       });
 
-      $('#debug-messages').click(function (evt) {
+      // Debug messages buttons event handlers.
+      $('#debug-messages').click(function () {
         localStorage.imagerShowDebug = (localStorage.imagerShowDebug === 'TRUE') ? 'FALSE' : 'TRUE';
         if (localStorage.imagerShowDebug === 'TRUE') {
           $(this).addClass('checked');
@@ -1321,26 +1354,27 @@
      *   The new mode.
      */
     function setFullScreen() {
-      if (localStorage.imagerFullScreen === 'TRUE') {
-        $canvasWrapper.addClass('fullscreen');
-        $('#mode-fullscreen').addClass('checked');
-      }
-      else {
-        $canvasWrapper.removeClass('fullscreen');
-        $('#mode-fullscreen').removeClass('checked');
-      }
-      initializeImage();
-      redraw();
+
+      // Introduce a slight delay so window dimensions can get updated.
+      setTimeout(function () {
+        if (localStorage.imagerFullScreen === 'TRUE') {
+          $canvasWrapper.addClass('fullscreen');
+          $('#mode-fullscreen').addClass('checked');
+        }
+        else {
+          $canvasWrapper.removeClass('fullscreen');
+          $('#mode-fullscreen').removeClass('checked');
+        }
+        initializeImage();
+        redraw();
+      }, 100);
     }
 
 //  /**
 //   * Copy the canvas into the current IMG
-//   *
-//   * @return {viewerC} popup
 //   */
 //  Drupal.imager.viewer.copyCanvasToImg = function copyCanvasToImg() {
 //    img.src = $canvas[0].toDataURL();
-//    return popup;
 //  };
 
     /**
@@ -1353,6 +1387,10 @@
 
     /**
      * Viewer dialog has finished opening
+     *
+     * Grab current scroll location of page,
+     * Set the focus to imager,
+     * and reset the scroll.
      *
      * @return {viewerC} popup
      */
@@ -1384,8 +1422,26 @@
      *   The popup.
      */
     popup.dialogOnResize = function dialogOnResize(event) {
+
+      var rect = $('#imager-viewer #button-wrapper')[0].getBoundingClientRect();
+      console.log('buttons ', rect.top, rect.right, rect.bottom, rect.left);
+
+      var rect2 = $canvas[0].getBoundingClientRect();
+      console.log('canvas ', rect2.top, rect2.right, rect2.bottom, rect2.left);
+
+      var $bod = $('html body');
+      var rect3 = $bod[0].getBoundingClientRect();
+      console.log('body ', rect3.top, rect3.right, rect3.bottom, rect3.left);
+
+//    var width = event.target.offsetWidth - widthMargin;
+//    var height = event.target.offsetHeight - heightMargin;
+
+//    $canvas.width(width).height(height);
+//    $canvasWrapper.width(width).height(height);
+
       initializeImage(event.target.offsetWidth, event.target.offsetHeight);
-      doInit = false;
+
+      doInit = true;
       redraw();
       showInfo();
       return popup;

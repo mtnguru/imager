@@ -39,14 +39,19 @@
       var img = Viewer.getImg();
       var dataurl;
 
-      mimeType = 'image/png';
+      mimeType = 'image/jpeg';
       if (img.src.match(/\.png$/i)) {
         mimeType = 'image/png';
       }
       else if (img.src.match(/\.jpe*g$/i)) {
         mimeType = 'image/jpeg';
       }
+      else if (img.src.match(/\.gif$/i)) {
+        mimeType = 'image/gif';
+      }
 
+      var ncw;
+      var nch;
       switch (resolution) {
         case 'screen':
           dataurl = Viewer.$canvas[0].toDataURL(mimeType);
@@ -54,33 +59,45 @@
 
         case 'image-cropped':
           Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
-          var ncw;
-          var nch;
           var pt = pointC('tmp');
+          var imageSize = Drupal.imager.viewer.calculateDisplayedImage();
           if (status.rotation === 0 || status.rotation === 180) {
-            ncw = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
-            nch = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
+
             Viewer.$canvas2.attr({
-              width: ncw,
               // Set canvas to same size as image.
-              height: nch
+              width: imageSize.width,
+              height: imageSize.height
             });
             if (status.rotation === 0) {
               pt.setPt(0, 0, Viewer.ctx);
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x,
-                -pt.getTxPt().y);
+              Viewer.ctx2.drawImage(img,
+                  imageSize.offsetx, imageSize.offsety,
+                  imageSize.width, imageSize.height,
+                  0, 0,
+                  imageSize.width, imageSize.height
+              );
             }
             else {
-              Viewer.ctx2.translate(ncw, nch);
+//            Viewer.ctx2.translate(ncw, nch);
+//            Viewer.ctx2.rotate(angleInRadians(status.rotation));
+//            pt.setPt(status.cw, status.ch, Viewer.ctx);
+//            Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
+
+              Viewer.ctx2.drawImage(img,
+                  imageSize.offsetx, imageSize.offsety,
+                  imageSize.width, imageSize.height,
+                  0, 0,
+                  imageSize.width, imageSize.height
+              );
+              Viewer.ctx2.translate(imageSize.width, imageSize.height);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
-              pt.setPt(status.cw, status.ch, Viewer.ctx);
-              Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
             }
           }
           else {
             ncw = Math.abs(pt_canvas_lr.getTxPt().y - pt_canvas_ul.getTxPt().y);
             nch = Math.abs(pt_canvas_lr.getTxPt().x - pt_canvas_ul.getTxPt().x);
             Viewer.$canvas2.attr({
+              // Set canvas to same size as image.
               width: ncw,
               height: nch
             });
@@ -94,8 +111,8 @@
             else {
               Viewer.ctx2.translate(0, nch);
               Viewer.ctx2.rotate(angleInRadians(status.rotation));
-              pt.setPt(0, status.ch, Viewer.ctx);
               // Find Upper left corner of canvas in original image.
+              pt.setPt(0, status.ch, Viewer.ctx);
               Viewer.ctx2.drawImage(img, -pt.getTxPt().x, -pt.getTxPt().y);
             }
           }
@@ -106,30 +123,31 @@
           var tcw;
           var tch;
           Viewer.ctx2.setTransform(1, 0, 0, 1, 0, 0);
+          var image = Viewer.getImage();
           if (status.rotation === 0 || status.rotation === 180) {
-            tcw = Viewer.image().iw;
+            tcw = image.iw;
             Viewer.$canvas2.attr({
               width: tcw,
               // Set canvas to same size as image.
               height: tch
             });
             if (status.rotation === 180) {
-              Viewer.ctx2.translate(Viewer.image().iw, Viewer.image().ih);
+              Viewer.ctx2.translate(image.iw, image.ih);
             }
           }
           else {
-            tcw = Viewer.image().ih;
-            tch = Viewer.image().iw;
+            tcw = image.ih;
+            tch = image.iw;
             Viewer.$canvas2.attr({
               width: tcw,
               // Set canvas to same size as image.
               height: tch
             });
             if (status.rotation === 90) {
-              Viewer.ctx2.translate(Viewer.image().ih, 0);
+              Viewer.ctx2.translate(image.ih, 0);
             }
             else {
-              Viewer.ctx2.translate(0, Viewer.image().iw);
+              Viewer.ctx2.translate(0, image.iw);
             }
           }
           Viewer.ctx2.rotate(angleInRadians(status.rotation));
@@ -215,8 +233,8 @@
       var namex = spec.name + '-x';
       var namey = spec.name + '-y';
       var point = {
-        v: {x: 0, y: 0},
-        t: {x: 0, y: 0}
+        v: {x: 0, y: 0},  // canvas point
+        t: {x: 0, y: 0}   // transformed point -- apply ctx.form (SVG)
       };
       var doTransform = spec.transform || true;
       var namext;
