@@ -39,7 +39,7 @@ gulp.task('uglify', function () {
 gulp.task('watch', function () {
 //  livereload.listen();
 
-  gulp.watch('sass/**/*.scss', ['sass']);
+  gulp.watch('sass/**/*.scss', gulp.series('sass'));
 //  gulp.watch(['css/styles.css', '**/*.twig', 'js/*.js'], function (files){
 //      livereload.changed(files)
 //  });
