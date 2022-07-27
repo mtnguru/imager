@@ -37,9 +37,9 @@ function template_preprocess_imager_formatter(array &$variables) {
   $item = $variables['item'];
 
   // Do not output an empty 'title' attribute.
-  if (Unicode::strlen($item->title) != 0) {
-    $variables['image']['#title'] = $item->title;
-  }
+//if (Unicode::strlen($item->title) != 0) {
+//  $variables['image']['#title'] = $item->title;
+//}
 
   if (($entity = $item->entity) && empty($item->uri)) {
     $variables['image']['#uri'] = $entity->getFileUri();
