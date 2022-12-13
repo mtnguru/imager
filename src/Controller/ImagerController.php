@@ -150,8 +150,13 @@ class ImagerController extends ControllerBase {
   private function convertImage($spath, $dpath, $type = NULL) {
     switch ($type) {
       case 'browser':
-        $geometry = variable_get('imager_browser_width', 1200) . 'x' .
-          variable_get('imager_browser_height', 1200);
+//      $geometry = 
+//        variable_get('imager_browser_width', 1200) . 'x' .
+//        variable_get('imager_browser_height', 1200);
+        $config = \Drupal::service('config.factory')->getEditable('variable_get_set.api');
+        $geometry = 
+          variable_get_set_cilent_name =  $config->get('imager_browser_width') . 'x' .
+          variable_get_set_cilent_name =  $config->get('imager_browser_height');
         $cmd = "/usr/bin/convert -quality 60 -scale $geometry \"$spath\" \"$dpath\" > /tmp/convert.log 2>&1";
         break;
 
