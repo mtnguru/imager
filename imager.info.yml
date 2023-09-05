@@ -1,9 +1,8 @@
 name: Imager
 type: module
 description: Display and edit images - pan, zoom, rotate, crop, change contrast/brightness, change hue/saturation/lightness.
-core_version_requirement: '9.x'
+core_version_requirement: '^8 || ^9 || ^10' 
 package: Media
-dependicies:
+dependencies:
   - field
-  - media_entity:media_entity
 configure: imager.settings
